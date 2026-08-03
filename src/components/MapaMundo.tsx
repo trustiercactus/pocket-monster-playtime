@@ -101,11 +101,10 @@ export function MapaMundo({
   }, [zonesDone, allGems]);
 
   useEffect(() => {
-    if (zonesDone.length > 0) {
-      setWave(true);
-      const t = setTimeout(() => setWave(false), 1700);
-      return () => clearTimeout(t);
-    }
+    if (zonesDone.length === 0) return undefined;
+    setWave(true);
+    const t = setTimeout(() => setWave(false), 1700);
+    return () => clearTimeout(t);
   }, [zonesDone.length]);
 
   useEffect(() => {
