@@ -31,7 +31,7 @@ function say(text: string) {
   }
 }
 
-/** Hueco de corona: cavidad plateada que recibe la esmeralda */
+/** Hueco de corona: cavidad blanca 3D que espera su esmeralda */
 function GemSocket({ color, on }: { color: string; on: boolean }) {
   return (
     <span className="relative grid h-9 w-8 place-items-center">
@@ -39,20 +39,26 @@ function GemSocket({ color, on }: { color: string; on: boolean }) {
         <path
           d="M7 2h10l5 6v12l-5 6H7l-5-6V8z"
           fill="url(#socket)"
-          stroke="rgba(255,255,255,0.95)"
-          strokeWidth="2"
+          stroke="#ffffff"
+          strokeWidth="2.5"
           strokeLinejoin="round"
         />
         <defs>
           <linearGradient id="socket" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#e9eef6" />
-            <stop offset="55%" stopColor="#b9c3d4" />
-            <stop offset="100%" stopColor="#8f9bb0" />
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="60%" stopColor="#f4f8ff" />
+            <stop offset="100%" stopColor="#dbe6f7" />
           </linearGradient>
         </defs>
       </svg>
       {!on && (
-        <span className="socket-shine pointer-events-none absolute inset-2 rounded-full bg-white blur-[3px]" />
+        <>
+          <span className="socket-shine pointer-events-none absolute inset-[6px] rounded-full bg-white blur-[2px]" />
+          <span
+            className="twinkle pointer-events-none absolute -inset-[2px] rounded-full"
+            style={{ boxShadow: "0 0 12px 3px rgba(255,255,255,0.85)" }}
+          />
+        </>
       )}
       {on && (
         <span className="gem-drop absolute inset-0 grid place-items-center">
