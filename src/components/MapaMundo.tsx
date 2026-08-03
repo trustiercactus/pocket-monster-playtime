@@ -376,6 +376,24 @@ export function MapaMundo({
         ))}
       </div>
 
+      {/* esmeralda que vuela hasta la corona */}
+      {flying && (
+        <div
+          className="pointer-events-none absolute left-1/2 top-1/2 z-30"
+          style={{
+            transform:
+              flying.phase === 0
+                ? "translate(-50%, -50%) scale(1.8)"
+                : "translate(-50%, calc(-50vh + 22px)) scale(0.9)",
+            opacity: flying.phase === 0 ? 1 : 0.95,
+            transition: "transform 1s cubic-bezier(0.5, -0.2, 0.4, 1.3), opacity 1s ease",
+          }}
+          aria-hidden="true"
+        >
+          <GemSocket color={flying.color} on />
+        </div>
+      )}
+
       {/* botones permanentes */}
       <div className="absolute left-3 top-16 z-20 flex flex-row items-center gap-3">
         <RoundButton onClick={onSettings} label="Opciones" icon="⚙️" color="var(--arcade-blue)" />
