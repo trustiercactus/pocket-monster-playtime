@@ -100,42 +100,41 @@ function RoundButton({
       onClick={onClick}
       aria-label={label}
       style={{ backgroundColor: color }}
-      className="btn-bounce btn-3d grid h-16 w-16 place-items-center rounded-full border-4 border-white text-3xl text-white shadow-[0_7px_0_rgba(0,0,0,0.35)]"
+      className="btn-bounce btn-3d grid h-11 w-11 place-items-center rounded-full border-[3px] border-white text-xl text-white shadow-[0_5px_0_rgba(0,0,0,0.35)]"
     >
       <span className="drop-shadow-[0_2px_0_rgba(0,0,0,0.35)]">{icon}</span>
     </button>
   );
 }
 
-/** piedras del sendero entre dos zonas */
+/** piedras pequeñas del sendero, con el terreno propio de la zona */
 function PathStones({ a, b, lit }: { a: Area; b: Area; lit: boolean }) {
-  const stones = 5;
+  const stones = 7;
+  const t = TERRAIN[a.terrain];
   return (
     <>
       {Array.from({ length: stones }).map((_, i) => {
-        const t = (i + 1) / (stones + 1);
-        const x = a.x + (b.x - a.x) * t;
-        const y = a.y + (b.y - a.y) * t;
-        const size = 16 + Math.sin(t * Math.PI) * 8;
+        const k = (i + 1) / (stones + 1);
+        const x = a.x + (b.x - a.x) * k;
+        const y = a.y + (b.y - a.y) * k;
+        const size = 8 + Math.sin(k * Math.PI) * 3;
         return (
           <span
             key={i}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 ${
-              lit ? "stone-pulse" : ""
-            }`}
+            className={`absolute -translate-x-1/2 -translate-y-1/2 border ${lit ? "stone-pulse" : ""}`}
             style={{
               left: `${x}%`,
               top: `${y}%`,
               width: size,
-              height: size * 0.8,
-              animationDelay: `${i * 0.15}s`,
-              background: lit
-                ? "radial-gradient(circle at 40% 30%, #fff3b0, #ffcc4d)"
-                : "radial-gradient(circle at 40% 30%, #fdfbf4, #cfc7b4)",
-              borderColor: lit ? "#ffffffdd" : "#ffffffaa",
+              height: size * 0.78,
+              borderRadius: t.round,
+              animationDelay: `${i * 0.14}s`,
+              background: t.fill,
+              borderColor: t.border,
+              opacity: lit ? 1 : 0.78,
               boxShadow: lit
-                ? "0 3px 0 rgba(0,0,0,0.28), 0 0 12px rgba(255,214,90,0.9)"
-                : "0 3px 0 rgba(0,0,0,0.25)",
+                ? "0 2px 0 rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,0.7), 0 0 8px rgba(255,236,160,0.85)"
+                : "0 2px 0 rgba(0,0,0,0.22), inset 0 1px 1px rgba(255,255,255,0.6)",
             }}
             aria-hidden="true"
           />
@@ -144,6 +143,31 @@ function PathStones({ a, b, lit }: { a: Area; b: Area; lit: boolean }) {
     </>
   );
 }
+
+/** ambiente vivo del bioma alrededor de la zona */
+function Ambiente({ area }: { area: Area }) {
+  return (
+    <span className="pointer-events-none absolute -inset-8 overflow-visible" aria-hidden="true">
+      {area.ambient.map((p, i) => (
+        <span
+          key={i}
+          className={`absolute text-sm ${
+            p.kind === "fall" ? "amb-fall" : p.kind === "rise" ? "amb-rise" : "amb-drift"
+          }`}
+          style={{
+            left: `${18 + i * 46}%`,
+            top: `${i % 2 === 0 ? 8 : 46}%`,
+            animationDelay: `${i * 1.6}s`,
+            opacity: 0.85,
+          }}
+        >
+          {p.emoji}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 
 export function MapaMundo({
   name,
