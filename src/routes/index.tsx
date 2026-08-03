@@ -41,12 +41,12 @@ function Index() {
       <div className="absolute inset-0 bg-gradient-to-b from-sky/10 via-transparent to-green/25" />
       <Scenery dense />
 
-      <div className="relative flex min-h-screen flex-col items-center justify-between px-5 py-8 text-center">
-        <h1 className="title-bob font-black text-6xl leading-none text-white [text-shadow:0_4px_0_var(--arcade-orange),0_8px_0_rgba(0,0,0,0.25)]">
+      <div className="relative flex min-h-screen flex-col items-center justify-between px-4 py-8 text-center">
+        <h1 className="title-bob font-black text-5xl leading-none text-white [text-shadow:0_4px_0_var(--arcade-orange),0_8px_0_rgba(0,0,0,0.25)]">
           CRIATURITAS
         </h1>
 
-        <div className="relative flex items-end justify-center gap-1">
+        <div className="relative mt-auto flex w-full items-end justify-center gap-0.5">
           <LiveSprite
             src={hojito}
             alt="Hojito, criatura planta"
