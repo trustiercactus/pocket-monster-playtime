@@ -52,27 +52,27 @@ function Index() {
             alt="Hojito, criatura planta"
             motion="sway"
             delay={0.2}
-            className="w-24 drop-shadow-2xl"
+            className="w-20 drop-shadow-2xl"
           />
           <LiveSprite
             src={trainer}
             alt="Tu entrenador"
             motion="hop"
-            className="w-40 drop-shadow-2xl"
+            className="w-32 drop-shadow-2xl"
           />
           <LiveSprite
             src={flami}
             alt="Flami, criatura de fuego"
             motion="breathe"
             delay={0.5}
-            className="w-24 drop-shadow-2xl"
+            className="w-20 drop-shadow-2xl"
           />
           <LiveSprite
             src={aquip}
             alt="Aquip, criatura de agua"
             motion="sway"
             delay={0.9}
-            className="w-24 drop-shadow-2xl"
+            className="w-20 drop-shadow-2xl"
           />
         </div>
 
