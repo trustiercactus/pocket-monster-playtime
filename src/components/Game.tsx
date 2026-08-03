@@ -170,6 +170,14 @@ export function Game() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-sky px-4 py-5 pb-16">
+      <img
+        src={fondoImg}
+        alt=""
+        width={1536}
+        height={1024}
+        loading="lazy"
+        className="fixed inset-0 h-full w-full object-cover opacity-60"
+      />
       <Scenery />
       <div className="relative">
       {screen === "mapa" && (
