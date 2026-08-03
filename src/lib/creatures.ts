@@ -51,7 +51,7 @@ export const CREATURES: Creature[] = [
 ];
 
 export const getCreature = (id: string): Creature =>
-  CREATURES.find((c) => c.id === id) ?? CREATURES[0];
+  CREATURES.find((c) => c.id === id) ?? (CREATURES[0] as Creature);
 
 export const XP_PER_LEVEL = 3;
 
@@ -61,5 +61,5 @@ export function nextUnlock(level: number): Creature | undefined {
 
 export function randomRival(exclude: string): Creature {
   const pool = CREATURES.filter((c) => c.id !== exclude);
-  return pool[Math.floor(Math.random() * pool.length)];
+  return pool[Math.floor(Math.random() * pool.length)] as Creature;
 }
