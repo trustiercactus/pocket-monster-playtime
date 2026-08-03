@@ -9,6 +9,8 @@ import {
   type Creature,
 } from "@/lib/creatures";
 import { AREAS, type Area } from "@/lib/areas";
+import { Scenery } from "@/components/Scenery";
+import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
 import rivalTrainerImg from "@/assets/rival-trainer.png";
 
@@ -84,7 +86,7 @@ function BigButton({
       disabled={disabled}
       aria-label={label}
       style={{ backgroundColor: color }}
-      className="min-h-[92px] flex-1 rounded-[1.75rem] px-4 py-4 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] transition-transform duration-150 hover:scale-105 active:translate-y-1 active:shadow-[0_3px_0_rgba(0,0,0,0.2)] disabled:opacity-50"
+      className="btn-bounce min-h-[92px] flex-1 rounded-[1.75rem] border-4 border-white px-4 py-4 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] disabled:opacity-50"
     >
       {children}
     </button>
@@ -156,7 +158,9 @@ export function Game() {
   }
 
   return (
-    <main className="min-h-screen bg-sky px-4 py-5">
+    <main className="relative min-h-screen overflow-hidden bg-sky px-4 py-5 pb-16">
+      <Scenery />
+      <div className="relative">
       {screen === "mapa" && (
         <Mapa
           progress={progress}
@@ -197,6 +201,7 @@ export function Game() {
       )}
 
       {captured && <Captura creature={captured} onClose={() => setCaptured(null)} />}
+      </div>
     </main>
   );
 }
