@@ -356,8 +356,8 @@ export function MapaMundo({
         ))}
       </div>
 
-      {/* botones */}
-      <div className="absolute left-3 top-20 z-20 flex flex-col gap-3">
+      {/* botones permanentes */}
+      <div className="absolute left-3 top-16 z-20 flex flex-row items-center gap-3">
         <RoundButton onClick={onSettings} label="Opciones" icon="⚙️" color="var(--arcade-blue)" />
         <RoundButton
           onClick={toggleSound}
@@ -365,15 +365,14 @@ export function MapaMundo({
           icon={sound ? "🔊" : "🔇"}
           color="var(--arcade-green)"
         />
-      </div>
-      <div className="absolute bottom-6 left-3 z-20">
         <RoundButton
           onClick={onCollection}
           label="Colección"
-          icon="📖"
+          icon="🎒"
           color="var(--arcade-yellow)"
         />
       </div>
+
 
       {cine && (
         <Cinematica
