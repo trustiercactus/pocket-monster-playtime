@@ -519,12 +519,12 @@ function Batalla({
       <div className="screen-in relative flex min-h-[85vh] flex-col items-center justify-center gap-6 text-center">
         {result === "win" && <Confetti />}
         <div className="text-8xl pop-in">{result === "win" ? "🎉" : "🤗"}</div>
-        <img src={trainerImg} alt="" className="w-32 wiggle" />
-        <img src={companion.image} alt={companion.name} className="w-40 float-soft" />
+        <LiveSprite src={trainerImg} alt="" motion="hop" className="w-32" />
+        <LiveSprite src={companion.image} alt={companion.name} motion="sway" className="w-40" />
         <button
           onClick={() => onFinish(result === "win")}
           aria-label="Continuar"
-          className="w-full max-w-sm rounded-[2rem] bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] active:translate-y-1"
+          className="btn-bounce btn-pulse w-full max-w-sm rounded-[2rem] border-4 border-white bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)]"
         >
           ✅
         </button>
