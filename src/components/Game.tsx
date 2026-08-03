@@ -1,6 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
 import {
   CREATURES,
   TYPE_EMOJI,
@@ -12,6 +10,7 @@ import {
 } from "@/lib/creatures";
 
 export type Progress = {
+  name: string;
   level: number;
   xp: number;
   unlocked: string[];
@@ -22,9 +21,10 @@ export type Progress = {
 type Screen = "menu" | "equipo" | "batalla";
 
 const MAX_HP = 5;
-const GUEST_KEY = "criaturitas-invitado";
+const SAVE_KEY = "criaturitas-partida";
 
 const INITIAL: Progress = {
+  name: "",
   level: 1,
   xp: 0,
   unlocked: ["flami", "aquip", "hojito"],
@@ -68,56 +68,39 @@ function BigButton({
   );
 }
 
-export function Game({ mode }: { mode: "cloud" | "invitado" }) {
-  const navigate = useNavigate();
+export function Game() {
   const [progress, setProgress] = useState<Progress | null>(null);
   const [screen, setScreen] = useState<Screen>("menu");
 
   useEffect(() => {
-    (async () => {
-      if (mode === "invitado") {
-        try {
-          const raw = window.localStorage.getItem(GUEST_KEY);
-          setProgress(raw ? { ...INITIAL, ...(JSON.parse(raw) as Progress) } : INITIAL);
-        } catch {
-          setProgress(INITIAL);
-        }
-        return;
-      }
-      const { data: userData } = await supabase.auth.getUser();
-      const uid = userData.user?.id;
-      if (!uid) return;
-      const { data } = await supabase
-        .from("game_progress")
-        .select("level, xp, unlocked, companion, wins")
-        .eq("user_id", uid)
-        .maybeSingle();
-      setProgress(data ? (data as Progress) : INITIAL);
-    })();
-  }, [mode]);
+    try {
+      const raw = window.localStorage.getItem(SAVE_KEY);
+      setProgress(raw ? { ...INITIAL, ...(JSON.parse(raw) as Progress) } : INITIAL);
+    } catch {
+      setProgress(INITIAL);
+    }
+  }, []);
 
-  const save = useCallback(
-    async (next: Progress) => {
-      setProgress(next);
-      if (mode === "invitado") {
-        try {
-          window.localStorage.setItem(GUEST_KEY, JSON.stringify(next));
-        } catch {
-          /* sin guardado */
-        }
-        return;
-      }
-      const { data: userData } = await supabase.auth.getUser();
-      const uid = userData.user?.id;
-      if (!uid) return;
-      await supabase.from("game_progress").upsert({ user_id: uid, ...next });
-    },
-    [mode],
-  );
+  const save = useCallback((next: Progress) => {
+    setProgress(next);
+    try {
+      window.localStorage.setItem(SAVE_KEY, JSON.stringify(next));
+    } catch {
+      /* sin guardado */
+    }
+  }, []);
 
   if (!progress) {
     return (
       <main className="min-h-screen bg-sky flex items-center justify-center text-5xl">⏳</main>
+    );
+  }
+
+  if (!progress.name) {
+    return (
+      <main className="min-h-screen bg-sky flex items-center justify-center px-5">
+        <NombreForm onDone={(name) => save({ ...progress, name })} />
+      </main>
     );
   }
 
@@ -129,13 +112,8 @@ export function Game({ mode }: { mode: "cloud" | "invitado" }) {
         <Menu
           progress={progress}
           companion={companion}
-          guest={mode === "invitado"}
           onPlay={() => setScreen("batalla")}
           onTeam={() => setScreen("equipo")}
-          onExit={async () => {
-            if (mode === "cloud") await supabase.auth.signOut();
-            navigate({ to: "/", replace: true });
-          }}
         />
       )}
       {screen === "equipo" && (
@@ -157,10 +135,10 @@ export function Game({ mode }: { mode: "cloud" | "invitado" }) {
                 (c) => c.unlockLevel <= level && !progress.unlocked.includes(c.id),
               ).map((c) => c.id);
               save({
+                ...progress,
                 level,
                 xp: levelUp ? 0 : xp,
                 unlocked: [...progress.unlocked, ...newOnes],
-                companion: progress.companion,
                 wins: progress.wins + 1,
               });
             }
@@ -173,26 +151,53 @@ export function Game({ mode }: { mode: "cloud" | "invitado" }) {
   );
 }
 
+function NombreForm({ onDone }: { onDone: (name: string) => void }) {
+  const [value, setValue] = useState("");
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const n = value.trim();
+        if (n) onDone(n.slice(0, 14));
+      }}
+      className="flex w-full max-w-sm flex-col items-center gap-5 text-center"
+    >
+      <p className="text-4xl font-black text-ink">👋 ¿Cómo te llamas?</p>
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        aria-label="Tu nombre"
+        placeholder="Daniel"
+        autoFocus
+        className="w-full rounded-[1.75rem] bg-white px-5 py-6 text-center text-4xl font-black text-ink shadow-[0_8px_0_rgba(0,0,0,0.15)] outline-none"
+      />
+      <button
+        type="submit"
+        disabled={!value.trim()}
+        className="w-full rounded-[2rem] bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] active:translate-y-1 disabled:opacity-50"
+      >
+        ✅ ¡VAMOS!
+      </button>
+    </form>
+  );
+}
+
 function Menu({
   progress,
   companion,
-  guest,
   onPlay,
   onTeam,
-  onExit,
 }: {
   progress: Progress;
   companion: Creature;
-  guest: boolean;
   onPlay: () => void;
   onTeam: () => void;
-  onExit: () => void;
 }) {
   return (
     <div className="flex flex-col items-center gap-5">
       <div className="flex w-full items-center justify-between">
         <span className="rounded-full bg-white px-4 py-2 text-2xl font-black text-ink">
-          ⭐ {progress.level}
+          ⭐ {progress.level} · {progress.name}
         </span>
         <span className="text-2xl">{"🏆".repeat(Math.min(progress.wins, 5)) || "🏆"}</span>
       </div>
@@ -227,10 +232,6 @@ function Menu({
         className="w-full max-w-sm rounded-[2rem] bg-green px-6 py-6 text-3xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] active:translate-y-1"
       >
         🐣 MIS AMIGOS
-      </button>
-      {guest && <p className="text-sm text-ink/60">Modo invitado: se guarda solo en este aparato</p>}
-      <button onClick={onExit} className="mt-1 text-ink/60 underline">
-        Salir
       </button>
     </div>
   );
