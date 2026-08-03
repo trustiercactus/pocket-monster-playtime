@@ -31,7 +31,7 @@ function say(text: string) {
   }
 }
 
-/** Hueco de corona: cavidad plateada que recibe la esmeralda */
+/** Hueco de corona: cavidad blanca 3D que espera su esmeralda */
 function GemSocket({ color, on }: { color: string; on: boolean }) {
   return (
     <span className="relative grid h-9 w-8 place-items-center">
@@ -39,20 +39,26 @@ function GemSocket({ color, on }: { color: string; on: boolean }) {
         <path
           d="M7 2h10l5 6v12l-5 6H7l-5-6V8z"
           fill="url(#socket)"
-          stroke="rgba(255,255,255,0.95)"
-          strokeWidth="2"
+          stroke="#ffffff"
+          strokeWidth="2.5"
           strokeLinejoin="round"
         />
         <defs>
           <linearGradient id="socket" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#e9eef6" />
-            <stop offset="55%" stopColor="#b9c3d4" />
-            <stop offset="100%" stopColor="#8f9bb0" />
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="60%" stopColor="#f4f8ff" />
+            <stop offset="100%" stopColor="#dbe6f7" />
           </linearGradient>
         </defs>
       </svg>
       {!on && (
-        <span className="socket-shine pointer-events-none absolute inset-2 rounded-full bg-white blur-[3px]" />
+        <>
+          <span className="socket-shine pointer-events-none absolute inset-[6px] rounded-full bg-white blur-[2px]" />
+          <span
+            className="twinkle pointer-events-none absolute -inset-[2px] rounded-full"
+            style={{ boxShadow: "0 0 12px 3px rgba(255,255,255,0.85)" }}
+          />
+        </>
       )}
       {on && (
         <span className="gem-drop absolute inset-0 grid place-items-center">
@@ -159,8 +165,26 @@ export function MapaMundo({
 }) {
   const [cine, setCine] = useState(false);
   const [sound, setSound] = useState(true);
+  const [flying, setFlying] = useState<{ color: string; phase: 0 | 1 } | null>(null);
+  const prevDone = useRef<string[]>(zonesDone);
   const scroller = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const added = zonesDone.find((id) => !prevDone.current.includes(id));
+    prevDone.current = zonesDone;
+    if (!added) return;
+    const zone = GEM_ZONES.find((z) => z.id === added);
+    if (!zone) return;
+    setFlying({ color: zone.gem, phase: 0 });
+    const t1 = setTimeout(() => setFlying((f) => (f ? { ...f, phase: 1 } : f)), 80);
+    const t2 = setTimeout(() => setFlying(null), 1500);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [zonesDone]);
+
 
   const allGems = GEM_ZONES.every((z) => zonesDone.includes(z.id));
 
@@ -264,13 +288,13 @@ export function MapaMundo({
                     isNext ? "node-bob" : ""
                   }`}
                 >
-                  {/* niebla mágica del hechizo */}
+                  {/* niebla mágica del hechizo (suave, sin oscurecer) */}
                   {!done && (
                     <span
                       className="fog-drift pointer-events-none absolute -inset-4 rounded-full blur-md"
                       style={{
                         background:
-                          "radial-gradient(circle, rgba(190,200,255,0.75), rgba(120,110,180,0.25) 60%, transparent 75%)",
+                          "radial-gradient(circle, rgba(235,240,255,0.55), rgba(180,190,255,0.18) 60%, transparent 75%)",
                       }}
                       aria-hidden="true"
                     />
@@ -280,11 +304,12 @@ export function MapaMundo({
                       className="dark-aura pointer-events-none absolute left-1/2 top-2 h-20 w-20 -translate-x-1/2 rounded-full blur-sm"
                       style={{
                         background:
-                          "radial-gradient(circle, rgba(90,40,140,0.55), transparent 70%)",
+                          "radial-gradient(circle, rgba(140,110,220,0.3), transparent 70%)",
                       }}
                       aria-hidden="true"
                     />
                   )}
+
 
                   {/* guardián */}
                   <span className="relative -mb-3">
@@ -295,8 +320,9 @@ export function MapaMundo({
                       className="h-20 w-20 object-contain drop-shadow-[0_5px_5px_rgba(0,0,0,0.45)]"
                       style={{
                         filter: done
-                          ? "saturate(1.1)"
-                          : "saturate(0.72) brightness(0.88) contrast(0.95)",
+                          ? "saturate(1.15) brightness(1.05)"
+                          : "saturate(0.88) brightness(0.98)",
+                        transition: "filter 0.6s ease",
                       }}
                     />
                     {!done && (
@@ -350,8 +376,26 @@ export function MapaMundo({
         ))}
       </div>
 
-      {/* botones */}
-      <div className="absolute left-3 top-20 z-20 flex flex-col gap-3">
+      {/* esmeralda que vuela hasta la corona */}
+      {flying && (
+        <div
+          className="pointer-events-none absolute left-1/2 top-1/2 z-30"
+          style={{
+            transform:
+              flying.phase === 0
+                ? "translate(-50%, -50%) scale(1.8)"
+                : "translate(-50%, calc(-50vh + 22px)) scale(0.9)",
+            opacity: flying.phase === 0 ? 1 : 0.95,
+            transition: "transform 1s cubic-bezier(0.5, -0.2, 0.4, 1.3), opacity 1s ease",
+          }}
+          aria-hidden="true"
+        >
+          <GemSocket color={flying.color} on />
+        </div>
+      )}
+
+      {/* botones permanentes */}
+      <div className="absolute left-3 top-16 z-20 flex flex-row items-center gap-3">
         <RoundButton onClick={onSettings} label="Opciones" icon="⚙️" color="var(--arcade-blue)" />
         <RoundButton
           onClick={toggleSound}
@@ -359,15 +403,14 @@ export function MapaMundo({
           icon={sound ? "🔊" : "🔇"}
           color="var(--arcade-green)"
         />
-      </div>
-      <div className="absolute bottom-6 left-3 z-20">
         <RoundButton
           onClick={onCollection}
           label="Colección"
-          icon="📖"
+          icon="🎒"
           color="var(--arcade-yellow)"
         />
       </div>
+
 
       {cine && (
         <Cinematica
