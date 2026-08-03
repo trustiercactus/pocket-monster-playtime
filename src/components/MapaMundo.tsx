@@ -301,8 +301,9 @@ export function MapaMundo({
                       className="h-20 w-20 object-contain drop-shadow-[0_5px_5px_rgba(0,0,0,0.45)]"
                       style={{
                         filter: done
-                          ? "saturate(1.1)"
-                          : "saturate(0.72) brightness(0.88) contrast(0.95)",
+                          ? "saturate(1.15) brightness(1.05)"
+                          : "saturate(0.88) brightness(0.98)",
+                        transition: "filter 0.6s ease",
                       }}
                     />
                     {!done && (
