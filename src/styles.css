@@ -154,3 +154,77 @@
     color: var(--color-foreground);
   }
 }
+
+@keyframes pop-in {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-20vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(105vh) rotate(540deg);
+    opacity: 1;
+  }
+}
+
+@keyframes screen-in {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility screen-in {
+  animation: screen-in 0.35s ease-out both;
+}
+
+@utility pop-in {
+  animation: pop-in 0.4s ease-out both;
+}
+
+@utility wiggle {
+  animation: wiggle 1.6s ease-in-out infinite;
+}
+
+@utility float-soft {
+  animation: float-soft 2.4s ease-in-out infinite;
+}
+
