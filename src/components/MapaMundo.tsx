@@ -428,12 +428,19 @@ export function MapaMundo({
           }}
           aria-hidden="true"
         >
+          <span
+            className="gem-trail absolute left-1/2 top-1/2 h-24 w-2 -translate-x-1/2 origin-top rounded-full blur-[3px]"
+            style={{
+              background: `linear-gradient(to bottom, ${flying.color}, transparent)`,
+            }}
+          />
           <GemSocket color={flying.color} on />
         </div>
       )}
 
       {/* botones permanentes */}
-      <div className="absolute left-3 top-16 z-20 flex flex-row items-center gap-3">
+      <div className="absolute left-3 top-14 z-20 flex flex-row items-center gap-2">
+
         <RoundButton onClick={onSettings} label="Opciones" icon="⚙️" color="var(--arcade-blue)" />
         <RoundButton
           onClick={toggleSound}
