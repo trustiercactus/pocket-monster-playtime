@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import flami from "@/assets/flami.png";
 import aquip from "@/assets/aquip.png";
@@ -40,7 +40,6 @@ function Index() {
   const [confirmar, setConfirmar] = useState(false);
   const [creditos, setCreditos] = useState(false);
   const [opciones, setOpciones] = useState<Opciones>(OPTS_DEFAULT);
-  const navigate = useNavigate();
 
   useEffect(() => {
     try {
