@@ -14,7 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      game_progress: {
+        Row: {
+          companion: string
+          created_at: string
+          level: number
+          unlocked: string[]
+          updated_at: string
+          user_id: string
+          wins: number
+          xp: number
+        }
+        Insert: {
+          companion?: string
+          created_at?: string
+          level?: number
+          unlocked?: string[]
+          updated_at?: string
+          user_id: string
+          wins?: number
+          xp?: number
+        }
+        Update: {
+          companion?: string
+          created_at?: string
+          level?: number
+          unlocked?: string[]
+          updated_at?: string
+          user_id?: string
+          wins?: number
+          xp?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar: string
+          child_name: string
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar?: string
+          child_name?: string
+          created_at?: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar?: string
+          child_name?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
