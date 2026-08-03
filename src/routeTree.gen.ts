@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as InvitadoRouteImport } from './routes/invitado'
 import { Route as AuthenticatedJugarRouteImport } from './routes/_authenticated/jugar'
 
 const IndexRoute = IndexRouteImport.update({
@@ -28,6 +29,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvitadoRoute = InvitadoRouteImport.update({
+  id: '/invitado',
+  path: '/invitado',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedJugarRoute = AuthenticatedJugarRouteImport.update({
   id: '/jugar',
   path: '/jugar',
@@ -37,11 +43,13 @@ const AuthenticatedJugarRoute = AuthenticatedJugarRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/invitado': typeof InvitadoRoute
   '/jugar': typeof AuthenticatedJugarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/invitado': typeof InvitadoRoute
   '/jugar': typeof AuthenticatedJugarRoute
 }
 export interface FileRoutesById {
@@ -49,20 +57,28 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/invitado': typeof InvitadoRoute
   '/_authenticated/jugar': typeof AuthenticatedJugarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/jugar'
+  fullPaths: '/' | '/auth' | '/invitado' | '/jugar'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/jugar'
-  id: '__root__' | '/' | '/_authenticated' | '/auth' | '/_authenticated/jugar'
+  to: '/' | '/auth' | '/invitado' | '/jugar'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/auth'
+    | '/invitado'
+    | '/_authenticated/jugar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  InvitadoRoute: typeof InvitadoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -86,6 +102,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invitado': {
+      id: '/invitado'
+      path: '/invitado'
+      fullPath: '/invitado'
+      preLoaderRoute: typeof InvitadoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/jugar': {
@@ -113,6 +136,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  InvitadoRoute: InvitadoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
