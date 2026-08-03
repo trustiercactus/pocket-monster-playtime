@@ -1,6 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import flami from "@/assets/flami.png";
 import aquip from "@/assets/aquip.png";
 import hojito from "@/assets/hojito.png";
@@ -27,16 +25,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const navigate = useNavigate();
-  const [checked, setChecked] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/jugar", replace: true });
-      else setChecked(true);
-    });
-  }, [navigate]);
-
   return (
     <main className="min-h-screen bg-sky flex flex-col items-center justify-between px-5 py-10 text-center">
       <div className="flex flex-col items-center gap-4">
@@ -50,25 +38,12 @@ function Index() {
         </div>
       </div>
 
-      {checked && (
-        <div className="flex w-full max-w-sm flex-col gap-4">
-          <Link
-            to="/invitado"
-            className="w-full rounded-[2rem] bg-orange px-6 py-8 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-[0_4px_0_rgba(0,0,0,0.2)]"
-          >
-            ▶ JUGAR YA
-          </Link>
-          <Link
-            to="/auth"
-            className="w-full rounded-[2rem] bg-green px-6 py-5 text-2xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] active:translate-y-1"
-          >
-            💾 Guardar progreso
-          </Link>
-          <p className="text-sm text-ink/60">
-            «Jugar ya» es modo invitado: sin cuenta y sin guardar en la nube.
-          </p>
-        </div>
-      )}
+      <Link
+        to="/jugar"
+        className="w-full max-w-sm rounded-[2rem] bg-orange px-6 py-8 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-[0_4px_0_rgba(0,0,0,0.2)]"
+      >
+        ▶ JUGAR YA
+      </Link>
     </main>
   );
 }

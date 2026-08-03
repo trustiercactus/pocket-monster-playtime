@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Game } from "@/components/Game";
 
-export const Route = createFileRoute("/_authenticated/jugar")({
+export const Route = createFileRoute("/jugar")({
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Jugar — Criaturitas" },
@@ -12,5 +13,5 @@ export const Route = createFileRoute("/_authenticated/jugar")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: () => <Game mode="cloud" />,
+  component: () => <Game />,
 });
