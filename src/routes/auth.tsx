@@ -40,6 +40,9 @@ function AuthPage() {
     return () => sub.subscription.unsubscribe();
   }, [navigate]);
 
+  // Supabase exige 6 caracteres: rellenamos por detrás para que valga cualquier clave corta.
+  const padded = (p: string) => (p.length >= 6 ? p : p + "criatu".slice(0, 6 - p.length));
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -47,12 +50,12 @@ function AuthPage() {
     if (mode === "up") {
       const { error } = await supabase.auth.signUp({
         email,
-        password,
+        password: padded(password),
         options: { emailRedirectTo: window.location.origin },
       });
       if (error) setMsg(error.message);
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password: padded(password) });
       if (error) setMsg(error.message);
     }
     setBusy(false);
@@ -64,6 +67,8 @@ function AuthPage() {
       <p className="text-center text-ink/70 max-w-xs">
         Entra para guardar el progreso del peque en la nube.
       </p>
+
+      <a href="/invitado" className="text-ink/70 underline">O jugar como invitado, sin cuenta</a>
 
       <form onSubmit={submit} className="w-full max-w-sm flex flex-col gap-3">
         <input
@@ -77,14 +82,14 @@ function AuthPage() {
         <input
           type="password"
           required
-          minLength={6}
+          minLength={1}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Contraseña (la que tú quieras)"
           className="rounded-2xl bg-white px-5 py-4 text-lg text-ink outline-none"
         />
         <p className="px-2 text-sm text-ink/60">
-          Vale cualquier cosa fácil de recordar, solo 6 caracteres mínimo.
+          Vale cualquier cosa fácil de recordar: 1234, el nombre del peque...
         </p>
 
         <button
