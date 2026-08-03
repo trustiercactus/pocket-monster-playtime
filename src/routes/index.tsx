@@ -120,55 +120,121 @@ function Index() {
           <Link
             to="/jugar"
             aria-label="Jugar"
-            className="btn-bounce btn-pulse flex w-full items-center justify-center gap-3 rounded-[2.5rem] border-[6px] border-white bg-orange px-6 py-6 text-4xl font-black text-white shadow-[0_12px_0_rgba(0,0,0,0.25)]"
+            className="btn-3d btn-pulse flex w-full items-center justify-center gap-3 border-[6px] border-white bg-orange px-6 py-6 text-4xl font-black text-white shadow-[0_14px_0_rgba(0,0,0,0.28),0_20px_26px_rgba(0,0,0,0.28),inset_0_-6px_0_rgba(0,0,0,0.18)] [text-shadow:0_3px_0_rgba(0,0,0,0.28)]"
           >
-            <span aria-hidden="true">▶️</span> JUGAR
+            <span aria-hidden="true" className="text-5xl drop-shadow-[0_3px_0_rgba(0,0,0,0.25)]">
+              ▶️
+            </span>{" "}
+            JUGAR
           </Link>
           <Link
             to="/coleccion"
             aria-label="Colección"
-            className="btn-bounce flex w-11/12 items-center justify-center gap-3 rounded-[2rem] border-[5px] border-white bg-blue px-5 py-4 text-2xl font-black text-white shadow-[0_9px_0_rgba(0,0,0,0.25)]"
+            className="btn-3d flex w-11/12 items-center justify-center gap-3 rounded-[2rem] border-[5px] border-white bg-blue px-5 py-4 text-2xl font-black text-white shadow-[0_11px_0_rgba(0,0,0,0.28),0_16px_22px_rgba(0,0,0,0.25),inset_0_-5px_0_rgba(0,0,0,0.16)] [text-shadow:0_3px_0_rgba(0,0,0,0.25)]"
           >
-            <span aria-hidden="true">📘</span> COLECCIÓN
+            <span aria-hidden="true" className="text-4xl drop-shadow-[0_3px_0_rgba(0,0,0,0.25)]">
+              📘
+            </span>{" "}
+            COLECCIÓN
           </Link>
         </div>
       </div>
 
       {ajustes && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 px-6">
-          <div className="screen-in w-full max-w-xs rounded-[2rem] border-[6px] border-white bg-sky p-5 text-center shadow-[0_12px_0_rgba(0,0,0,0.25)]">
+          <div className="screen-in w-full max-w-xs rounded-[2rem] border-[6px] border-white bg-sky p-5 text-center shadow-[0_14px_0_rgba(0,0,0,0.25)]">
             <p className="mb-4 text-5xl" aria-hidden="true">
               ⚙️
             </p>
             <div className="flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={cambiarNombre}
-                aria-label="Cambiar nombre"
-                className="btn-bounce rounded-[1.5rem] border-4 border-white bg-green px-4 py-4 text-3xl font-black text-white shadow-[0_7px_0_rgba(0,0,0,0.2)]"
-              >
-                ✏️
-              </button>
-              <button
-                type="button"
-                onClick={borrarTodo}
-                aria-label="Empezar de nuevo"
-                className="btn-bounce rounded-[1.5rem] border-4 border-white bg-orange px-4 py-4 text-3xl font-black text-white shadow-[0_7px_0_rgba(0,0,0,0.2)]"
-              >
-                🔄
-              </button>
+              {(
+                [
+                  ["sonidos", "🔊", "Sonidos"],
+                  ["musica", "🎵", "Música"],
+                  ["vibracion", "📳", "Vibración"],
+                ] as const
+              ).map(([key, icon, label]) => (
+                <button
+                  key={key}
+                  type="button"
+                  role="switch"
+                  aria-checked={opciones[key]}
+                  aria-label={label}
+                  onClick={() => toggle(key)}
+                  className="btn-3d flex items-center justify-between gap-3 rounded-[1.5rem] border-4 border-white bg-blue px-4 py-3 shadow-[0_8px_0_rgba(0,0,0,0.22)]"
+                >
+                  <span aria-hidden="true" className="text-4xl">
+                    {icon}
+                  </span>
+                  <span
+                    className={`toggle-pill ${opciones[key] ? "bg-green" : "bg-ink/40"}`}
+                    aria-hidden="true"
+                  >
+                    <span
+                      className="toggle-knob"
+                      style={{ transform: `translateX(${opciones[key] ? "2.15rem" : "0.15rem"})` }}
+                    />
+                  </span>
+                </button>
+              ))}
+
+              {confirmar ? (
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={borrarTodo}
+                    aria-label="Sí, reiniciar"
+                    className="btn-3d flex-1 rounded-[1.5rem] border-4 border-white bg-orange px-4 py-4 text-3xl shadow-[0_8px_0_rgba(0,0,0,0.22)]"
+                  >
+                    ✅
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmar(false)}
+                    aria-label="No reiniciar"
+                    className="btn-3d flex-1 rounded-[1.5rem] border-4 border-white bg-blue px-4 py-4 text-3xl shadow-[0_8px_0_rgba(0,0,0,0.22)]"
+                  >
+                    ❌
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmar(true)}
+                  aria-label="Reiniciar partida"
+                  className="btn-3d rounded-[1.5rem] border-4 border-white bg-orange px-4 py-4 text-3xl shadow-[0_8px_0_rgba(0,0,0,0.22)]"
+                >
+                  🔄
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => setAjustes(false)}
                 aria-label="Cerrar"
-                className="btn-bounce rounded-[1.5rem] border-4 border-white bg-blue px-4 py-4 text-3xl font-black text-white shadow-[0_7px_0_rgba(0,0,0,0.2)]"
+                className="btn-3d rounded-[1.5rem] border-4 border-white bg-green px-4 py-4 text-3xl shadow-[0_8px_0_rgba(0,0,0,0.22)]"
               >
                 ✅
               </button>
+
+              <button
+                type="button"
+                onClick={() => setCreditos((v) => !v)}
+                aria-label="Créditos"
+                className="mt-1 text-xs font-black uppercase tracking-wide text-ink/70"
+              >
+                ❤️ Créditos
+              </button>
+              {creditos && (
+                <p className="pop-in text-xs font-bold text-ink/70">
+                  Criaturitas · hecho con cariño para Daniel
+                </p>
+              )}
             </div>
           </div>
         </div>
       )}
+
     </main>
   );
 }
