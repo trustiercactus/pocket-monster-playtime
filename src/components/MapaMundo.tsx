@@ -165,8 +165,26 @@ export function MapaMundo({
 }) {
   const [cine, setCine] = useState(false);
   const [sound, setSound] = useState(true);
+  const [flying, setFlying] = useState<{ color: string; phase: 0 | 1 } | null>(null);
+  const prevDone = useRef<string[]>(zonesDone);
   const scroller = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const added = zonesDone.find((id) => !prevDone.current.includes(id));
+    prevDone.current = zonesDone;
+    if (!added) return;
+    const zone = GEM_ZONES.find((z) => z.id === added);
+    if (!zone) return;
+    setFlying({ color: zone.gem, phase: 0 });
+    const t1 = setTimeout(() => setFlying((f) => (f ? { ...f, phase: 1 } : f)), 80);
+    const t2 = setTimeout(() => setFlying(null), 1500);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [zonesDone]);
+
 
   const allGems = GEM_ZONES.every((z) => zonesDone.includes(z.id));
 
