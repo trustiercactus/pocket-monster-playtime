@@ -186,19 +186,9 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
     if (nuevo) setCaptured(nuevo);
   }
 
-  return (
-    <main className="relative min-h-screen overflow-hidden bg-sky px-4 py-5 pb-16">
-      <img
-        src={fondoImg}
-        alt=""
-        width={1536}
-        height={1024}
-        loading="lazy"
-        className="fixed inset-0 h-full w-full object-cover opacity-25"
-      />
-      <Scenery />
-      <div className="relative">
-      {screen === "mapa" && (
+  if (screen === "mapa") {
+    return (
+      <main className="relative h-[100dvh] w-full overflow-hidden bg-sky">
         <MapaMundo
           name={progress.name}
           zonesDone={progress.zonesDone}
@@ -223,7 +213,24 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
             });
           }}
         />
-      )}
+        {captured && <Captura creature={captured} onClose={() => setCaptured(null)} />}
+      </main>
+    );
+  }
+
+  return (
+    <main className="relative min-h-screen overflow-hidden bg-sky px-4 py-5 pb-16">
+      <img
+        src={fondoImg}
+        alt=""
+        width={1536}
+        height={1024}
+        loading="lazy"
+        className="fixed inset-0 h-full w-full object-cover opacity-25"
+      />
+      <Scenery />
+      <div className="relative">
+
       {screen === "casa" && (
         <Casa
           eggs={progress.eggs}
