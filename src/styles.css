@@ -228,3 +228,185 @@
   animation: float-soft 2.4s ease-in-out infinite;
 }
 
+/* ---- Vida y personalidad ---- */
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+  50% {
+    transform: scale(1.04, 0.96) translateY(2px);
+  }
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-4deg) translateY(0);
+  }
+  50% {
+    transform: rotate(4deg) translateY(-4px);
+  }
+}
+
+@keyframes hop {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  70% {
+    transform: translateY(-14px) scale(0.96, 1.05);
+  }
+  85% {
+    transform: translateY(0) scale(1.06, 0.94);
+  }
+}
+
+@keyframes blink-shine {
+  0%,
+  92%,
+  100% {
+    opacity: 0;
+  }
+  95% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes cloud-drift {
+  0% {
+    transform: translateX(-12vw);
+  }
+  100% {
+    transform: translateX(112vw);
+  }
+}
+
+@keyframes butterfly {
+  0% {
+    transform: translate(0, 0) rotate(-8deg);
+  }
+  25% {
+    transform: translate(24vw, -8vh) rotate(10deg);
+  }
+  50% {
+    transform: translate(48vw, 2vh) rotate(-6deg);
+  }
+  75% {
+    transform: translate(24vw, -6vh) rotate(12deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(-8deg);
+  }
+}
+
+@keyframes flap {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.55);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes grass-wave {
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes title-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1.5deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1.5deg);
+  }
+}
+
+@keyframes btn-pulse {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.02);
+  }
+}
+
+@utility breathe {
+  animation: breathe 3s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@utility sway {
+  animation: sway 2.8s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@utility hop {
+  animation: hop 3.4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@utility twinkle {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+@utility grass-wave {
+  animation: grass-wave 3.2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@utility title-bob {
+  animation: title-bob 3.6s ease-in-out infinite;
+}
+
+@utility btn-pulse {
+  animation: btn-pulse 2.4s ease-in-out infinite;
+}
+
+@utility btn-bounce {
+  transition:
+    transform 0.14s cubic-bezier(0.34, 1.8, 0.64, 1),
+    box-shadow 0.14s ease-out;
+
+  &:hover {
+    transform: translateY(-3px) scale(1.05);
+  }
+
+  &:active {
+    transform: translateY(6px) scale(0.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+
