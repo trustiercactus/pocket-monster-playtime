@@ -13,6 +13,7 @@ import { Scenery } from "@/components/Scenery";
 import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
 import rivalTrainerImg from "@/assets/rival-trainer.png";
+import fondoImg from "@/assets/portada-fondo.jpg";
 
 export type Progress = {
   name: string;
@@ -126,8 +127,18 @@ export function Game() {
 
   if (!progress.name) {
     return (
-      <main className="min-h-screen bg-sky flex items-center justify-center px-5">
-        <NombreForm onDone={(name) => save({ ...progress, name })} />
+      <main className="relative min-h-screen overflow-hidden px-5">
+        <img
+          src={fondoImg}
+          alt=""
+          width={1536}
+          height={1024}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <Scenery dense />
+        <div className="relative flex min-h-screen items-center justify-center">
+          <NombreForm onDone={(name) => save({ ...progress, name })} />
+        </div>
       </main>
     );
   }
