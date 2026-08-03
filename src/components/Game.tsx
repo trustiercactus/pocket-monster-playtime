@@ -217,7 +217,7 @@ function NombreForm({ onDone }: { onDone: (name: string) => void }) {
       }}
       className="screen-in flex w-full max-w-sm flex-col items-center gap-5 text-center"
     >
-      <img src={trainerImg} alt="Tu entrenador" className="w-40 float-soft" />
+      <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-40" />
       <p className="text-4xl font-black text-ink">👋</p>
       <input
         value={value}
@@ -230,7 +230,7 @@ function NombreForm({ onDone }: { onDone: (name: string) => void }) {
       <button
         type="submit"
         disabled={!value.trim()}
-        className="w-full rounded-[2rem] bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] transition-transform active:translate-y-1 disabled:opacity-50"
+        className="btn-bounce w-full rounded-[2rem] border-4 border-white bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] disabled:opacity-50"
       >
         ✅
       </button>
@@ -271,17 +271,21 @@ function Mapa({
                 onClick={() => open && onArea(a)}
                 aria-label={open ? a.name : `${a.name} bloqueada`}
                 style={{ borderColor: open ? a.color : "transparent" }}
-                className={`flex w-[86%] items-center gap-3 rounded-[2rem] border-[6px] bg-white p-3 shadow-[0_8px_0_rgba(0,0,0,0.12)] transition-transform duration-200 ${
+                className={`flex w-[86%] items-center gap-3 rounded-[2rem] border-[6px] bg-white/95 p-3 shadow-[0_8px_0_rgba(0,0,0,0.12)] ${
                   left ? "self-start" : "self-end flex-row-reverse"
-                } ${open ? "hover:scale-105 active:translate-y-1" : "opacity-60"}`}
+                } ${open ? "btn-bounce" : "opacity-60"}`}
               >
                 <img
                   src={a.image}
                   alt={a.name}
                   loading="lazy"
-                  className={`h-24 w-24 object-contain ${open ? "" : "grayscale opacity-40"}`}
+                  className={`h-24 w-24 object-contain ${open ? "float-soft" : "grayscale opacity-40"}`}
+                  style={{ animationDelay: `${i * 0.3}s` }}
                 />
-                <span className="text-5xl">{open ? a.emoji : "🔒"}</span>
+                <span className={`text-5xl ${open ? "wiggle inline-block" : ""}`}>
+                  {open ? a.emoji : "🔒"}
+                </span>
+                {open && <span className="twinkle text-2xl">✨</span>}
               </button>
             </div>
           );
@@ -291,7 +295,7 @@ function Mapa({
       <button
         onClick={onTeam}
         aria-label="Mi colección"
-        className="w-full max-w-sm rounded-[2rem] bg-green px-6 py-6 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] transition-transform hover:scale-105 active:translate-y-1"
+        className="btn-bounce btn-pulse w-full max-w-sm rounded-[2rem] border-4 border-white bg-green px-6 py-6 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)]"
       >
         🐣
       </button>
