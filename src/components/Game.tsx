@@ -176,7 +176,7 @@ export function Game() {
         width={1536}
         height={1024}
         loading="lazy"
-        className="fixed inset-0 h-full w-full object-cover opacity-60"
+        className="fixed inset-0 h-full w-full object-cover opacity-25"
       />
       <Scenery />
       <div className="relative">
