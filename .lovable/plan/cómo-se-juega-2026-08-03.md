@@ -1,4 +1,4 @@
-# Juego de criaturas por turnos para niños de 4 años
+- Juego de criaturas por turnos para niños de 4 años
 
 Un juego muy simple, tipo Pokémon pero con criaturas originales, botones enormes, casi sin texto y colores arcade muy vivos (naranja, amarillo, azul, verde).
 
@@ -6,9 +6,9 @@ Un juego muy simple, tipo Pokémon pero con criaturas originales, botones enorme
 
 1. **Inicio**: pantalla con una única acción gigante: un botón "¡LUCHAR!" con una criatura animada. Debajo, un botón grande con la mochila de criaturas.
 2. **Combate por turnos**: tu criatura a la izquierda, la rival a la derecha, barras de vida en forma de corazones grandes de colores.
-   - Solo 3 botones enormes con icono + color (ataque fuerte, ataque rápido, curarse). Sin números ni menús.
-   - El turno rival ocurre solo, con animación y sonido, sin que el niño tenga que hacer nada.
-   - Nadie "pierde" de forma dura: si tu criatura se cansa, aparece una pantalla amable y se puede volver a intentar con un botón gigante.
+  - Solo 3 botones enormes con icono + color (ataque fuerte, ataque rápido, curarse). Sin números ni menús.
+  - El turno rival ocurre solo, con animación y sonido, sin que el niño tenga que hacer nada.
+  - Nadie "pierde" de forma dura: si tu criatura se cansa, aparece una pantalla amable y se puede volver a intentar con un botón gigante.
 3. **Recompensa**: al ganar, animación de estrellas, la barra de nivel se llena y de vez en cuando aparece una criatura nueva desbloqueada (huevo que se abre).
 4. **Mochila**: cuadrícula de criaturas con las desbloqueadas en color y las bloqueadas en silueta. Se toca una para elegirla como compañera.
 
