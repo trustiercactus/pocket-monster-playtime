@@ -391,29 +391,35 @@ function Elegir({
       <div className="flex w-full items-center justify-between">
         <button
           onClick={onBack}
-          className="rounded-full bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)] active:translate-y-1"
+          className="btn-bounce rounded-full border-4 border-white bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Volver"
         >
           ⬅️
         </button>
-        <img src={area.image} alt={area.name} className="h-20 object-contain" />
+        <img src={area.image} alt={area.name} className="float-soft h-20 object-contain" />
       </div>
 
       <div className="flex items-center gap-3">
-        <img src={trainerImg} alt="Tu entrenador" className="w-24 wiggle" />
-        <span className="text-5xl">👉</span>
+        <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-24" />
+        <span className="wiggle text-5xl">👉</span>
       </div>
 
       <div className="grid w-full max-w-sm grid-cols-3 gap-3">
-        {mine.map((c) => (
+        {mine.map((c, i) => (
           <button
             key={c.id}
             onClick={() => onPick(c.id)}
             aria-label={c.name}
             style={{ borderColor: TYPE_COLOR[c.type] }}
-            className="pop-in flex flex-col items-center rounded-3xl border-[6px] bg-white p-2 shadow-[0_6px_0_rgba(0,0,0,0.12)] transition-transform duration-200 hover:scale-110 active:translate-y-1"
+            className="pop-in btn-bounce flex flex-col items-center rounded-3xl border-[6px] bg-white/95 p-2 shadow-[0_6px_0_rgba(0,0,0,0.12)]"
           >
-            <img src={c.image} alt="" className="w-20" />
+            <LiveSprite
+              src={c.image}
+              alt=""
+              motion={i % 2 === 0 ? "breathe" : "sway"}
+              delay={(i % 4) * 0.25}
+              className="w-20"
+            />
             <span className="text-2xl">{TYPE_EMOJI[c.type]}</span>
           </button>
         ))}
