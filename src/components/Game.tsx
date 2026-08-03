@@ -10,6 +10,9 @@ import {
 } from "@/lib/creatures";
 import { AREAS, type Area } from "@/lib/areas";
 import { Scenery } from "@/components/Scenery";
+import { Casa } from "@/components/Casa";
+import { PetSprite } from "@/components/PetSprite";
+import { randomEgg, type Egg } from "@/lib/eggs";
 import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
 import rivalTrainerImg from "@/assets/rival-trainer.png";
@@ -22,9 +25,10 @@ export type Progress = {
   unlocked: string[];
   companion: string;
   wins: number;
+  eggs: Egg[];
 };
 
-type Screen = "mapa" | "coleccion" | "elegir" | "batalla";
+type Screen = "mapa" | "casa" | "coleccion" | "elegir" | "batalla";
 
 const MAX_HP = 5;
 const SAVE_KEY = "criaturitas-partida";
@@ -36,6 +40,7 @@ const INITIAL: Progress = {
   unlocked: ["flami", "aquip", "hojito"],
   companion: "flami",
   wins: 0,
+  eggs: [],
 };
 
 function Hearts({ n, max = MAX_HP }: { n: number; max?: number }) {
@@ -104,7 +109,8 @@ export function Game() {
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(SAVE_KEY);
-      setProgress(raw ? { ...INITIAL, ...(JSON.parse(raw) as Progress) } : INITIAL);
+      const loaded = raw ? { ...INITIAL, ...(JSON.parse(raw) as Progress) } : INITIAL;
+      setProgress({ ...loaded, eggs: loaded.eggs ?? [] });
     } catch {
       setProgress(INITIAL);
     }
@@ -156,12 +162,15 @@ export function Game() {
         (c) => c.unlockLevel <= level && !progress.unlocked.includes(c.id),
       );
       nuevo = newOnes[0] ?? null;
+      const eggs =
+        progress.eggs.length < 3 ? [...progress.eggs, randomEgg()] : progress.eggs;
       save({
         ...progress,
         level,
         xp: levelUp ? 0 : xp,
         unlocked: [...progress.unlocked, ...newOnes.map((c) => c.id)],
         wins: progress.wins + 1,
+        eggs,
       });
     }
     setScreen("mapa");
@@ -188,6 +197,22 @@ export function Game() {
             setScreen("elegir");
           }}
           onTeam={() => setScreen("coleccion")}
+          onHome={() => setScreen("casa")}
+        />
+      )}
+      {screen === "casa" && (
+        <Casa
+          eggs={progress.eggs}
+          unlocked={progress.unlocked}
+          onEggs={(eggs) => save({ ...progress, eggs })}
+          onHatch={(c) => {
+            if (!progress.unlocked.includes(c.id)) {
+              save({ ...progress, unlocked: [...progress.unlocked, c.id] });
+            }
+            setCaptured(c);
+          }}
+          onCollection={() => setScreen("coleccion")}
+          onBack={() => setScreen("mapa")}
         />
       )}
       {screen === "coleccion" && (
@@ -261,11 +286,14 @@ function Mapa({
   progress,
   onArea,
   onTeam,
+  onHome,
 }: {
   progress: Progress;
   onArea: (a: Area) => void;
   onTeam: () => void;
+  onHome: () => void;
 }) {
+  const seguidores = CREATURES.filter((c) => progress.unlocked.includes(c.id)).slice(0, 3);
   return (
     <div className="screen-in flex flex-col items-center gap-4">
       <div className="flex w-full items-center justify-between">
@@ -309,6 +337,30 @@ function Mapa({
             </div>
           );
         })}
+      </div>
+
+      <div className="flex items-end justify-center gap-1">
+        <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-24" />
+        {seguidores.map((c, i) => (
+          <PetSprite
+            key={c.id}
+            src={c.image}
+            alt={c.name}
+            motion={i % 2 === 0 ? "sway" : "breathe"}
+            delay={i * 0.35}
+            className="w-16 follow-walk"
+          />
+        ))}
+      </div>
+
+      <div className="flex w-full max-w-sm gap-3">
+        <button
+          onClick={onHome}
+          aria-label="Ir a casa"
+          className="btn-bounce btn-pulse flex-1 rounded-[2rem] border-4 border-white bg-orange px-6 py-6 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)]"
+        >
+          🏠{progress.eggs.length > 0 ? " 🥚" : ""}
+        </button>
       </div>
 
       <button
