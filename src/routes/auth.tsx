@@ -50,7 +50,7 @@ function AuthPage() {
         password,
         options: { emailRedirectTo: window.location.origin },
       });
-      setMsg(error ? error.message : "Te hemos enviado un correo para confirmar la cuenta.");
+      if (error) setMsg(error.message);
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setMsg(error.message);
