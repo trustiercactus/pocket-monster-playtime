@@ -9,8 +9,11 @@ import {
   type Creature,
 } from "@/lib/creatures";
 import { AREAS, type Area } from "@/lib/areas";
+import { Scenery } from "@/components/Scenery";
+import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
 import rivalTrainerImg from "@/assets/rival-trainer.png";
+import fondoImg from "@/assets/portada-fondo.jpg";
 
 export type Progress = {
   name: string;
@@ -84,7 +87,7 @@ function BigButton({
       disabled={disabled}
       aria-label={label}
       style={{ backgroundColor: color }}
-      className="min-h-[92px] flex-1 rounded-[1.75rem] px-4 py-4 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] transition-transform duration-150 hover:scale-105 active:translate-y-1 active:shadow-[0_3px_0_rgba(0,0,0,0.2)] disabled:opacity-50"
+      className="btn-bounce min-h-[92px] flex-1 rounded-[1.75rem] border-4 border-white px-4 py-4 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] disabled:opacity-50"
     >
       {children}
     </button>
@@ -124,8 +127,18 @@ export function Game() {
 
   if (!progress.name) {
     return (
-      <main className="min-h-screen bg-sky flex items-center justify-center px-5">
-        <NombreForm onDone={(name) => save({ ...progress, name })} />
+      <main className="relative min-h-screen overflow-hidden px-5">
+        <img
+          src={fondoImg}
+          alt=""
+          width={1536}
+          height={1024}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <Scenery dense />
+        <div className="relative flex min-h-screen items-center justify-center">
+          <NombreForm onDone={(name) => save({ ...progress, name })} />
+        </div>
       </main>
     );
   }
@@ -156,7 +169,17 @@ export function Game() {
   }
 
   return (
-    <main className="min-h-screen bg-sky px-4 py-5">
+    <main className="relative min-h-screen overflow-hidden bg-sky px-4 py-5 pb-16">
+      <img
+        src={fondoImg}
+        alt=""
+        width={1536}
+        height={1024}
+        loading="lazy"
+        className="fixed inset-0 h-full w-full object-cover opacity-25"
+      />
+      <Scenery />
+      <div className="relative">
       {screen === "mapa" && (
         <Mapa
           progress={progress}
@@ -197,6 +220,7 @@ export function Game() {
       )}
 
       {captured && <Captura creature={captured} onClose={() => setCaptured(null)} />}
+      </div>
     </main>
   );
 }
@@ -212,7 +236,7 @@ function NombreForm({ onDone }: { onDone: (name: string) => void }) {
       }}
       className="screen-in flex w-full max-w-sm flex-col items-center gap-5 text-center"
     >
-      <img src={trainerImg} alt="Tu entrenador" className="w-40 float-soft" />
+      <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-40" />
       <p className="text-4xl font-black text-ink">👋</p>
       <input
         value={value}
@@ -225,7 +249,7 @@ function NombreForm({ onDone }: { onDone: (name: string) => void }) {
       <button
         type="submit"
         disabled={!value.trim()}
-        className="w-full rounded-[2rem] bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] transition-transform active:translate-y-1 disabled:opacity-50"
+        className="btn-bounce w-full rounded-[2rem] border-4 border-white bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] disabled:opacity-50"
       >
         ✅
       </button>
@@ -266,17 +290,21 @@ function Mapa({
                 onClick={() => open && onArea(a)}
                 aria-label={open ? a.name : `${a.name} bloqueada`}
                 style={{ borderColor: open ? a.color : "transparent" }}
-                className={`flex w-[86%] items-center gap-3 rounded-[2rem] border-[6px] bg-white p-3 shadow-[0_8px_0_rgba(0,0,0,0.12)] transition-transform duration-200 ${
+                className={`flex w-[86%] items-center gap-3 rounded-[2rem] border-[6px] bg-white/95 p-3 shadow-[0_8px_0_rgba(0,0,0,0.12)] ${
                   left ? "self-start" : "self-end flex-row-reverse"
-                } ${open ? "hover:scale-105 active:translate-y-1" : "opacity-60"}`}
+                } ${open ? "btn-bounce" : "opacity-60"}`}
               >
                 <img
                   src={a.image}
                   alt={a.name}
                   loading="lazy"
-                  className={`h-24 w-24 object-contain ${open ? "" : "grayscale opacity-40"}`}
+                  className={`h-24 w-24 object-contain ${open ? "float-soft" : "grayscale opacity-40"}`}
+                  style={{ animationDelay: `${i * 0.3}s` }}
                 />
-                <span className="text-5xl">{open ? a.emoji : "🔒"}</span>
+                <span className={`text-5xl ${open ? "wiggle inline-block" : ""}`}>
+                  {open ? a.emoji : "🔒"}
+                </span>
+                {open && <span className="twinkle text-2xl">✨</span>}
               </button>
             </div>
           );
@@ -286,7 +314,7 @@ function Mapa({
       <button
         onClick={onTeam}
         aria-label="Mi colección"
-        className="w-full max-w-sm rounded-[2rem] bg-green px-6 py-6 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] transition-transform hover:scale-105 active:translate-y-1"
+        className="btn-bounce btn-pulse w-full max-w-sm rounded-[2rem] border-4 border-white bg-green px-6 py-6 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)]"
       >
         🐣
       </button>
@@ -309,7 +337,7 @@ function Coleccion({
       <div className="flex w-full max-w-sm items-center gap-3">
         <button
           onClick={onBack}
-          className="rounded-full bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)] active:translate-y-1"
+          className="btn-bounce rounded-full border-4 border-white bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Volver"
         >
           ⬅️
@@ -323,7 +351,7 @@ function Coleccion({
           aria-label="Criaturas conseguidas"
         >
           <div
-            className="h-full rounded-full bg-orange transition-all duration-700"
+            className="h-full rounded-full bg-gradient-to-r from-yellow via-orange to-green transition-all duration-700"
             style={{ width: `${pct}%` }}
           />
           <span className="absolute inset-0 flex items-center justify-center text-2xl font-black text-ink">
@@ -333,7 +361,7 @@ function Coleccion({
       </div>
 
       <div className="grid w-full max-w-sm grid-cols-2 gap-3">
-        {CREATURES.map((c) => {
+        {CREATURES.map((c, i) => {
           const owned = progress.unlocked.includes(c.id);
           const active = progress.companion === c.id;
           return (
@@ -342,13 +370,17 @@ function Coleccion({
               onClick={() => owned && onPick(c.id)}
               aria-label={owned ? c.name : "Criatura bloqueada"}
               style={{ borderColor: active ? TYPE_COLOR[c.type] : "transparent" }}
-              className="pop-in flex flex-col items-center gap-1 rounded-3xl border-[6px] bg-white p-3 shadow-[0_6px_0_rgba(0,0,0,0.12)] transition-transform duration-200 hover:scale-105 active:translate-y-1"
+              className={`pop-in flex flex-col items-center gap-1 rounded-3xl border-[6px] bg-white/95 p-3 shadow-[0_6px_0_rgba(0,0,0,0.12)] ${
+                owned ? "btn-bounce" : ""
+              }`}
             >
-              <img
+              <LiveSprite
                 src={c.image}
-                alt={c.name}
-                loading="lazy"
-                className={owned ? "w-24" : "w-24 opacity-25 grayscale"}
+                alt={owned ? c.name : ""}
+                dim={!owned}
+                motion={i % 3 === 0 ? "sway" : i % 3 === 1 ? "breathe" : "float"}
+                delay={(i % 5) * 0.3}
+                className="w-24"
               />
               <span className="text-xl font-black text-ink">
                 {owned ? `${TYPE_EMOJI[c.type]} ${c.name}` : "🔒"}
@@ -378,29 +410,35 @@ function Elegir({
       <div className="flex w-full items-center justify-between">
         <button
           onClick={onBack}
-          className="rounded-full bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)] active:translate-y-1"
+          className="btn-bounce rounded-full border-4 border-white bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Volver"
         >
           ⬅️
         </button>
-        <img src={area.image} alt={area.name} className="h-20 object-contain" />
+        <img src={area.image} alt={area.name} className="float-soft h-20 object-contain" />
       </div>
 
       <div className="flex items-center gap-3">
-        <img src={trainerImg} alt="Tu entrenador" className="w-24 wiggle" />
-        <span className="text-5xl">👉</span>
+        <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-24" />
+        <span className="wiggle text-5xl">👉</span>
       </div>
 
       <div className="grid w-full max-w-sm grid-cols-3 gap-3">
-        {mine.map((c) => (
+        {mine.map((c, i) => (
           <button
             key={c.id}
             onClick={() => onPick(c.id)}
             aria-label={c.name}
             style={{ borderColor: TYPE_COLOR[c.type] }}
-            className="pop-in flex flex-col items-center rounded-3xl border-[6px] bg-white p-2 shadow-[0_6px_0_rgba(0,0,0,0.12)] transition-transform duration-200 hover:scale-110 active:translate-y-1"
+            className="pop-in btn-bounce flex flex-col items-center rounded-3xl border-[6px] bg-white/95 p-2 shadow-[0_6px_0_rgba(0,0,0,0.12)]"
           >
-            <img src={c.image} alt="" className="w-20" />
+            <LiveSprite
+              src={c.image}
+              alt=""
+              motion={i % 2 === 0 ? "breathe" : "sway"}
+              delay={(i % 4) * 0.25}
+              className="w-20"
+            />
             <span className="text-2xl">{TYPE_EMOJI[c.type]}</span>
           </button>
         ))}
@@ -413,15 +451,15 @@ function Captura({ creature, onClose }: { creature: Creature; onClose: () => voi
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-ink/70 px-6">
       <Confetti />
-      <img src={creature.image} alt={creature.name} className="pop-in w-56 drop-shadow-2xl" />
+      <img src={creature.image} alt={creature.name} className="pop-in hop w-56 drop-shadow-2xl" />
       <p className="text-4xl font-black text-white">
         {TYPE_EMOJI[creature.type]} {creature.name}
       </p>
-      <img src={trainerImg} alt="" className="w-28 wiggle" />
+      <LiveSprite src={trainerImg} alt="" motion="hop" className="w-28" />
       <button
         onClick={onClose}
         aria-label="Continuar"
-        className="w-full max-w-sm rounded-[2rem] bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)] active:translate-y-1"
+        className="btn-bounce btn-pulse w-full max-w-sm rounded-[2rem] border-4 border-white bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
       >
         ✅
       </button>
@@ -500,12 +538,12 @@ function Batalla({
       <div className="screen-in relative flex min-h-[85vh] flex-col items-center justify-center gap-6 text-center">
         {result === "win" && <Confetti />}
         <div className="text-8xl pop-in">{result === "win" ? "🎉" : "🤗"}</div>
-        <img src={trainerImg} alt="" className="w-32 wiggle" />
-        <img src={companion.image} alt={companion.name} className="w-40 float-soft" />
+        <LiveSprite src={trainerImg} alt="" motion="hop" className="w-32" />
+        <LiveSprite src={companion.image} alt={companion.name} motion="sway" className="w-40" />
         <button
           onClick={() => onFinish(result === "win")}
           aria-label="Continuar"
-          className="w-full max-w-sm rounded-[2rem] bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] active:translate-y-1"
+          className="btn-bounce btn-pulse w-full max-w-sm rounded-[2rem] border-4 border-white bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)]"
         >
           ✅
         </button>
@@ -518,47 +556,72 @@ function Batalla({
       <div className="flex items-start justify-between">
         <button
           onClick={onBack}
-          className="rounded-full bg-white px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.15)] active:translate-y-1"
+          className="btn-bounce rounded-full border-4 border-white bg-white px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Volver"
         >
           ⬅️
         </button>
-        <img src={area.image} alt={area.name} className="h-16 object-contain opacity-80" />
+        <img src={area.image} alt={area.name} className="float-soft h-16 object-contain" />
       </div>
 
       {/* Rival: entrenadora a la derecha con sus criaturas detrás */}
       <div className="flex items-end justify-end gap-1">
         <div className="flex flex-col items-end gap-1">
           <Hearts n={rivalHp} />
-          <img src={rival.image} alt={rival.name} className="w-24 drop-shadow-xl float-soft" />
+          <LiveSprite
+            src={rival.image}
+            alt={rival.name}
+            motion="breathe"
+            className="w-24 drop-shadow-xl"
+          />
         </div>
         <div className="flex flex-col gap-1">
           {rivalTeam.map((c, i) => (
-            <img key={i} src={c.image} alt="" className="w-12 opacity-70" />
+            <LiveSprite
+              key={i}
+              src={c.image}
+              alt=""
+              motion="sway"
+              delay={i * 0.4}
+              className="w-12 opacity-70"
+            />
           ))}
         </div>
-        <img src={rivalTrainerImg} alt="Entrenadora rival" className="w-20" />
+        <LiveSprite src={rivalTrainerImg} alt="Entrenadora rival" motion="hop" className="w-20" />
       </div>
 
-      <div className="text-center text-7xl h-24">{fx}</div>
+      <div className="text-center text-7xl h-24">
+        <span className="pop-in inline-block" key={fx ?? "none"}>
+          {fx}
+        </span>
+      </div>
 
       {/* Jugador: entrenador a la izquierda con sus criaturas detrás */}
       <div className="flex items-end gap-1">
-        <img src={trainerImg} alt="Tu entrenador" className="w-24" />
+        <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-24" />
         <div className="flex flex-col gap-1">
-          {myTeam.map((c) => (
-            <img key={c.id} src={c.image} alt="" className="w-12 opacity-70" />
+          {myTeam.map((c, i) => (
+            <LiveSprite
+              key={c.id}
+              src={c.image}
+              alt=""
+              motion="sway"
+              delay={i * 0.4}
+              className="w-12 opacity-70"
+            />
           ))}
         </div>
         <div className="flex flex-col items-start gap-1">
-          <img
+          <LiveSprite
             src={companion.image}
             alt={companion.name}
-            className="w-32 drop-shadow-xl float-soft"
+            motion="breathe"
+            className="w-32 drop-shadow-xl"
           />
           <Hearts n={myHp} />
         </div>
       </div>
+
 
       <div className="mt-4 flex gap-3">
         <BigButton
