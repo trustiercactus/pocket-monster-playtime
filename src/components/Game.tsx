@@ -432,15 +432,15 @@ function Captura({ creature, onClose }: { creature: Creature; onClose: () => voi
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-ink/70 px-6">
       <Confetti />
-      <img src={creature.image} alt={creature.name} className="pop-in w-56 drop-shadow-2xl" />
+      <img src={creature.image} alt={creature.name} className="pop-in hop w-56 drop-shadow-2xl" />
       <p className="text-4xl font-black text-white">
         {TYPE_EMOJI[creature.type]} {creature.name}
       </p>
-      <img src={trainerImg} alt="" className="w-28 wiggle" />
+      <LiveSprite src={trainerImg} alt="" motion="hop" className="w-28" />
       <button
         onClick={onClose}
         aria-label="Continuar"
-        className="w-full max-w-sm rounded-[2rem] bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)] active:translate-y-1"
+        className="btn-bounce btn-pulse w-full max-w-sm rounded-[2rem] border-4 border-white bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
       >
         ✅
       </button>
