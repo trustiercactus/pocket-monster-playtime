@@ -11,7 +11,7 @@ import {
 import { AREAS, type Area } from "@/lib/areas";
 import { Scenery } from "@/components/Scenery";
 import { Casa } from "@/components/Casa";
-import { PetSprite } from "@/components/PetSprite";
+import { MapaMundo } from "@/components/MapaMundo";
 import { randomEgg, type Egg } from "@/lib/eggs";
 import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
@@ -26,6 +26,8 @@ export type Progress = {
   companion: string;
   wins: number;
   eggs: Egg[];
+  zonesDone: string[];
+  legendary: boolean;
 };
 
 type Screen = "mapa" | "casa" | "coleccion" | "elegir" | "batalla";
@@ -37,10 +39,12 @@ const INITIAL: Progress = {
   name: "",
   level: 1,
   xp: 0,
-  unlocked: ["flami", "aquip", "hojito"],
+  unlocked: ["flami"],
   companion: "flami",
   wins: 0,
   eggs: [],
+  zonesDone: [],
+  legendary: false,
 };
 
 function Hearts({ n, max = MAX_HP }: { n: number; max?: number }) {
@@ -110,7 +114,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
     try {
       const raw = window.localStorage.getItem(SAVE_KEY);
       const loaded = raw ? { ...INITIAL, ...(JSON.parse(raw) as Progress) } : INITIAL;
-      setProgress({ ...loaded, eggs: loaded.eggs ?? [] });
+      setProgress({ ...loaded, eggs: loaded.eggs ?? [], zonesDone: loaded.zonesDone ?? [] });
     } catch {
       setProgress(INITIAL);
     }
@@ -158,17 +162,22 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
       const xp = progress.xp + 1;
       const levelUp = xp >= XP_PER_LEVEL;
       const level = levelUp ? progress.level + 1 : progress.level;
-      const newOnes = CREATURES.filter(
-        (c) => c.unlockLevel <= level && !progress.unlocked.includes(c.id),
-      );
-      nuevo = newOnes[0] ?? null;
+      const zonesDone = progress.zonesDone.includes(area.id)
+        ? progress.zonesDone
+        : [...progress.zonesDone, area.id];
+      const guardian = getCreature(area.guardian);
+      const unlocked = progress.unlocked.includes(guardian.id)
+        ? progress.unlocked
+        : [...progress.unlocked, guardian.id];
+      nuevo = progress.unlocked.includes(guardian.id) ? null : guardian;
       const eggs =
         progress.eggs.length < 3 ? [...progress.eggs, randomEgg()] : progress.eggs;
       save({
         ...progress,
         level,
         xp: levelUp ? 0 : xp,
-        unlocked: [...progress.unlocked, ...newOnes.map((c) => c.id)],
+        unlocked,
+        zonesDone,
         wins: progress.wins + 1,
         eggs,
       });
@@ -190,14 +199,29 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
       <Scenery />
       <div className="relative">
       {screen === "mapa" && (
-        <Mapa
-          progress={progress}
+        <MapaMundo
+          name={progress.name}
+          zonesDone={progress.zonesDone}
+          legendary={progress.legendary}
+          hasEggs={progress.eggs.length > 0}
           onArea={(a) => {
             setArea(a);
             setScreen("elegir");
           }}
-          onTeam={() => setScreen("coleccion")}
+          onCollection={() => setScreen("coleccion")}
           onHome={() => setScreen("casa")}
+          onSettings={() => {
+            window.location.href = "/";
+          }}
+          onLegendary={() => {
+            save({
+              ...progress,
+              legendary: true,
+              unlocked: progress.unlocked.includes("estrelin")
+                ? progress.unlocked
+                : [...progress.unlocked, "estrelin"],
+            });
+          }}
         />
       )}
       {screen === "casa" && (
@@ -282,97 +306,8 @@ function NombreForm({ onDone }: { onDone: (name: string) => void }) {
   );
 }
 
-function Mapa({
-  progress,
-  onArea,
-  onTeam,
-  onHome,
-}: {
-  progress: Progress;
-  onArea: (a: Area) => void;
-  onTeam: () => void;
-  onHome: () => void;
-}) {
-  const seguidores = CREATURES.filter((c) => progress.unlocked.includes(c.id)).slice(0, 3);
-  return (
-    <div className="screen-in flex flex-col items-center gap-4">
-      <div className="flex w-full items-center justify-between">
-        <span className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-2xl font-black text-ink">
-          <img src={trainerImg} alt="" className="h-9 w-9 object-contain" />⭐ {progress.level}
-        </span>
-        <span className="text-2xl">{"🏆".repeat(Math.min(progress.wins, 5)) || "🏆"}</span>
-      </div>
 
-      <div className="relative flex w-full max-w-sm flex-col gap-3">
-        {AREAS.map((a, i) => {
-          const open = progress.wins >= a.winsNeeded;
-          const left = i % 2 === 0;
-          return (
-            <div key={a.id} className="flex flex-col items-center">
-              {i > 0 && (
-                <div className="flex h-8 flex-col justify-center text-3xl leading-none opacity-70">
-                  ⚪
-                </div>
-              )}
-              <button
-                onClick={() => open && onArea(a)}
-                aria-label={open ? a.name : `${a.name} bloqueada`}
-                style={{ borderColor: open ? a.color : "transparent" }}
-                className={`flex w-[86%] items-center gap-3 rounded-[2rem] border-[6px] bg-white/95 p-3 shadow-[0_8px_0_rgba(0,0,0,0.12)] ${
-                  left ? "self-start" : "self-end flex-row-reverse"
-                } ${open ? "btn-bounce" : "opacity-60"}`}
-              >
-                <img
-                  src={a.image}
-                  alt={a.name}
-                  loading="lazy"
-                  className={`h-24 w-24 object-contain ${open ? "float-soft" : "grayscale opacity-40"}`}
-                  style={{ animationDelay: `${i * 0.3}s` }}
-                />
-                <span className={`text-5xl ${open ? "wiggle inline-block" : ""}`}>
-                  {open ? a.emoji : "🔒"}
-                </span>
-                {open && <span className="twinkle text-2xl">✨</span>}
-              </button>
-            </div>
-          );
-        })}
-      </div>
 
-      <div className="flex items-end justify-center gap-1">
-        <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-24" />
-        {seguidores.map((c, i) => (
-          <PetSprite
-            key={c.id}
-            src={c.image}
-            alt={c.name}
-            motion={i % 2 === 0 ? "sway" : "breathe"}
-            delay={i * 0.35}
-            className="w-16 follow-walk"
-          />
-        ))}
-      </div>
-
-      <div className="flex w-full max-w-sm gap-3">
-        <button
-          onClick={onHome}
-          aria-label="Ir a casa"
-          className="btn-bounce btn-pulse flex-1 rounded-[2rem] border-4 border-white bg-orange px-6 py-6 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)]"
-        >
-          🏠{progress.eggs.length > 0 ? " 🥚" : ""}
-        </button>
-      </div>
-
-      <button
-        onClick={onTeam}
-        aria-label="Mi colección"
-        className="btn-bounce btn-pulse w-full max-w-sm rounded-[2rem] border-4 border-white bg-green px-6 py-6 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)]"
-      >
-        🐣
-      </button>
-    </div>
-  );
-}
 
 function Coleccion({
   progress,
