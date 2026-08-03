@@ -99,9 +99,9 @@ function BigButton({
   );
 }
 
-export function Game() {
+export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}) {
   const [progress, setProgress] = useState<Progress | null>(null);
-  const [screen, setScreen] = useState<Screen>("mapa");
+  const [screen, setScreen] = useState<Screen>(initialScreen);
   const [area, setArea] = useState<Area>(AREAS[0] as Area);
   const [fighter, setFighter] = useState<string | null>(null);
   const [captured, setCaptured] = useState<Creature | null>(null);
