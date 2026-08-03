@@ -8,6 +8,9 @@ import {
   randomRival,
   type Creature,
 } from "@/lib/creatures";
+import { AREAS, type Area } from "@/lib/areas";
+import trainerImg from "@/assets/trainer.png";
+import rivalTrainerImg from "@/assets/rival-trainer.png";
 
 export type Progress = {
   name: string;
@@ -18,7 +21,7 @@ export type Progress = {
   wins: number;
 };
 
-type Screen = "menu" | "equipo" | "batalla";
+type Screen = "mapa" | "coleccion" | "elegir" | "batalla";
 
 const MAX_HP = 5;
 const SAVE_KEY = "criaturitas-partida";
@@ -37,6 +40,26 @@ function Hearts({ n, max = MAX_HP }: { n: number; max?: number }) {
     <div className="flex gap-1 text-2xl leading-none" aria-label={`${n} vidas`}>
       {Array.from({ length: max }).map((_, i) => (
         <span key={i}>{i < n ? "❤️" : "🤍"}</span>
+      ))}
+    </div>
+  );
+}
+
+function Confetti() {
+  const bits = ["⭐", "🎉", "✨", "🌟", "🎊", "💫"];
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      {Array.from({ length: 22 }).map((_, i) => (
+        <span
+          key={i}
+          className="absolute text-3xl"
+          style={{
+            left: `${(i * 37) % 96}%`,
+            animation: `confetti-fall ${1.6 + (i % 5) * 0.35}s linear ${(i % 7) * 0.18}s infinite`,
+          }}
+        >
+          {bits[i % bits.length]}
+        </span>
       ))}
     </div>
   );
@@ -61,7 +84,7 @@ function BigButton({
       disabled={disabled}
       aria-label={label}
       style={{ backgroundColor: color }}
-      className="min-h-[92px] flex-1 rounded-[1.75rem] px-4 py-4 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-[0_3px_0_rgba(0,0,0,0.2)] disabled:opacity-50"
+      className="min-h-[92px] flex-1 rounded-[1.75rem] px-4 py-4 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] transition-transform duration-150 hover:scale-105 active:translate-y-1 active:shadow-[0_3px_0_rgba(0,0,0,0.2)] disabled:opacity-50"
     >
       {children}
     </button>
@@ -70,7 +93,10 @@ function BigButton({
 
 export function Game() {
   const [progress, setProgress] = useState<Progress | null>(null);
-  const [screen, setScreen] = useState<Screen>("menu");
+  const [screen, setScreen] = useState<Screen>("mapa");
+  const [area, setArea] = useState<Area>(AREAS[0] as Area);
+  const [fighter, setFighter] = useState<string | null>(null);
+  const [captured, setCaptured] = useState<Creature | null>(null);
 
   useEffect(() => {
     try {
@@ -104,49 +130,73 @@ export function Game() {
     );
   }
 
-  const companion = getCreature(progress.companion);
+  const companion = getCreature(fighter ?? progress.companion);
+
+  function finishBattle(won: boolean) {
+    if (!progress) return;
+    let nuevo: Creature | null = null;
+    if (won) {
+      const xp = progress.xp + 1;
+      const levelUp = xp >= XP_PER_LEVEL;
+      const level = levelUp ? progress.level + 1 : progress.level;
+      const newOnes = CREATURES.filter(
+        (c) => c.unlockLevel <= level && !progress.unlocked.includes(c.id),
+      );
+      nuevo = newOnes[0] ?? null;
+      save({
+        ...progress,
+        level,
+        xp: levelUp ? 0 : xp,
+        unlocked: [...progress.unlocked, ...newOnes.map((c) => c.id)],
+        wins: progress.wins + 1,
+      });
+    }
+    setScreen("mapa");
+    if (nuevo) setCaptured(nuevo);
+  }
 
   return (
     <main className="min-h-screen bg-sky px-4 py-5">
-      {screen === "menu" && (
-        <Menu
+      {screen === "mapa" && (
+        <Mapa
           progress={progress}
-          companion={companion}
-          onPlay={() => setScreen("batalla")}
-          onTeam={() => setScreen("equipo")}
+          onArea={(a) => {
+            setArea(a);
+            setScreen("elegir");
+          }}
+          onTeam={() => setScreen("coleccion")}
         />
       )}
-      {screen === "equipo" && (
-        <Equipo
+      {screen === "coleccion" && (
+        <Coleccion
           progress={progress}
           onPick={(id) => save({ ...progress, companion: id })}
-          onBack={() => setScreen("menu")}
+          onBack={() => setScreen("mapa")}
+        />
+      )}
+      {screen === "elegir" && (
+        <Elegir
+          progress={progress}
+          area={area}
+          onPick={(id) => {
+            setFighter(id);
+            save({ ...progress, companion: id });
+            setScreen("batalla");
+          }}
+          onBack={() => setScreen("mapa")}
         />
       )}
       {screen === "batalla" && (
         <Batalla
+          progress={progress}
+          area={area}
           companion={companion}
-          onFinish={(won) => {
-            if (won) {
-              const xp = progress.xp + 1;
-              const levelUp = xp >= XP_PER_LEVEL;
-              const level = levelUp ? progress.level + 1 : progress.level;
-              const newOnes = CREATURES.filter(
-                (c) => c.unlockLevel <= level && !progress.unlocked.includes(c.id),
-              ).map((c) => c.id);
-              save({
-                ...progress,
-                level,
-                xp: levelUp ? 0 : xp,
-                unlocked: [...progress.unlocked, ...newOnes],
-                wins: progress.wins + 1,
-              });
-            }
-            setScreen("menu");
-          }}
-          onBack={() => setScreen("menu")}
+          onFinish={finishBattle}
+          onBack={() => setScreen("mapa")}
         />
       )}
+
+      {captured && <Captura creature={captured} onClose={() => setCaptured(null)} />}
     </main>
   );
 }
@@ -160,9 +210,10 @@ function NombreForm({ onDone }: { onDone: (name: string) => void }) {
         const n = value.trim();
         if (n) onDone(n.slice(0, 14));
       }}
-      className="flex w-full max-w-sm flex-col items-center gap-5 text-center"
+      className="screen-in flex w-full max-w-sm flex-col items-center gap-5 text-center"
     >
-      <p className="text-4xl font-black text-ink">👋 ¿Cómo te llamas?</p>
+      <img src={trainerImg} alt="Tu entrenador" className="w-40 float-soft" />
+      <p className="text-4xl font-black text-ink">👋</p>
       <input
         value={value}
         onChange={(e) => setValue(e.target.value)}
@@ -174,70 +225,76 @@ function NombreForm({ onDone }: { onDone: (name: string) => void }) {
       <button
         type="submit"
         disabled={!value.trim()}
-        className="w-full rounded-[2rem] bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] active:translate-y-1 disabled:opacity-50"
+        className="w-full rounded-[2rem] bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] transition-transform active:translate-y-1 disabled:opacity-50"
       >
-        ✅ ¡VAMOS!
+        ✅
       </button>
     </form>
   );
 }
 
-function Menu({
+function Mapa({
   progress,
-  companion,
-  onPlay,
+  onArea,
   onTeam,
 }: {
   progress: Progress;
-  companion: Creature;
-  onPlay: () => void;
+  onArea: (a: Area) => void;
   onTeam: () => void;
 }) {
   return (
-    <div className="flex flex-col items-center gap-5">
+    <div className="screen-in flex flex-col items-center gap-4">
       <div className="flex w-full items-center justify-between">
-        <span className="rounded-full bg-white px-4 py-2 text-2xl font-black text-ink">
-          ⭐ {progress.level} · {progress.name}
+        <span className="flex items-center gap-2 rounded-full bg-white px-4 py-2 text-2xl font-black text-ink">
+          <img src={trainerImg} alt="" className="h-9 w-9 object-contain" />⭐ {progress.level}
         </span>
         <span className="text-2xl">{"🏆".repeat(Math.min(progress.wins, 5)) || "🏆"}</span>
       </div>
 
-      <img
-        src={companion.image}
-        alt={companion.name}
-        className="w-56 animate-[bounce_2.2s_ease-in-out_infinite] drop-shadow-2xl"
-      />
-      <p className="text-3xl font-black text-ink">
-        {TYPE_EMOJI[companion.type]} {companion.name}
-      </p>
-
-      <div className="flex w-full max-w-sm gap-1">
-        {Array.from({ length: XP_PER_LEVEL }).map((_, i) => (
-          <div
-            key={i}
-            className="h-5 flex-1 rounded-full"
-            style={{ backgroundColor: i < progress.xp ? "var(--arcade-yellow)" : "#ffffff" }}
-          />
-        ))}
+      <div className="relative flex w-full max-w-sm flex-col gap-3">
+        {AREAS.map((a, i) => {
+          const open = progress.wins >= a.winsNeeded;
+          const left = i % 2 === 0;
+          return (
+            <div key={a.id} className="flex flex-col items-center">
+              {i > 0 && (
+                <div className="flex h-8 flex-col justify-center text-3xl leading-none opacity-70">
+                  ⚪
+                </div>
+              )}
+              <button
+                onClick={() => open && onArea(a)}
+                aria-label={open ? a.name : `${a.name} bloqueada`}
+                style={{ borderColor: open ? a.color : "transparent" }}
+                className={`flex w-[86%] items-center gap-3 rounded-[2rem] border-[6px] bg-white p-3 shadow-[0_8px_0_rgba(0,0,0,0.12)] transition-transform duration-200 ${
+                  left ? "self-start" : "self-end flex-row-reverse"
+                } ${open ? "hover:scale-105 active:translate-y-1" : "opacity-60"}`}
+              >
+                <img
+                  src={a.image}
+                  alt={a.name}
+                  loading="lazy"
+                  className={`h-24 w-24 object-contain ${open ? "" : "grayscale opacity-40"}`}
+                />
+                <span className="text-5xl">{open ? a.emoji : "🔒"}</span>
+              </button>
+            </div>
+          );
+        })}
       </div>
 
       <button
-        onClick={onPlay}
-        className="w-full max-w-sm rounded-[2rem] bg-orange px-6 py-8 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] active:translate-y-1"
-      >
-        ⚔️ LUCHAR
-      </button>
-      <button
         onClick={onTeam}
-        className="w-full max-w-sm rounded-[2rem] bg-green px-6 py-6 text-3xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] active:translate-y-1"
+        aria-label="Mi colección"
+        className="w-full max-w-sm rounded-[2rem] bg-green px-6 py-6 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] transition-transform hover:scale-105 active:translate-y-1"
       >
-        🐣 MIS AMIGOS
+        🐣
       </button>
     </div>
   );
 }
 
-function Equipo({
+function Coleccion({
   progress,
   onPick,
   onBack,
@@ -246,15 +303,35 @@ function Equipo({
   onPick: (id: string) => void;
   onBack: () => void;
 }) {
+  const pct = Math.round((progress.unlocked.length / CREATURES.length) * 100);
   return (
-    <div className="flex flex-col items-center gap-4">
-      <button
-        onClick={onBack}
-        className="self-start rounded-full bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
-        aria-label="Volver"
-      >
-        ⬅️
-      </button>
+    <div className="screen-in flex flex-col items-center gap-4">
+      <div className="flex w-full max-w-sm items-center gap-3">
+        <button
+          onClick={onBack}
+          className="rounded-full bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)] active:translate-y-1"
+          aria-label="Volver"
+        >
+          ⬅️
+        </button>
+        <div
+          className="relative h-12 flex-1 overflow-hidden rounded-full bg-white shadow-[0_5px_0_rgba(0,0,0,0.12)]"
+          role="progressbar"
+          aria-valuenow={progress.unlocked.length}
+          aria-valuemin={0}
+          aria-valuemax={CREATURES.length}
+          aria-label="Criaturas conseguidas"
+        >
+          <div
+            className="h-full rounded-full bg-orange transition-all duration-700"
+            style={{ width: `${pct}%` }}
+          />
+          <span className="absolute inset-0 flex items-center justify-center text-2xl font-black text-ink">
+            🐣 {progress.unlocked.length}/{CREATURES.length}
+          </span>
+        </div>
+      </div>
+
       <div className="grid w-full max-w-sm grid-cols-2 gap-3">
         {CREATURES.map((c) => {
           const owned = progress.unlocked.includes(c.id);
@@ -265,11 +342,12 @@ function Equipo({
               onClick={() => owned && onPick(c.id)}
               aria-label={owned ? c.name : "Criatura bloqueada"}
               style={{ borderColor: active ? TYPE_COLOR[c.type] : "transparent" }}
-              className="flex flex-col items-center gap-1 rounded-3xl border-[6px] bg-white p-3 shadow-[0_6px_0_rgba(0,0,0,0.12)] active:translate-y-1"
+              className="pop-in flex flex-col items-center gap-1 rounded-3xl border-[6px] bg-white p-3 shadow-[0_6px_0_rgba(0,0,0,0.12)] transition-transform duration-200 hover:scale-105 active:translate-y-1"
             >
               <img
                 src={c.image}
                 alt={c.name}
+                loading="lazy"
                 className={owned ? "w-24" : "w-24 opacity-25 grayscale"}
               />
               <span className="text-xl font-black text-ink">
@@ -283,21 +361,100 @@ function Equipo({
   );
 }
 
+function Elegir({
+  progress,
+  area,
+  onPick,
+  onBack,
+}: {
+  progress: Progress;
+  area: Area;
+  onPick: (id: string) => void;
+  onBack: () => void;
+}) {
+  const mine = CREATURES.filter((c) => progress.unlocked.includes(c.id));
+  return (
+    <div className="screen-in flex flex-col items-center gap-4">
+      <div className="flex w-full items-center justify-between">
+        <button
+          onClick={onBack}
+          className="rounded-full bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)] active:translate-y-1"
+          aria-label="Volver"
+        >
+          ⬅️
+        </button>
+        <img src={area.image} alt={area.name} className="h-20 object-contain" />
+      </div>
+
+      <div className="flex items-center gap-3">
+        <img src={trainerImg} alt="Tu entrenador" className="w-24 wiggle" />
+        <span className="text-5xl">👉</span>
+      </div>
+
+      <div className="grid w-full max-w-sm grid-cols-3 gap-3">
+        {mine.map((c) => (
+          <button
+            key={c.id}
+            onClick={() => onPick(c.id)}
+            aria-label={c.name}
+            style={{ borderColor: TYPE_COLOR[c.type] }}
+            className="pop-in flex flex-col items-center rounded-3xl border-[6px] bg-white p-2 shadow-[0_6px_0_rgba(0,0,0,0.12)] transition-transform duration-200 hover:scale-110 active:translate-y-1"
+          >
+            <img src={c.image} alt="" className="w-20" />
+            <span className="text-2xl">{TYPE_EMOJI[c.type]}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Captura({ creature, onClose }: { creature: Creature; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-ink/70 px-6">
+      <Confetti />
+      <img src={creature.image} alt={creature.name} className="pop-in w-56 drop-shadow-2xl" />
+      <p className="text-4xl font-black text-white">
+        {TYPE_EMOJI[creature.type]} {creature.name}
+      </p>
+      <img src={trainerImg} alt="" className="w-28 wiggle" />
+      <button
+        onClick={onClose}
+        aria-label="Continuar"
+        className="w-full max-w-sm rounded-[2rem] bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)] active:translate-y-1"
+      >
+        ✅
+      </button>
+    </div>
+  );
+}
+
 function Batalla({
+  progress,
+  area,
   companion,
   onFinish,
   onBack,
 }: {
+  progress: Progress;
+  area: Area;
   companion: Creature;
   onFinish: (won: boolean) => void;
   onBack: () => void;
 }) {
   const [rival] = useState(() => randomRival(companion.id));
+  const [rivalTeam] = useState(() =>
+    Array.from({ length: 2 }, () => randomRival(companion.id)),
+  );
   const [myHp, setMyHp] = useState(MAX_HP);
   const [rivalHp, setRivalHp] = useState(MAX_HP);
   const [fx, setFx] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<"win" | "lose" | null>(null);
+
+  const myTeam = CREATURES.filter(
+    (c) => progress.unlocked.includes(c.id) && c.id !== companion.id,
+  ).slice(0, 2);
 
   function turn(kind: "fuerte" | "rapido" | "curar") {
     if (busy || result) return;
@@ -340,41 +497,67 @@ function Batalla({
 
   if (result) {
     return (
-      <div className="flex min-h-[85vh] flex-col items-center justify-center gap-6 text-center">
-        <div className="text-8xl">{result === "win" ? "🎉" : "🤗"}</div>
-        <p className="text-4xl font-black text-ink">{result === "win" ? "¡GANASTE!" : "¡CASI!"}</p>
-        <img src={companion.image} alt={companion.name} className="w-48" />
+      <div className="screen-in relative flex min-h-[85vh] flex-col items-center justify-center gap-6 text-center">
+        {result === "win" && <Confetti />}
+        <div className="text-8xl pop-in">{result === "win" ? "🎉" : "🤗"}</div>
+        <img src={trainerImg} alt="" className="w-32 wiggle" />
+        <img src={companion.image} alt={companion.name} className="w-40 float-soft" />
         <button
           onClick={() => onFinish(result === "win")}
-          className="w-full max-w-sm rounded-[2rem] bg-orange px-6 py-7 text-3xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] active:translate-y-1"
+          aria-label="Continuar"
+          className="w-full max-w-sm rounded-[2rem] bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] active:translate-y-1"
         >
-          ✅ SEGUIR
+          ✅
         </button>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-[90vh] flex-col justify-between">
-      <div className="flex items-center justify-between">
+    <div className="screen-in flex min-h-[90vh] flex-col justify-between">
+      <div className="flex items-start justify-between">
         <button
           onClick={onBack}
-          className="rounded-full bg-white px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
+          className="rounded-full bg-white px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.15)] active:translate-y-1"
           aria-label="Volver"
         >
           ⬅️
         </button>
+        <img src={area.image} alt={area.name} className="h-16 object-contain opacity-80" />
+      </div>
+
+      {/* Rival: entrenadora a la derecha con sus criaturas detrás */}
+      <div className="flex items-end justify-end gap-1">
         <div className="flex flex-col items-end gap-1">
           <Hearts n={rivalHp} />
-          <img src={rival.image} alt={rival.name} className="w-28 drop-shadow-xl" />
+          <img src={rival.image} alt={rival.name} className="w-24 drop-shadow-xl float-soft" />
         </div>
+        <div className="flex flex-col gap-1">
+          {rivalTeam.map((c, i) => (
+            <img key={i} src={c.image} alt="" className="w-12 opacity-70" />
+          ))}
+        </div>
+        <img src={rivalTrainerImg} alt="Entrenadora rival" className="w-20" />
       </div>
 
       <div className="text-center text-7xl h-24">{fx}</div>
 
-      <div className="flex flex-col items-start gap-1">
-        <img src={companion.image} alt={companion.name} className="w-40 drop-shadow-xl" />
-        <Hearts n={myHp} />
+      {/* Jugador: entrenador a la izquierda con sus criaturas detrás */}
+      <div className="flex items-end gap-1">
+        <img src={trainerImg} alt="Tu entrenador" className="w-24" />
+        <div className="flex flex-col gap-1">
+          {myTeam.map((c) => (
+            <img key={c.id} src={c.image} alt="" className="w-12 opacity-70" />
+          ))}
+        </div>
+        <div className="flex flex-col items-start gap-1">
+          <img
+            src={companion.image}
+            alt={companion.name}
+            className="w-32 drop-shadow-xl float-soft"
+          />
+          <Hearts n={myHp} />
+        </div>
       </div>
 
       <div className="mt-4 flex gap-3">
