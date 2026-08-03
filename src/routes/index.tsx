@@ -51,12 +51,23 @@ function Index() {
       </div>
 
       {checked && (
-        <Link
-          to="/auth"
-          className="w-full max-w-sm rounded-[2rem] bg-orange px-6 py-8 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-[0_4px_0_rgba(0,0,0,0.2)]"
-        >
-          ▶ JUGAR
-        </Link>
+        <div className="flex w-full max-w-sm flex-col gap-4">
+          <Link
+            to="/invitado"
+            className="w-full rounded-[2rem] bg-orange px-6 py-8 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-[0_4px_0_rgba(0,0,0,0.2)]"
+          >
+            ▶ JUGAR YA
+          </Link>
+          <Link
+            to="/auth"
+            className="w-full rounded-[2rem] bg-green px-6 py-5 text-2xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] active:translate-y-1"
+          >
+            💾 Guardar progreso
+          </Link>
+          <p className="text-sm text-ink/60">
+            «Jugar ya» es modo invitado: sin cuenta y sin guardar en la nube.
+          </p>
+        </div>
       )}
     </main>
   );
