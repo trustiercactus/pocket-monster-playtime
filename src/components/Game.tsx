@@ -318,7 +318,7 @@ function Coleccion({
       <div className="flex w-full max-w-sm items-center gap-3">
         <button
           onClick={onBack}
-          className="rounded-full bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)] active:translate-y-1"
+          className="btn-bounce rounded-full border-4 border-white bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Volver"
         >
           ⬅️
@@ -332,7 +332,7 @@ function Coleccion({
           aria-label="Criaturas conseguidas"
         >
           <div
-            className="h-full rounded-full bg-orange transition-all duration-700"
+            className="h-full rounded-full bg-gradient-to-r from-yellow via-orange to-green transition-all duration-700"
             style={{ width: `${pct}%` }}
           />
           <span className="absolute inset-0 flex items-center justify-center text-2xl font-black text-ink">
@@ -342,7 +342,7 @@ function Coleccion({
       </div>
 
       <div className="grid w-full max-w-sm grid-cols-2 gap-3">
-        {CREATURES.map((c) => {
+        {CREATURES.map((c, i) => {
           const owned = progress.unlocked.includes(c.id);
           const active = progress.companion === c.id;
           return (
@@ -351,13 +351,17 @@ function Coleccion({
               onClick={() => owned && onPick(c.id)}
               aria-label={owned ? c.name : "Criatura bloqueada"}
               style={{ borderColor: active ? TYPE_COLOR[c.type] : "transparent" }}
-              className="pop-in flex flex-col items-center gap-1 rounded-3xl border-[6px] bg-white p-3 shadow-[0_6px_0_rgba(0,0,0,0.12)] transition-transform duration-200 hover:scale-105 active:translate-y-1"
+              className={`pop-in flex flex-col items-center gap-1 rounded-3xl border-[6px] bg-white/95 p-3 shadow-[0_6px_0_rgba(0,0,0,0.12)] ${
+                owned ? "btn-bounce" : ""
+              }`}
             >
-              <img
+              <LiveSprite
                 src={c.image}
-                alt={c.name}
-                loading="lazy"
-                className={owned ? "w-24" : "w-24 opacity-25 grayscale"}
+                alt={owned ? c.name : ""}
+                dim={!owned}
+                motion={i % 3 === 0 ? "sway" : i % 3 === 1 ? "breathe" : "float"}
+                delay={(i % 5) * 0.3}
+                className="w-24"
               />
               <span className="text-xl font-black text-ink">
                 {owned ? `${TYPE_EMOJI[c.type]} ${c.name}` : "🔒"}
