@@ -291,6 +291,8 @@ export function MapaMundo({
                 className="absolute -translate-x-1/2 -translate-y-1/2"
                 style={{ left: `${a.x}%`, top: `${a.y}%` }}
               >
+                <Ambiente area={a} />
+
                 {done && (
                   <div className="pointer-events-none absolute inset-0" aria-hidden="true">
                     {a.particles.map((p, k) => (
@@ -319,67 +321,77 @@ export function MapaMundo({
                       className="fog-drift pointer-events-none absolute -inset-4 rounded-full blur-md"
                       style={{
                         background:
-                          "radial-gradient(circle, rgba(235,240,255,0.55), rgba(180,190,255,0.18) 60%, transparent 75%)",
+                          "radial-gradient(circle, rgba(235,240,255,0.45), rgba(180,190,255,0.14) 60%, transparent 75%)",
                       }}
                       aria-hidden="true"
                     />
                   )}
-                  {!done && (
+
+                  {/* guardián sobre su pedestal mágico */}
+                  <span className="relative -mb-2 grid place-items-center">
                     <span
-                      className="dark-aura pointer-events-none absolute left-1/2 top-2 h-20 w-20 -translate-x-1/2 rounded-full blur-sm"
+                      className="pedestal-glow pointer-events-none absolute bottom-1 left-1/2 h-6 w-24 rounded-[50%] blur-[3px]"
                       style={{
-                        background:
-                          "radial-gradient(circle, rgba(140,110,220,0.3), transparent 70%)",
+                        background: `radial-gradient(circle, ${a.gem}, transparent 70%)`,
                       }}
                       aria-hidden="true"
                     />
-                  )}
-
-
-                  {/* guardián */}
-                  <span className="relative -mb-3">
                     <img
                       src={guardian.image}
                       alt=""
                       loading="lazy"
-                      className="h-20 w-20 object-contain drop-shadow-[0_5px_5px_rgba(0,0,0,0.45)]"
+                      className="relative h-20 w-20 object-contain drop-shadow-[0_5px_5px_rgba(0,0,0,0.4)]"
                       style={{
                         filter: done
-                          ? "saturate(1.15) brightness(1.05)"
-                          : "saturate(0.88) brightness(0.98)",
+                          ? "saturate(1.2) brightness(1.06)"
+                          : "saturate(0.82) brightness(0.96)",
                         transition: "filter 0.6s ease",
                       }}
                     />
                     {!done && (
                       <>
-                        <span className="absolute left-[34%] top-[42%] h-[6px] w-[6px] rounded-full bg-[#ff3b3b] shadow-[0_0_8px_#ff2b2b]" />
-                        <span className="absolute left-[56%] top-[42%] h-[6px] w-[6px] rounded-full bg-[#ff3b3b] shadow-[0_0_8px_#ff2b2b]" />
+                        <span className="absolute left-[34%] top-[42%] h-[5px] w-[7px] rounded-[50%] bg-[#ff5c5c] shadow-[0_0_7px_#ff2b2b]" />
+                        <span className="absolute left-[57%] top-[42%] h-[5px] w-[7px] rounded-[50%] bg-[#ff5c5c] shadow-[0_0_7px_#ff2b2b]" />
+                        <span className="absolute -right-2 -top-1 grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-ink/85 text-sm shadow-[0_3px_0_rgba(0,0,0,0.35)]">
+                          🔒
+                        </span>
                       </>
                     )}
                     {done && (
-                      <span className="absolute -right-1 -top-1 text-xl drop-shadow">😊</span>
+                      <span className="pop-in absolute -right-1 -top-1 text-xl drop-shadow">😊</span>
                     )}
                   </span>
 
+                  {/* pedestal de piedra */}
+                  <span
+                    className="relative z-10 h-4 w-[74px] rounded-[50%] border-2 border-white/80 shadow-[0_4px_0_rgba(0,0,0,0.35)]"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 50% 25%, #f4efe3, #b9ad97 70%, #8c8171)",
+                      filter: open ? "none" : "saturate(0.8) brightness(0.92)",
+                    }}
+                    aria-hidden="true"
+                  />
+
                   {/* medallón */}
                   <span
-                    className="grid h-11 w-24 place-items-center rounded-[50%] border-4 shadow-[0_7px_0_rgba(0,0,0,0.4)]"
+                    className="-mt-2 grid h-10 w-[84px] place-items-center rounded-[50%] border-4 shadow-[0_6px_0_rgba(0,0,0,0.38)]"
                     style={{
                       background: `radial-gradient(circle at 50% 28%, ${a.gem}, rgba(0,0,0,0.28))`,
                       borderColor: "#ffffffee",
-                      filter: open ? "none" : "saturate(0.6) brightness(0.85)",
+                      filter: open ? "none" : "saturate(0.75) brightness(0.9)",
                     }}
                   >
-                    <span className="grid h-8 w-8 place-items-center rounded-full border-2 border-white/90 bg-ink/70 text-lg font-black text-white">
+                    <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-white/90 bg-ink/70 text-base font-black text-white">
                       {open ? i + 1 : "🔒"}
                     </span>
                   </span>
 
                   <span
-                    className="-mt-1 rounded-lg border-2 border-white/80 px-2 py-[2px] text-[0.7rem] font-black uppercase tracking-wider text-white shadow-[0_3px_0_rgba(0,0,0,0.35)]"
-                    style={{ backgroundColor: "rgba(28,36,52,0.92)" }}
+                    className="-mt-1 rounded-full border-2 border-white/90 px-3 py-[3px] text-[0.68rem] font-black tracking-wide text-white shadow-[0_3px_0_rgba(0,0,0,0.3)]"
+                    style={{ backgroundColor: "rgba(24,32,48,0.78)", backdropFilter: "blur(2px)" }}
                   >
-                    {a.name}
+                    {a.emoji} {a.name}
                   </span>
 
                   {isNext && (
@@ -387,6 +399,7 @@ export function MapaMundo({
                       👇
                     </span>
                   )}
+
                 </button>
               </div>
             );
