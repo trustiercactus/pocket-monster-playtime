@@ -270,13 +270,13 @@ export function MapaMundo({
                     isNext ? "node-bob" : ""
                   }`}
                 >
-                  {/* niebla mágica del hechizo */}
+                  {/* niebla mágica del hechizo (suave, sin oscurecer) */}
                   {!done && (
                     <span
                       className="fog-drift pointer-events-none absolute -inset-4 rounded-full blur-md"
                       style={{
                         background:
-                          "radial-gradient(circle, rgba(190,200,255,0.75), rgba(120,110,180,0.25) 60%, transparent 75%)",
+                          "radial-gradient(circle, rgba(235,240,255,0.55), rgba(180,190,255,0.18) 60%, transparent 75%)",
                       }}
                       aria-hidden="true"
                     />
@@ -286,11 +286,12 @@ export function MapaMundo({
                       className="dark-aura pointer-events-none absolute left-1/2 top-2 h-20 w-20 -translate-x-1/2 rounded-full blur-sm"
                       style={{
                         background:
-                          "radial-gradient(circle, rgba(90,40,140,0.55), transparent 70%)",
+                          "radial-gradient(circle, rgba(140,110,220,0.3), transparent 70%)",
                       }}
                       aria-hidden="true"
                     />
                   )}
+
 
                   {/* guardián */}
                   <span className="relative -mb-3">
