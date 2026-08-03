@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import flami from "@/assets/flami.png";
 import aquip from "@/assets/aquip.png";
 import hojito from "@/assets/hojito.png";
