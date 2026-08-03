@@ -30,20 +30,37 @@ export const Route = createFileRoute("/")({
 });
 
 const SAVE_KEY = "criaturitas-partida";
+const OPTS_KEY = "criaturitas-opciones";
+
+type Opciones = { sonidos: boolean; musica: boolean; vibracion: boolean };
+const OPTS_DEFAULT: Opciones = { sonidos: true, musica: true, vibracion: true };
 
 function Index() {
   const [ajustes, setAjustes] = useState(false);
+  const [confirmar, setConfirmar] = useState(false);
+  const [creditos, setCreditos] = useState(false);
+  const [opciones, setOpciones] = useState<Opciones>(OPTS_DEFAULT);
   const navigate = useNavigate();
 
-  const cambiarNombre = () => {
+  useEffect(() => {
     try {
-      const raw = window.localStorage.getItem(SAVE_KEY);
-      const data = raw ? JSON.parse(raw) : {};
-      window.localStorage.setItem(SAVE_KEY, JSON.stringify({ ...data, name: "" }));
+      const raw = window.localStorage.getItem(OPTS_KEY);
+      if (raw) setOpciones({ ...OPTS_DEFAULT, ...JSON.parse(raw) });
     } catch {
       /* sin guardado */
     }
-    navigate({ to: "/jugar" });
+  }, []);
+
+  const toggle = (key: keyof Opciones) => {
+    setOpciones((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      try {
+        window.localStorage.setItem(OPTS_KEY, JSON.stringify(next));
+      } catch {
+        /* sin guardado */
+      }
+      return next;
+    });
   };
 
   const borrarTodo = () => {
@@ -52,8 +69,10 @@ function Index() {
     } catch {
       /* sin guardado */
     }
+    setConfirmar(false);
     setAjustes(false);
   };
+
 
   return (
     <main className="relative min-h-screen overflow-hidden">
