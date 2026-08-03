@@ -1,13 +1,23 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AREAS, GEM_ZONES, type Area } from "@/lib/areas";
 import { getCreature } from "@/lib/creatures";
-import { LiveSprite } from "@/components/LiveSprite";
-import trainerImg from "@/assets/trainer.png";
-import mapaFondo from "@/assets/mapa-mundo.jpg";
+import mapaFondo from "@/assets/mapa-vertical.jpg";
 import legendariaImg from "@/assets/legendaria.png";
+
+const OPTS_KEY = "criaturitas-opciones";
+
+function soundOn() {
+  try {
+    const raw = window.localStorage.getItem(OPTS_KEY);
+    return raw ? (JSON.parse(raw).sonidos ?? true) : true;
+  } catch {
+    return true;
+  }
+}
 
 function say(text: string) {
   try {
+    if (!soundOn()) return;
     const s = window.speechSynthesis;
     if (!s) return;
     s.cancel();
@@ -21,29 +31,53 @@ function say(text: string) {
   }
 }
 
-function Gem({ color, on, size = 30 }: { color: string; on: boolean; size?: number }) {
+/** Hueco de corona: cavidad plateada que recibe la esmeralda */
+function GemSocket({ color, on }: { color: string; on: boolean }) {
   return (
-    <svg
-      width={size}
-      height={size * 1.15}
-      viewBox="0 0 24 28"
-      aria-hidden="true"
-      className={on ? "gem-pop drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]" : "opacity-60"}
-    >
-      <path
-        d="M7 2h10l5 6v12l-5 6H7l-5-6V8z"
-        fill={on ? color : "#8a8f99"}
-        stroke="rgba(0,0,0,0.6)"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path d="M7 2l5 12L7 26z" fill="rgba(255,255,255,0.35)" />
-      <path d="M17 2l-5 12 5 12z" fill="rgba(0,0,0,0.18)" />
-    </svg>
+    <span className="relative grid h-9 w-8 place-items-center">
+      <svg width="30" height="34" viewBox="0 0 24 28" aria-hidden="true">
+        <path
+          d="M7 2h10l5 6v12l-5 6H7l-5-6V8z"
+          fill="url(#socket)"
+          stroke="rgba(255,255,255,0.95)"
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+        <defs>
+          <linearGradient id="socket" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#e9eef6" />
+            <stop offset="55%" stopColor="#b9c3d4" />
+            <stop offset="100%" stopColor="#8f9bb0" />
+          </linearGradient>
+        </defs>
+      </svg>
+      {!on && (
+        <span className="socket-shine pointer-events-none absolute inset-2 rounded-full bg-white blur-[3px]" />
+      )}
+      {on && (
+        <span className="gem-drop absolute inset-0 grid place-items-center">
+          <svg width="26" height="30" viewBox="0 0 24 28" aria-hidden="true">
+            <path
+              d="M7 2h10l5 6v12l-5 6H7l-5-6V8z"
+              fill={color}
+              stroke="rgba(255,255,255,0.9)"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+            <path d="M7 2l5 12L7 26z" fill="rgba(255,255,255,0.45)" />
+            <path d="M17 2l-5 12 5 12z" fill="rgba(0,0,0,0.15)" />
+          </svg>
+          <span
+            className="twinkle pointer-events-none absolute -inset-1 rounded-full"
+            style={{ boxShadow: `0 0 14px 4px ${color}` }}
+          />
+        </span>
+      )}
+    </span>
   );
 }
 
-function ChunkyButton({
+function RoundButton({
   onClick,
   label,
   icon,
@@ -59,11 +93,48 @@ function ChunkyButton({
       onClick={onClick}
       aria-label={label}
       style={{ backgroundColor: color }}
-      className="btn-bounce btn-3d flex flex-col items-center rounded-[1.4rem] border-4 border-white/90 px-4 py-2 text-white shadow-[0_8px_0_rgba(0,0,0,0.35)]"
+      className="btn-bounce btn-3d grid h-16 w-16 place-items-center rounded-full border-4 border-white text-3xl text-white shadow-[0_7px_0_rgba(0,0,0,0.35)]"
     >
-      <span className="text-3xl drop-shadow-[0_2px_0_rgba(0,0,0,0.35)]">{icon}</span>
-      <span className="text-[0.7rem] font-black tracking-wide">{label}</span>
+      <span className="drop-shadow-[0_2px_0_rgba(0,0,0,0.35)]">{icon}</span>
     </button>
+  );
+}
+
+/** piedras del sendero entre dos zonas */
+function PathStones({ a, b, lit }: { a: Area; b: Area; lit: boolean }) {
+  const stones = 5;
+  return (
+    <>
+      {Array.from({ length: stones }).map((_, i) => {
+        const t = (i + 1) / (stones + 1);
+        const x = a.x + (b.x - a.x) * t;
+        const y = a.y + (b.y - a.y) * t;
+        const size = 16 + Math.sin(t * Math.PI) * 8;
+        return (
+          <span
+            key={i}
+            className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 ${
+              lit ? "stone-pulse" : ""
+            }`}
+            style={{
+              left: `${x}%`,
+              top: `${y}%`,
+              width: size,
+              height: size * 0.8,
+              animationDelay: `${i * 0.15}s`,
+              background: lit
+                ? "radial-gradient(circle at 40% 30%, #fff3b0, #ffcc4d)"
+                : "radial-gradient(circle at 40% 30%, #fdfbf4, #cfc7b4)",
+              borderColor: lit ? "#ffffffdd" : "#ffffffaa",
+              boxShadow: lit
+                ? "0 3px 0 rgba(0,0,0,0.28), 0 0 12px rgba(255,214,90,0.9)"
+                : "0 3px 0 rgba(0,0,0,0.25)",
+            }}
+            aria-hidden="true"
+          />
+        );
+      })}
+    </>
   );
 }
 
@@ -73,7 +144,6 @@ export function MapaMundo({
   legendary,
   onArea,
   onCollection,
-  onHome,
   onSettings,
   onLegendary,
 }: {
@@ -82,14 +152,15 @@ export function MapaMundo({
   legendary: boolean;
   onArea: (a: Area) => void;
   onCollection: () => void;
-  onHome: () => void;
+  onHome?: () => void;
   onSettings: () => void;
   onLegendary: () => void;
   hasEggs?: boolean;
 }) {
-  const [profile, setProfile] = useState(false);
-  const [wave, setWave] = useState(false);
   const [cine, setCine] = useState(false);
+  const [sound, setSound] = useState(true);
+  const scroller = useRef<HTMLDivElement>(null);
+  const nextRef = useRef<HTMLDivElement>(null);
 
   const allGems = GEM_ZONES.every((z) => zonesDone.includes(z.id));
 
@@ -105,9 +176,13 @@ export function MapaMundo({
   }, [zonesDone, allGems]);
 
   useEffect(() => {
-    if (zonesDone.length === 0) return undefined;
-    setWave(true);
-    const t = setTimeout(() => setWave(false), 1700);
+    setSound(soundOn());
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      nextRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 350);
     return () => clearTimeout(t);
   }, [zonesDone.length]);
 
@@ -115,247 +190,193 @@ export function MapaMundo({
     if (allGems && !legendary) setCine(true);
   }, [allGems, legendary]);
 
-  // zonas despiertas: agujeros de color en el velo gris
-  const awake = AREAS.filter((a, i) => zonesDone.includes(a.id) || isOpen(a, i));
-  const holes = awake
-    .map((a) => `radial-gradient(circle at ${a.x}% ${a.y}%, transparent 0 12%, #000 24%)`)
-    .join(", ");
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (nextZone) say(`¡Vamos ${name}! Toca ${nextZone.name}.`);
+    }, 1100);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nextZone?.id]);
+
+  const toggleSound = () => {
+    const next = !sound;
+    setSound(next);
+    try {
+      const raw = window.localStorage.getItem(OPTS_KEY);
+      const prev = raw ? JSON.parse(raw) : {};
+      window.localStorage.setItem(OPTS_KEY, JSON.stringify({ ...prev, sonidos: next }));
+    } catch {
+      /* sin guardado */
+    }
+    if (next && nextZone) say(`Toca ${nextZone.name}.`);
+    else window.speechSynthesis?.cancel();
+  };
 
   return (
-    <div className="screen-in w-full overflow-x-auto">
-      <div className="relative mx-auto aspect-[16/9] w-full min-w-[880px] overflow-hidden rounded-[2rem] border-[6px] border-white/80 shadow-[0_12px_0_rgba(0,0,0,0.25)]">
-        <img
-          src={mapaFondo}
-          alt=""
-          width={1920}
-          height={1088}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        {/* velo del reino dormido */}
-        <div
-          className="pointer-events-none absolute inset-0 transition-all duration-1000"
-          style={{
-            backgroundImage: `url(${mapaFondo})`,
-            backgroundSize: "cover",
-            filter: "grayscale(1) brightness(0.42) contrast(1.05)",
-            WebkitMaskImage: holes || undefined,
-            maskImage: holes || undefined,
-            WebkitMaskComposite: "source-in",
-            maskComposite: "intersect",
-          }}
-        />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(10,14,25,0.55))]" />
+    <div className="fixed inset-0 z-0 bg-[#8fd8ff]">
+      <div ref={scroller} className="h-full w-full overflow-y-auto overflow-x-hidden">
+        <div className="relative h-[240vh] min-h-[1400px] w-full">
+          <img
+            src={mapaFondo}
+            alt=""
+            width={768}
+            height={1920}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
 
-        {/* camino */}
-        <svg className="absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-          {AREAS.slice(0, -1).map((a, i) => {
-            const b = AREAS[i + 1]!;
-            const lit = zonesDone.includes(a.id);
+          {/* sendero de piedras */}
+          {AREAS.slice(0, -1).map((a, i) => (
+            <PathStones key={a.id} a={a} b={AREAS[i + 1]!} lit={zonesDone.includes(a.id)} />
+          ))}
+
+          {/* zonas */}
+          {AREAS.map((a, i) => {
+            const done = zonesDone.includes(a.id);
+            const open = isOpen(a, i);
+            const isNext = nextZone?.id === a.id;
+            const guardian = getCreature(a.guardian);
             return (
-              <line
+              <div
                 key={a.id}
-                x1={a.x}
-                y1={a.y}
-                x2={b.x}
-                y2={b.y}
-                stroke={lit ? "#ffe27a" : "rgba(220,225,235,0.45)"}
-                strokeWidth={lit ? 2.2 : 1.4}
-                strokeLinecap="round"
-                strokeDasharray="3 4"
-                className={lit ? "path-glow" : undefined}
-              />
+                ref={isNext ? nextRef : undefined}
+                className="absolute -translate-x-1/2 -translate-y-1/2"
+                style={{ left: `${a.x}%`, top: `${a.y}%` }}
+              >
+                {done && (
+                  <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+                    {a.particles.map((p, k) => (
+                      <span
+                        key={k}
+                        className="sparkle-up absolute text-2xl"
+                        style={{ left: `${k * 34}%`, animationDelay: `${k * 0.7}s` }}
+                      >
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <button
+                  onClick={() => open && onArea(a)}
+                  aria-label={open ? a.name : `${a.name} bloqueada`}
+                  disabled={!open}
+                  className={`relative flex flex-col items-center ${open ? "btn-bounce" : ""} ${
+                    isNext ? "node-bob" : ""
+                  }`}
+                >
+                  {/* niebla mágica del hechizo */}
+                  {!done && (
+                    <span
+                      className="fog-drift pointer-events-none absolute -inset-4 rounded-full blur-md"
+                      style={{
+                        background:
+                          "radial-gradient(circle, rgba(190,200,255,0.75), rgba(120,110,180,0.25) 60%, transparent 75%)",
+                      }}
+                      aria-hidden="true"
+                    />
+                  )}
+                  {!done && (
+                    <span
+                      className="dark-aura pointer-events-none absolute left-1/2 top-2 h-20 w-20 -translate-x-1/2 rounded-full blur-sm"
+                      style={{
+                        background:
+                          "radial-gradient(circle, rgba(90,40,140,0.55), transparent 70%)",
+                      }}
+                      aria-hidden="true"
+                    />
+                  )}
+
+                  {/* guardián */}
+                  <span className="relative -mb-3">
+                    <img
+                      src={guardian.image}
+                      alt=""
+                      loading="lazy"
+                      className="h-20 w-20 object-contain drop-shadow-[0_5px_5px_rgba(0,0,0,0.45)]"
+                      style={{
+                        filter: done
+                          ? "saturate(1.1)"
+                          : "saturate(0.72) brightness(0.88) contrast(0.95)",
+                      }}
+                    />
+                    {!done && (
+                      <>
+                        <span className="absolute left-[34%] top-[42%] h-[6px] w-[6px] rounded-full bg-[#ff3b3b] shadow-[0_0_8px_#ff2b2b]" />
+                        <span className="absolute left-[56%] top-[42%] h-[6px] w-[6px] rounded-full bg-[#ff3b3b] shadow-[0_0_8px_#ff2b2b]" />
+                      </>
+                    )}
+                    {done && (
+                      <span className="absolute -right-1 -top-1 text-xl drop-shadow">😊</span>
+                    )}
+                  </span>
+
+                  {/* medallón */}
+                  <span
+                    className="grid h-11 w-24 place-items-center rounded-[50%] border-4 shadow-[0_7px_0_rgba(0,0,0,0.4)]"
+                    style={{
+                      background: `radial-gradient(circle at 50% 28%, ${a.gem}, rgba(0,0,0,0.28))`,
+                      borderColor: "#ffffffee",
+                      filter: open ? "none" : "saturate(0.6) brightness(0.85)",
+                    }}
+                  >
+                    <span className="grid h-8 w-8 place-items-center rounded-full border-2 border-white/90 bg-ink/70 text-lg font-black text-white">
+                      {open ? i + 1 : "🔒"}
+                    </span>
+                  </span>
+
+                  <span
+                    className="-mt-1 rounded-lg border-2 border-white/80 px-2 py-[2px] text-[0.7rem] font-black uppercase tracking-wider text-white shadow-[0_3px_0_rgba(0,0,0,0.35)]"
+                    style={{ backgroundColor: "rgba(28,36,52,0.92)" }}
+                  >
+                    {a.name}
+                  </span>
+
+                  {isNext && (
+                    <span className="arrow-point absolute -top-11 left-1/2 -translate-x-1/2 text-4xl drop-shadow-[0_3px_2px_rgba(0,0,0,0.4)]">
+                      👇
+                    </span>
+                  )}
+                </button>
+              </div>
             );
           })}
-        </svg>
-
-        {/* nodos */}
-        {AREAS.map((a, i) => {
-          const done = zonesDone.includes(a.id);
-          const open = isOpen(a, i);
-          const isNext = nextZone?.id === a.id;
-          const guardian = getCreature(a.guardian);
-          return (
-            <div
-              key={a.id}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${a.x}%`, top: `${a.y}%` }}
-            >
-              {done && (
-                <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-                  {a.particles.map((p, k) => (
-                    <span
-                      key={k}
-                      className="biome-float absolute text-2xl"
-                      style={{ left: `${k * 28}%`, animationDelay: `${k * 0.6}s` }}
-                    >
-                      {p}
-                    </span>
-                  ))}
-                </div>
-              )}
-              <button
-                onClick={() => open && onArea(a)}
-                aria-label={open ? a.name : `${a.name} bloqueada`}
-                disabled={!open}
-                className={`relative flex flex-col items-center ${open ? "btn-bounce" : ""} ${
-                  isNext ? "node-bob" : ""
-                }`}
-              >
-                {/* guardián sobre la plataforma */}
-                <img
-                  src={guardian.image}
-                  alt=""
-                  loading="lazy"
-                  className={`-mb-3 h-16 w-16 object-contain drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)] ${
-                    open ? "" : "grayscale brightness-75"
-                  }`}
-                />
-                {/* plataforma redonda */}
-                <span
-                  className="grid h-8 w-20 place-items-center rounded-[50%] border-4 shadow-[0_6px_0_rgba(0,0,0,0.4)]"
-                  style={{
-                    background: open
-                      ? `radial-gradient(circle at 50% 30%, ${a.gem}, rgba(0,0,0,0.25))`
-                      : "linear-gradient(#8d939d,#5c626c)",
-                    borderColor: open ? "#ffffffcc" : "#c9ced6aa",
-                  }}
-                >
-                  <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-white/80 bg-ink/70 text-sm font-black text-white">
-                    {i + 1}
-                  </span>
-                </span>
-                {/* banderola con el nombre */}
-                <span
-                  className="-mt-1 rounded-md border-2 border-white/70 px-2 py-[2px] text-[0.65rem] font-black uppercase tracking-wider text-white shadow-[0_3px_0_rgba(0,0,0,0.35)]"
-                  style={{ backgroundColor: open ? "rgba(28,36,52,0.9)" : "rgba(60,66,76,0.9)" }}
-                >
-                  {a.name}
-                </span>
-                {!open && (
-                  <span className="absolute right-0 top-8 grid h-8 w-8 place-items-center rounded-full border-2 border-white/80 bg-slate-300 text-lg shadow-[0_3px_0_rgba(0,0,0,0.4)]">
-                    🔒
-                  </span>
-                )}
-                {done && (
-                  <span className="absolute -right-1 top-6 text-2xl drop-shadow">✅</span>
-                )}
-                {isNext && (
-                  <span className="wiggle absolute -top-10 left-1/2 -translate-x-1/2 text-3xl">
-                    👇
-                  </span>
-                )}
-              </button>
-              {isNext && (
-                <LiveSprite
-                  src={trainerImg}
-                  alt=""
-                  motion="hop"
-                  className="pointer-events-none absolute -left-14 bottom-2 w-14"
-                />
-              )}
-            </div>
-          );
-        })}
-
-        {wave && (
-          <div
-            className="light-wave pointer-events-none absolute inset-y-0 w-1/3"
-            style={{
-              background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent)",
-            }}
-            aria-hidden="true"
-          />
-        )}
-
-        {/* barra de esmeraldas */}
-        <div className="absolute left-1/2 top-3 flex -translate-x-1/2 items-center gap-2 rounded-full border-4 border-white/70 bg-ink/80 px-4 py-1 shadow-[0_6px_0_rgba(0,0,0,0.4)]">
-          {GEM_ZONES.map((z) => (
-            <Gem key={z.id} color={z.gem} on={zonesDone.includes(z.id)} />
-          ))}
         </div>
-
-        {/* botones */}
-        <div className="absolute left-3 top-3">
-          <ChunkyButton onClick={onSettings} label="OPCIONES" icon="⚙️" color="var(--arcade-blue)" />
-        </div>
-        <div className="absolute right-3 top-3">
-          <ChunkyButton
-            onClick={() => setProfile(true)}
-            label="PERFIL"
-            icon="👦"
-            color="var(--arcade-green)"
-          />
-        </div>
-        <div className="absolute bottom-3 left-3">
-          <ChunkyButton
-            onClick={onCollection}
-            label="COLECCIÓN"
-            icon="📖"
-            color="var(--arcade-yellow)"
-          />
-        </div>
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
-          <ChunkyButton onClick={onHome} label="CASA" icon="🏠" color="var(--arcade-orange)" />
-        </div>
-
-        {/* búho guía */}
-        <div className="absolute left-4 top-1/4 flex items-start gap-2">
-          <span className="breathe text-6xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">🦉</span>
-          <div className="flex items-start gap-2">
-            <p className="max-w-[9.5rem] rounded-2xl border-4 border-white bg-[#fdf6e3] px-3 py-2 text-center text-[0.8rem] font-black leading-tight text-ink shadow-[0_6px_0_rgba(0,0,0,0.3)]">
-              ¡Derrota al guardián y consigue su{" "}
-              <span className="text-orange">Esmeralda!</span>
-            </p>
-            <button
-              onClick={() =>
-                say(
-                  nextZone
-                    ? `¡Hola ${name}! Toca ${nextZone.name} y vence al guardián para conseguir su esmeralda.`
-                    : "¡Has conseguido todas las esmeraldas!",
-                )
-              }
-              aria-label="Escuchar al búho"
-              className="btn-bounce grid h-12 w-12 place-items-center rounded-full border-4 border-white bg-blue text-2xl text-white shadow-[0_5px_0_rgba(0,0,0,0.35)]"
-              style={{ backgroundColor: "var(--arcade-blue)" }}
-            >
-              🔊
-            </button>
-          </div>
-        </div>
-
-        {profile && (
-          <div
-            className="absolute inset-0 z-20 grid place-items-center bg-ink/70 px-6"
-            onClick={() => setProfile(false)}
-          >
-            <div className="pop-in flex flex-col items-center gap-3 rounded-[2rem] border-4 border-white bg-white px-8 py-6 shadow-2xl">
-              <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-28" />
-              <p className="text-3xl font-black text-ink">{name}</p>
-              <div className="flex gap-1">
-                {GEM_ZONES.map((z) => (
-                  <Gem key={z.id} color={z.gem} on={zonesDone.includes(z.id)} size={22} />
-                ))}
-              </div>
-              <button
-                onClick={() => setProfile(false)}
-                aria-label="Cerrar"
-                className="btn-bounce rounded-[1.5rem] border-4 border-white bg-orange px-8 py-4 text-3xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)]"
-              >
-                ✅
-              </button>
-            </div>
-          </div>
-        )}
-
-        {cine && (
-          <Cinematica
-            onDone={() => {
-              setCine(false);
-              onLegendary();
-            }}
-          />
-        )}
       </div>
+
+      {/* corona de esmeraldas */}
+      <div className="pointer-events-none absolute left-1/2 top-2 z-20 flex -translate-x-1/2 items-center gap-[2px] rounded-full border-4 border-white/90 bg-ink/85 px-3 py-1 shadow-[0_6px_0_rgba(0,0,0,0.4)]">
+        {GEM_ZONES.map((z) => (
+          <GemSocket key={z.id} color={z.gem} on={zonesDone.includes(z.id)} />
+        ))}
+      </div>
+
+      {/* botones */}
+      <div className="absolute left-3 top-20 z-20 flex flex-col gap-3">
+        <RoundButton onClick={onSettings} label="Opciones" icon="⚙️" color="var(--arcade-blue)" />
+        <RoundButton
+          onClick={toggleSound}
+          label={sound ? "Silenciar" : "Activar sonido"}
+          icon={sound ? "🔊" : "🔇"}
+          color="var(--arcade-green)"
+        />
+      </div>
+      <div className="absolute bottom-6 left-3 z-20">
+        <RoundButton
+          onClick={onCollection}
+          label="Colección"
+          icon="📖"
+          color="var(--arcade-yellow)"
+        />
+      </div>
+
+      {cine && (
+        <Cinematica
+          onDone={() => {
+            setCine(false);
+            onLegendary();
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -382,12 +403,12 @@ function Cinematica({ onDone }: { onDone: () => void }) {
                 className="gem-fly absolute"
                 style={
                   {
-                    "--gx": `${Math.cos(ang) * 160}px`,
-                    "--gy": `${Math.sin(ang) * 110}px`,
+                    "--gx": `${Math.cos(ang) * 120}px`,
+                    "--gy": `${Math.sin(ang) * 120}px`,
                   } as React.CSSProperties
                 }
               >
-                <Gem color={z.gem} on size={44} />
+                <GemSocket color={z.gem} on />
               </span>
             );
           })}
