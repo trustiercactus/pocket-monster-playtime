@@ -50,7 +50,7 @@ function AuthPage() {
         password,
         options: { emailRedirectTo: window.location.origin },
       });
-      setMsg(error ? error.message : "Te hemos enviado un correo para confirmar la cuenta.");
+      if (error) setMsg(error.message);
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setMsg(error.message);
@@ -80,9 +80,13 @@ function AuthPage() {
           minLength={6}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="Contraseña"
+          placeholder="Contraseña (la que tú quieras)"
           className="rounded-2xl bg-white px-5 py-4 text-lg text-ink outline-none"
         />
+        <p className="px-2 text-sm text-ink/60">
+          Vale cualquier cosa fácil de recordar, solo 6 caracteres mínimo.
+        </p>
+
         <button
           type="submit"
           disabled={busy}
