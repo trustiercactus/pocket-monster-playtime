@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -65,15 +64,6 @@ function AuthPage() {
       <p className="text-center text-ink/70 max-w-xs">
         Entra para guardar el progreso del peque en la nube.
       </p>
-
-      <button
-        onClick={() =>
-          lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin })
-        }
-        className="w-full max-w-sm rounded-3xl bg-white px-6 py-5 text-xl font-bold text-ink shadow-[0_6px_0_rgba(0,0,0,0.15)] active:translate-y-1"
-      >
-        Continuar con Google
-      </button>
 
       <form onSubmit={submit} className="w-full max-w-sm flex flex-col gap-3">
         <input
