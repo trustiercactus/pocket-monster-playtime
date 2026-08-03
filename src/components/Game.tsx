@@ -537,47 +537,72 @@ function Batalla({
       <div className="flex items-start justify-between">
         <button
           onClick={onBack}
-          className="rounded-full bg-white px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.15)] active:translate-y-1"
+          className="btn-bounce rounded-full border-4 border-white bg-white px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Volver"
         >
           ⬅️
         </button>
-        <img src={area.image} alt={area.name} className="h-16 object-contain opacity-80" />
+        <img src={area.image} alt={area.name} className="float-soft h-16 object-contain" />
       </div>
 
       {/* Rival: entrenadora a la derecha con sus criaturas detrás */}
       <div className="flex items-end justify-end gap-1">
         <div className="flex flex-col items-end gap-1">
           <Hearts n={rivalHp} />
-          <img src={rival.image} alt={rival.name} className="w-24 drop-shadow-xl float-soft" />
+          <LiveSprite
+            src={rival.image}
+            alt={rival.name}
+            motion="breathe"
+            className="w-24 drop-shadow-xl"
+          />
         </div>
         <div className="flex flex-col gap-1">
           {rivalTeam.map((c, i) => (
-            <img key={i} src={c.image} alt="" className="w-12 opacity-70" />
+            <LiveSprite
+              key={i}
+              src={c.image}
+              alt=""
+              motion="sway"
+              delay={i * 0.4}
+              className="w-12 opacity-70"
+            />
           ))}
         </div>
-        <img src={rivalTrainerImg} alt="Entrenadora rival" className="w-20" />
+        <LiveSprite src={rivalTrainerImg} alt="Entrenadora rival" motion="hop" className="w-20" />
       </div>
 
-      <div className="text-center text-7xl h-24">{fx}</div>
+      <div className="text-center text-7xl h-24">
+        <span className="pop-in inline-block" key={fx ?? "none"}>
+          {fx}
+        </span>
+      </div>
 
       {/* Jugador: entrenador a la izquierda con sus criaturas detrás */}
       <div className="flex items-end gap-1">
-        <img src={trainerImg} alt="Tu entrenador" className="w-24" />
+        <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-24" />
         <div className="flex flex-col gap-1">
-          {myTeam.map((c) => (
-            <img key={c.id} src={c.image} alt="" className="w-12 opacity-70" />
+          {myTeam.map((c, i) => (
+            <LiveSprite
+              key={c.id}
+              src={c.image}
+              alt=""
+              motion="sway"
+              delay={i * 0.4}
+              className="w-12 opacity-70"
+            />
           ))}
         </div>
         <div className="flex flex-col items-start gap-1">
-          <img
+          <LiveSprite
             src={companion.image}
             alt={companion.name}
-            className="w-32 drop-shadow-xl float-soft"
+            motion="breathe"
+            className="w-32 drop-shadow-xl"
           />
           <Hearts n={myHp} />
         </div>
       </div>
+
 
       <div className="mt-4 flex gap-3">
         <BigButton
