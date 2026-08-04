@@ -231,7 +231,21 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
         <Coleccion
           progress={progress}
           onPick={(id) => save({ ...progress, companion: id })}
-          onBack={() => setScreen("mapa")}
+          onBack={() => setScreen(ended ? "final" : "mapa")}
+        />
+      )}
+      {screen === "final" && (
+        <FinalScreen
+          name={progress.name}
+          unlocked={progress.unlocked}
+          onCollection={() => setScreen("coleccion")}
+          onNewGame={() => {
+            setEnded(false);
+            setFighter(null);
+            setArea(AREAS[0] as Area);
+            save({ ...INITIAL, name: progress.name });
+            setScreen("mapa");
+          }}
         />
       )}
       {screen === "elegir" && (
