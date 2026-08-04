@@ -137,13 +137,14 @@ function AmbientLayer({ area }: { area: Area }) {
   );
 }
 
-/** botón enorme circular, degradado continuo y destello al pulsar */
+/** botón circular único: aro de carga opcional, brillo de juguete, sin marcos dobles */
 function RoundButton({
   onClick,
   disabled,
   label,
   color,
-  size = "big",
+  charge,
+  ready,
   className = "",
   children,
 }: {
@@ -151,11 +152,14 @@ function RoundButton({
   disabled?: boolean;
   label: string;
   color: string;
-  size?: "big" | "huge";
+  /** 0..1 — dibuja el aro de carga en el propio borde del botón */
+  charge?: number;
+  ready?: boolean;
   className?: string;
   children: React.ReactNode;
 }) {
   const [flash, setFlash] = useState(0);
+  const pct = Math.round((charge ?? 0) * 100);
 
   return (
     <button
@@ -167,13 +171,25 @@ function RoundButton({
       disabled={disabled}
       aria-label={label}
       style={{
-        background: `radial-gradient(circle at 50% 22%, color-mix(in oklab, ${color} 65%, white), ${color} 62%, color-mix(in oklab, ${color} 72%, black))`,
+        background: `radial-gradient(circle at 50% 20%, color-mix(in oklab, ${color} 62%, white), ${color} 60%, color-mix(in oklab, ${color} 78%, black))`,
       }}
-      className={`btn-orb ${flash ? "orb-bounce" : ""} grid place-items-center rounded-full border-[6px] border-white text-white shadow-[0_10px_0_rgba(0,0,0,0.28)] disabled:opacity-60 ${
-        size === "huge" ? "h-28 w-28 text-6xl" : "h-24 w-24 text-5xl"
-      } ${className}`}
+      className={`btn-orb ${flash ? "orb-bounce" : ""} ${ready ? "orb-ready" : ""} relative grid h-24 w-24 place-items-center rounded-full border-[3px] border-white/90 text-5xl text-white shadow-[0_6px_14px_rgba(0,0,0,0.28)] disabled:opacity-55 ${className}`}
     >
-      <span className="relative z-10 grid place-items-center drop-shadow-[0_3px_0_rgba(0,0,0,0.25)]">
+      {charge !== undefined && (
+        <span
+          className="pointer-events-none absolute -inset-[7px] rounded-full"
+          style={{
+            background: ready
+              ? "conic-gradient(from -90deg, #ffe27a, #ffb300 40%, #ffe27a 70%, #ffb300)"
+              : `conic-gradient(from -90deg, #ffd54a 0 ${pct}%, rgba(255,255,255,0.32) ${pct}% 100%)`,
+            mask: "radial-gradient(circle, transparent 78%, #000 79%)",
+            WebkitMask: "radial-gradient(circle, transparent 78%, #000 79%)",
+            filter: ready ? "drop-shadow(0 0 10px rgba(255,200,60,0.95))" : "none",
+          }}
+          aria-hidden="true"
+        />
+      )}
+      <span className="relative z-10 grid place-items-center drop-shadow-[0_2px_2px_rgba(0,0,0,0.28)]">
         {children}
       </span>
       {flash > 0 && (
@@ -499,7 +515,6 @@ export function Combate({
             color="var(--arcade-orange)"
             onClick={normalAttack}
             disabled={busy || ending > 0}
-            size="huge"
           >
             {attackIcon(companion, area)}
           </RoundButton>
@@ -510,7 +525,7 @@ export function Combate({
             onClick={heal}
             disabled={busy || ending > 0 || heals === 0}
           >
-            <span className="relative inline-grid h-14 w-14 place-items-center">
+            <span className="relative inline-grid h-12 w-12 place-items-center">
               {/* corazón gris de base */}
               <span
                 className="absolute inset-0 grid place-items-center text-5xl"
@@ -533,35 +548,12 @@ export function Combate({
             color="var(--arcade-yellow)"
             onClick={superAttack}
             disabled={busy || ending > 0 || !chargeReady}
-            size="huge"
-            className={chargeReady ? "btn-pulse star-ready" : ""}
+            charge={chargePct / 100}
+            ready={chargeReady}
           >
-            {/* borde dorado que se ilumina con la carga */}
-            <span
-              className="pointer-events-none absolute -inset-[6px] rounded-full"
-              style={{
-                background: `conic-gradient(from -90deg, #ffd54a 0 ${chargePct}%, rgba(255,255,255,0.35) ${chargePct}% 100%)`,
-                mask: "radial-gradient(circle, transparent 60%, #000 62%)",
-                WebkitMask: "radial-gradient(circle, transparent 60%, #000 62%)",
-                filter: chargeReady ? "drop-shadow(0 0 10px #ffd54a)" : "none",
-              }}
-              aria-hidden="true"
-            />
-            <span className="relative grid h-16 w-16 place-items-center">
-              <span className="absolute inset-0 grid place-items-center text-6xl opacity-40">
-                ⭐
-              </span>
-              <span
-                className="absolute inset-0 grid place-items-center overflow-hidden text-6xl"
-                style={{ clipPath: `inset(${100 - chargePct}% 0 0 0)` }}
-              >
-                ⭐
-              </span>
-              {chargeReady && (
-                <span className="absolute -right-1 -top-1 text-2xl twinkle">✨</span>
-              )}
-            </span>
+            <span className={chargeReady ? "star-ready" : "opacity-90"}>⭐</span>
           </RoundButton>
+
         </div>
       </div>
     </div>
