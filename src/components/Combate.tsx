@@ -473,7 +473,7 @@ export function Combate({
 
 
         {/* BOTONES */}
-        <div className="mt-2 flex items-center justify-center gap-5">
+        <div className="mt-2 flex items-center justify-center gap-7">
           <RoundButton
             label="Atacar"
             color="var(--arcade-orange)"
@@ -490,18 +490,21 @@ export function Combate({
             onClick={heal}
             disabled={busy || ending > 0 || heals === 0}
           >
-            <span
-              className="relative inline-block text-5xl"
-              style={{
-                filter:
-                  heals === 0
-                    ? "grayscale(1) brightness(0.9)"
-                    : heals === 1
-                      ? "grayscale(0.5)"
-                      : "none",
-              }}
-            >
-              💚
+            <span className="relative inline-grid h-14 w-14 place-items-center">
+              {/* corazón gris de base */}
+              <span
+                className="absolute inset-0 grid place-items-center text-5xl"
+                style={{ filter: "grayscale(1) brightness(0.85)" }}
+              >
+                💚
+              </span>
+              {/* parte verde restante: 100% → 50% → 0% */}
+              <span
+                className="absolute inset-0 grid place-items-center overflow-hidden text-5xl"
+                style={{ clipPath: `inset(0 ${100 - heals * 50}% 0 0)` }}
+              >
+                💚
+              </span>
             </span>
           </RoundButton>
 
@@ -513,6 +516,17 @@ export function Combate({
             size="huge"
             className={chargeReady ? "btn-pulse star-ready" : ""}
           >
+            {/* borde dorado que se ilumina con la carga */}
+            <span
+              className="pointer-events-none absolute -inset-[6px] rounded-full"
+              style={{
+                background: `conic-gradient(from -90deg, #ffd54a 0 ${chargePct}%, rgba(255,255,255,0.35) ${chargePct}% 100%)`,
+                mask: "radial-gradient(circle, transparent 60%, #000 62%)",
+                WebkitMask: "radial-gradient(circle, transparent 60%, #000 62%)",
+                filter: chargeReady ? "drop-shadow(0 0 10px #ffd54a)" : "none",
+              }}
+              aria-hidden="true"
+            />
             <span className="relative grid h-16 w-16 place-items-center">
               <span className="absolute inset-0 grid place-items-center text-6xl opacity-40">
                 ⭐
