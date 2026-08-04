@@ -332,8 +332,20 @@ export function MapaMundo({
 
                   {/* guardián integrado en su terreno */}
                   <span className="relative grid place-items-center">
+                    {a.boss && (
+                      <span
+                        className="boss-aura pointer-events-none absolute -inset-8 rounded-full blur-xl"
+                        style={{
+                          background:
+                            "radial-gradient(circle, rgba(122,47,242,0.85), rgba(40,10,70,0.55) 55%, transparent 75%)",
+                        }}
+                        aria-hidden="true"
+                      />
+                    )}
                     <span
-                      className="pointer-events-none absolute bottom-1 left-1/2 h-3 w-16 -translate-x-1/2 rounded-[50%] blur-[3px]"
+                      className={`pointer-events-none absolute bottom-1 left-1/2 h-3 -translate-x-1/2 rounded-[50%] blur-[3px] ${
+                        a.boss ? "w-28" : "w-16"
+                      }`}
                       style={{ background: "rgba(0,0,0,0.28)" }}
                       aria-hidden="true"
                     />
@@ -341,11 +353,15 @@ export function MapaMundo({
                       src={guardian.image}
                       alt=""
                       loading="lazy"
-                      className="relative h-20 w-20 object-contain drop-shadow-[0_5px_5px_rgba(0,0,0,0.4)]"
+                      className={`relative object-contain drop-shadow-[0_5px_5px_rgba(0,0,0,0.4)] ${
+                        a.boss ? "h-36 w-36" : "h-20 w-20"
+                      }`}
                       style={{
                         filter: done
                           ? "saturate(1.2) brightness(1.06)"
-                          : "saturate(0.82) brightness(0.96)",
+                          : a.boss
+                            ? "saturate(1.1) brightness(0.8) contrast(1.1)"
+                            : "saturate(0.82) brightness(0.96)",
                         transition: "filter 0.6s ease",
                       }}
                     />
@@ -366,24 +382,38 @@ export function MapaMundo({
 
                   {/* medallón */}
                   <span
-                    className="-mt-2 grid h-10 w-[84px] place-items-center rounded-[50%] border-4 shadow-[0_6px_0_rgba(0,0,0,0.38)]"
+                    className={`-mt-2 grid place-items-center rounded-[50%] border-4 shadow-[0_6px_0_rgba(0,0,0,0.38)] ${
+                      a.boss ? "h-12 w-[108px]" : "h-10 w-[84px]"
+                    }`}
                     style={{
-                      background: `radial-gradient(circle at 50% 28%, ${a.gem}, rgba(0,0,0,0.28))`,
+                      background: a.boss
+                        ? "radial-gradient(circle at 50% 28%, #a24bff, #2a1046)"
+                        : `radial-gradient(circle at 50% 28%, ${a.gem}, rgba(0,0,0,0.28))`,
                       borderColor: "#ffffffee",
                       filter: open ? "none" : "saturate(0.75) brightness(0.9)",
                     }}
                   >
-                    <span className="grid h-7 w-7 place-items-center rounded-full border-2 border-white/90 bg-ink/70 text-base font-black text-white">
-                      {open ? i + 1 : "🔒"}
+                    <span
+                      className={`grid place-items-center rounded-full border-2 border-white/90 bg-ink/70 font-black text-white ${
+                        a.boss ? "h-9 w-9 text-xl" : "h-7 w-7 text-base"
+                      }`}
+                    >
+                      {a.boss ? "👑" : open ? i + 1 : "🔒"}
                     </span>
                   </span>
 
                   <span
-                    className="-mt-1 rounded-full border-2 border-white/90 px-3 py-[3px] text-[0.68rem] font-black tracking-wide text-white shadow-[0_3px_0_rgba(0,0,0,0.3)]"
-                    style={{ backgroundColor: "rgba(24,32,48,0.78)", backdropFilter: "blur(2px)" }}
+                    className={`-mt-1 rounded-full border-2 border-white/90 font-black tracking-wide text-white shadow-[0_3px_0_rgba(0,0,0,0.3)] ${
+                      a.boss ? "px-4 py-1 text-[0.9rem]" : "px-3 py-[3px] text-[0.68rem]"
+                    }`}
+                    style={{
+                      backgroundColor: a.boss ? "rgba(24,10,40,0.92)" : "rgba(24,32,48,0.78)",
+                      backdropFilter: "blur(2px)",
+                    }}
                   >
                     {a.emoji} {a.name}
                   </span>
+
 
                   {isNext && (
                     <span className="arrow-point absolute -top-11 left-1/2 -translate-x-1/2 text-4xl drop-shadow-[0_3px_2px_rgba(0,0,0,0.4)]">
