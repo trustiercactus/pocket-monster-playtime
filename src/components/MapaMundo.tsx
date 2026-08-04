@@ -264,13 +264,7 @@ export function MapaMundo({
   return (
     <div className="fixed inset-0 z-0 bg-[#8fd8ff]">
       <div ref={scroller} className="h-full w-full overflow-y-auto overflow-x-hidden">
-        <div className="h-[120px] w-full bg-[#8fd8ff]" aria-hidden="true" />
-        <div className="relative h-[240vh] min-h-[1400px] w-full">
-          <div
-            className="absolute inset-x-0 -top-[120px] h-[130px]"
-            style={{ background: "linear-gradient(to bottom, #8fd8ff, #bfe8ff)" }}
-            aria-hidden="true"
-          />
+        <div className="relative w-full">
           <img
             src={mapaFondo}
             alt=""
@@ -278,6 +272,9 @@ export function MapaMundo({
             height={1920}
             className="absolute inset-0 h-full w-full object-cover"
           />
+          <div className="relative h-[150px] w-full" aria-hidden="true" />
+        <div className="relative h-[240vh] min-h-[1400px] w-full">
+
 
           {/* sendero de piedras */}
           {AREAS.slice(0, -1).map((a, i) => (
@@ -356,11 +353,9 @@ export function MapaMundo({
                       <>
                         <span className="absolute left-[34%] top-[42%] h-[5px] w-[7px] rounded-[50%] bg-[#ff5c5c] shadow-[0_0_7px_#ff2b2b]" />
                         <span className="absolute left-[57%] top-[42%] h-[5px] w-[7px] rounded-[50%] bg-[#ff5c5c] shadow-[0_0_7px_#ff2b2b]" />
-                        <span className="absolute -right-2 -top-1 grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-ink/85 text-sm shadow-[0_3px_0_rgba(0,0,0,0.35)]">
-                          🔒
-                        </span>
                       </>
                     )}
+
                     {done && (
                       <span className="pop-in absolute -right-1 -top-1 text-xl drop-shadow">😊</span>
                     )}
@@ -401,6 +396,8 @@ export function MapaMundo({
             );
           })}
         </div>
+        </div>
+
       </div>
 
       {/* corona de esmeraldas */}
