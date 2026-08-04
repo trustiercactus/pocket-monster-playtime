@@ -13,6 +13,7 @@ import { Scenery } from "@/components/Scenery";
 import { Casa } from "@/components/Casa";
 import { MapaMundo } from "@/components/MapaMundo";
 import { Combate } from "@/components/Combate";
+import { FinalScreen } from "@/components/FinalScreen";
 import { randomEgg, type Egg } from "@/lib/eggs";
 import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
@@ -30,7 +31,7 @@ export type Progress = {
   legendary: boolean;
 };
 
-type Screen = "mapa" | "casa" | "coleccion" | "elegir" | "batalla";
+type Screen = "mapa" | "casa" | "coleccion" | "elegir" | "batalla" | "final";
 
 const MAX_HP = 5;
 const SAVE_KEY = "criaturitas-partida";
