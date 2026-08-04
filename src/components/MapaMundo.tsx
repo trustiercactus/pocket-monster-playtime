@@ -3,6 +3,7 @@ import { AREAS, GEM_ZONES, TERRAIN, type Area } from "@/lib/areas";
 import { getCreature } from "@/lib/creatures";
 import mapaFondo from "@/assets/mapa-vertical.jpg";
 import legendariaImg from "@/assets/legendaria.png";
+import { Gema, type GemCut } from "@/components/Gema";
 
 
 const OPTS_KEY = "criaturitas-opciones";
@@ -441,33 +442,16 @@ export function MapaMundo({
       {/* corona de esmeraldas */}
       <div className="pointer-events-none absolute left-1/2 top-2 z-20 flex -translate-x-1/2 items-center gap-[2px] rounded-full border-4 border-white/90 bg-ink/85 px-3 py-1 shadow-[0_6px_0_rgba(0,0,0,0.4)]">
         {GEM_ZONES.map((z) => (
-          <GemSocket key={z.id} color={z.gem} on={zonesDone.includes(z.id)} />
+          <GemSocket
+            key={z.id}
+            color={z.gem}
+            cut={z.gemCut}
+            on={zonesDone.includes(z.id)}
+            justFilled={justFilled === z.id}
+          />
         ))}
       </div>
 
-      {/* esmeralda que vuela hasta la corona */}
-      {flying && (
-        <div
-          className="pointer-events-none absolute left-1/2 top-1/2 z-30"
-          style={{
-            transform:
-              flying.phase === 0
-                ? "translate(-50%, -50%) scale(1.8)"
-                : "translate(-50%, calc(-50vh + 22px)) scale(0.9)",
-            opacity: flying.phase === 0 ? 1 : 0.95,
-            transition: "transform 1s cubic-bezier(0.5, -0.2, 0.4, 1.3), opacity 1s ease",
-          }}
-          aria-hidden="true"
-        >
-          <span
-            className="gem-trail absolute left-1/2 top-1/2 h-24 w-2 -translate-x-1/2 origin-top rounded-full blur-[3px]"
-            style={{
-              background: `linear-gradient(to bottom, ${flying.color}, transparent)`,
-            }}
-          />
-          <GemSocket color={flying.color} on />
-        </div>
-      )}
 
       {/* botones permanentes */}
       <div className="absolute left-3 top-14 z-20 flex flex-row items-center gap-2">
