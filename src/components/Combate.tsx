@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getCreature, type Creature } from "@/lib/creatures";
 import type { Area } from "@/lib/areas";
 import { LiveSprite } from "@/components/LiveSprite";
+import mapaFondo from "@/assets/mapa-vertical.jpg";
 
 const MAX_HP = 5;
 const SUPER_CHARGE = 3;
@@ -160,7 +161,7 @@ function RoundButton({
       disabled={disabled}
       aria-label={label}
       style={{ background: color }}
-      className={`btn-bounce grid place-items-center rounded-full border-[6px] border-white text-white shadow-[0_10px_0_rgba(0,0,0,0.28)] disabled:opacity-60 ${
+      className={`btn-bounce btn-3d grid place-items-center rounded-full border-[6px] border-white text-white shadow-[0_10px_0_rgba(0,0,0,0.28)] disabled:opacity-60 ${
         size === "huge" ? "h-28 w-28 text-6xl" : "h-24 w-24 text-5xl"
       } ${className}`}
     >
@@ -315,13 +316,25 @@ export function Combate({
       className={`fixed inset-0 z-40 overflow-hidden ${shake ? "screen-shake" : micro ? "micro-shake" : ""}`}
       style={{ touchAction: "manipulation" }}
     >
-      {/* Fondo de la zona a pantalla completa */}
-      <img
-        src={area.image}
-        alt=""
-        className="absolute inset-0 h-full w-full scale-105 object-cover"
+      {/* El mismo mapa, con la cámara ampliada sobre esta zona */}
+      <div
+        className="battle-zoom absolute inset-0"
+        style={{
+          backgroundImage: `url(${mapaFondo})`,
+          backgroundSize: "cover",
+          backgroundPosition: `${area.x}% ${area.y}%`,
+        }}
+        aria-hidden="true"
       />
-      <div className="absolute inset-0 bg-white/5" />
+      <div className="absolute inset-0 bg-white/10" />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `radial-gradient(circle at 50% 45%, transparent 40%, ${area.color}22 75%, rgba(20,26,40,0.35) 100%)`,
+        }}
+        aria-hidden="true"
+      />
+
 
       {/* ambiente vivo del bioma */}
       <AmbientLayer area={area} />
@@ -349,34 +362,50 @@ export function Combate({
         )}
       </div>
 
-      <div className="relative flex h-full flex-col px-4 pb-10 pt-3">
-        {/* SUPERIOR */}
+      <div className="relative flex h-full flex-col px-3 pb-10 pt-2">
+        {/* SUPERIOR — mismo lenguaje visual que el mapa */}
         <div className="relative flex items-start">
           <button
             onClick={onBack}
             aria-label="Volver"
-            className="btn-bounce rounded-full border-4 border-white bg-white/95 px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.2)]"
+            style={{ backgroundColor: area.color }}
+            className="btn-bounce btn-3d z-10 grid h-11 w-11 place-items-center rounded-full border-[3px] border-white text-xl text-white shadow-[0_5px_0_rgba(0,0,0,0.35)]"
           >
-            ⬅️
+            <span className="drop-shadow-[0_2px_0_rgba(0,0,0,0.35)]">⬅️</span>
           </button>
           <div className="pointer-events-none absolute inset-x-0 top-0 flex flex-col items-center gap-1">
-            <span className="rounded-full border-4 border-white bg-ink/70 px-4 py-1 text-xl font-black text-white">
-              {guardian.name} Guardián
+            <span className="flex items-center gap-2 rounded-full border-4 border-white/90 bg-ink/85 px-4 py-1 text-lg font-black tracking-wide text-white shadow-[0_6px_0_rgba(0,0,0,0.4)]">
+              <span>{area.emoji}</span>
+              {guardian.name}
+              <span
+                className="grid h-6 w-6 place-items-center rounded-full border-2 border-white/90"
+                style={{
+                  background: `radial-gradient(circle at 50% 28%, ${area.gem}, rgba(0,0,0,0.3))`,
+                }}
+                aria-hidden="true"
+              />
             </span>
             <Hearts n={guardHp} />
           </div>
         </div>
 
-        {/* ZONA DE COMBATE: los dos muy cerca */}
-        <div className="flex flex-1 flex-col items-center justify-center gap-1">
+        {/* ZONA DE COMBATE: los dos muy cerca, protagonistas */}
+        <div className="flex flex-1 flex-col items-center justify-center gap-0">
           {/* GUARDIÁN */}
           <div className="relative flex justify-center">
-            <div className={`${hitGuard ? "hit-shake" : ""} ${lungeGuard ? "lunge-down" : ""}`}>
+            <span
+              className="pointer-events-none absolute -bottom-1 left-1/2 h-4 w-32 -translate-x-1/2 rounded-[50%] blur-[4px]"
+              style={{ background: "rgba(0,0,0,0.3)" }}
+              aria-hidden="true"
+            />
+            <div
+              className={`${hitGuard ? "hit-shake knockback-up" : ""} ${lungeGuard ? "lunge-down" : ""}`}
+            >
               <LiveSprite
                 src={guardian.image}
                 alt={guardian.name}
                 motion="float"
-                className={`w-52 drop-shadow-2xl transition-all duration-500 ${
+                className={`w-64 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] transition-all duration-500 ${
                   ending >= 2 ? "friend-glow" : ""
                 } ${ending === 1 ? "surprise-jump" : ""} ${ending >= 5 ? "into-ball" : ""}`}
               />
@@ -386,6 +415,9 @@ export function Combate({
                   <span className="evil-eye absolute left-[38%] top-[34%]" />
                   <span className="evil-eye absolute left-[54%] top-[34%]" />
                 </>
+              )}
+              {hitGuard && ending === 0 && (
+                <span className="pop-in absolute -left-2 top-2 text-5xl">😖</span>
               )}
               {ending >= 2 && <span className="absolute -right-2 top-2 text-5xl pop-in">😊</span>}
               {ending === 1 && <span className="absolute -right-2 top-0 text-5xl pop-in">😲</span>}
@@ -402,19 +434,26 @@ export function Combate({
           </div>
 
           {/* CRIATURA DEL JUGADOR */}
-          <div className="relative -mt-3 flex flex-col items-center gap-1">
+          <div className="relative -mt-6 flex flex-col items-center gap-1">
             {flyHeart && <span className="heal-fly absolute -top-4 text-5xl">💚</span>}
-            <div className={`${hitMe ? "hit-shake" : ""} ${lungeMe ? "lunge-up" : ""}`}>
+            <span
+              className="pointer-events-none absolute bottom-12 left-1/2 h-4 w-28 -translate-x-1/2 rounded-[50%] blur-[4px]"
+              style={{ background: "rgba(0,0,0,0.3)" }}
+              aria-hidden="true"
+            />
+            <div className={`${hitMe ? "hit-shake knockback-down" : ""} ${lungeMe ? "lunge-up" : ""}`}>
               <LiveSprite
                 src={companion.image}
                 alt={companion.name}
                 motion="breathe"
-                className="w-40 drop-shadow-2xl"
+                className="w-52 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)]"
               />
+              {hitMe && <span className="pop-in absolute -right-2 top-2 text-4xl">😖</span>}
             </div>
             <Hearts n={myHp} big />
           </div>
         </div>
+
 
         {/* BOTONES */}
         <div className="mt-2 flex items-center justify-center gap-5">
