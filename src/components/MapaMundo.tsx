@@ -327,13 +327,11 @@ export function MapaMundo({
                     />
                   )}
 
-                  {/* guardián sobre su pedestal mágico */}
-                  <span className="relative -mb-2 grid place-items-center">
+                  {/* guardián integrado en su terreno */}
+                  <span className="relative grid place-items-center">
                     <span
-                      className="pedestal-glow pointer-events-none absolute bottom-1 left-1/2 h-6 w-24 rounded-[50%] blur-[3px]"
-                      style={{
-                        background: `radial-gradient(circle, ${a.gem}, transparent 70%)`,
-                      }}
+                      className="pointer-events-none absolute bottom-1 left-1/2 h-3 w-16 -translate-x-1/2 rounded-[50%] blur-[3px]"
+                      style={{ background: "rgba(0,0,0,0.28)" }}
                       aria-hidden="true"
                     />
                     <img
