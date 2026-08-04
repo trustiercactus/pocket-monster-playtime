@@ -137,7 +137,7 @@ function AmbientLayer({ area }: { area: Area }) {
   );
 }
 
-/** botón enorme circular */
+/** botón enorme circular, degradado continuo y destello al pulsar */
 function RoundButton({
   onClick,
   disabled,
@@ -155,17 +155,34 @@ function RoundButton({
   className?: string;
   children: React.ReactNode;
 }) {
+  const [flash, setFlash] = useState(0);
+
   return (
     <button
-      onClick={onClick}
+      onClick={() => {
+        if (disabled) return;
+        setFlash((f) => f + 1);
+        onClick();
+      }}
       disabled={disabled}
       aria-label={label}
-      style={{ background: color }}
-      className={`btn-bounce btn-3d grid place-items-center rounded-full border-[6px] border-white text-white shadow-[0_10px_0_rgba(0,0,0,0.28)] disabled:opacity-60 ${
+      style={{
+        background: `radial-gradient(circle at 50% 22%, color-mix(in oklab, ${color} 65%, white), ${color} 62%, color-mix(in oklab, ${color} 72%, black))`,
+      }}
+      className={`btn-orb ${flash ? "orb-bounce" : ""} grid place-items-center rounded-full border-[6px] border-white text-white shadow-[0_10px_0_rgba(0,0,0,0.28)] disabled:opacity-60 ${
         size === "huge" ? "h-28 w-28 text-6xl" : "h-24 w-24 text-5xl"
       } ${className}`}
     >
-      {children}
+      <span className="relative z-10 grid place-items-center drop-shadow-[0_3px_0_rgba(0,0,0,0.25)]">
+        {children}
+      </span>
+      {flash > 0 && (
+        <span
+          key={flash}
+          className="orb-flash pointer-events-none absolute inset-0 rounded-full bg-white/70"
+          aria-hidden="true"
+        />
+      )}
     </button>
   );
 }
