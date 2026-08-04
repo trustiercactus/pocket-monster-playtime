@@ -32,8 +32,18 @@ function say(text: string) {
   }
 }
 
-/** Hueco de corona: cavidad blanca 3D que espera su esmeralda */
-function GemSocket({ color, on }: { color: string; on: boolean }) {
+/** Hueco de corona: cavidad blanca 3D que espera SU esmeralda */
+function GemSocket({
+  color,
+  cut,
+  on,
+  justFilled,
+}: {
+  color: string;
+  cut: GemCut;
+  on: boolean;
+  justFilled?: boolean;
+}) {
   return (
     <span className="relative grid h-9 w-8 place-items-center">
       <svg width="30" height="34" viewBox="0 0 24 28" aria-hidden="true">
@@ -62,22 +72,20 @@ function GemSocket({ color, on }: { color: string; on: boolean }) {
         </>
       )}
       {on && (
-        <span className="gem-drop absolute inset-0 grid place-items-center">
-          <svg width="26" height="30" viewBox="0 0 24 28" aria-hidden="true">
-            <path
-              d="M7 2h10l5 6v12l-5 6H7l-5-6V8z"
-              fill={color}
-              stroke="rgba(255,255,255,0.9)"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-            <path d="M7 2l5 12L7 26z" fill="rgba(255,255,255,0.45)" />
-            <path d="M17 2l-5 12 5 12z" fill="rgba(0,0,0,0.15)" />
-          </svg>
+        <span
+          className={`${justFilled ? "socket-fill" : "gem-drop"} absolute inset-0 grid place-items-center`}
+        >
+          <Gema color={color} cut={cut} size={26} />
           <span
             className="twinkle pointer-events-none absolute -inset-1 rounded-full"
             style={{ boxShadow: `0 0 14px 4px ${color}` }}
           />
+          {justFilled && (
+            <span
+              className="socket-flash pointer-events-none absolute -inset-2 rounded-full bg-white"
+              aria-hidden="true"
+            />
+          )}
         </span>
       )}
     </span>
