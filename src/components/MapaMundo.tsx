@@ -199,7 +199,7 @@ export function MapaMundo({
 }) {
   const [cine, setCine] = useState(false);
   const [sound, setSound] = useState(true);
-  const [flying, setFlying] = useState<{ color: string; phase: 0 | 1 } | null>(null);
+  const [justFilled, setJustFilled] = useState<string | null>(null);
   const prevDone = useRef<string[]>(zonesDone);
   const scroller = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
@@ -208,15 +208,9 @@ export function MapaMundo({
     const added = zonesDone.find((id) => !prevDone.current.includes(id));
     prevDone.current = zonesDone;
     if (!added) return;
-    const zone = GEM_ZONES.find((z) => z.id === added);
-    if (!zone) return;
-    setFlying({ color: zone.gem, phase: 0 });
-    const t1 = setTimeout(() => setFlying((f) => (f ? { ...f, phase: 1 } : f)), 80);
-    const t2 = setTimeout(() => setFlying(null), 1500);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    setJustFilled(added);
+    const t = setTimeout(() => setJustFilled(null), 1200);
+    return () => clearTimeout(t);
   }, [zonesDone]);
 
 
