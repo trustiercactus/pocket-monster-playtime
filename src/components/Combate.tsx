@@ -577,13 +577,13 @@ export function Combate({
               {ending === 1 && <span className="absolute -right-2 top-0 text-5xl pop-in">😲</span>}
             </div>
 
-            {/* partículas de luz al desaparecer */}
+            {/* partículas de luz (o humo oscuro para el jefe) al desaparecer */}
             {ending >= 3 && ending < 5 && (
               <span className="pointer-events-none absolute inset-0" aria-hidden="true">
-                {Array.from({ length: 14 }).map((_, i) => (
+                {Array.from({ length: area.boss ? 20 : 14 }).map((_, i) => (
                   <span
                     key={i}
-                    className="sparkle-up absolute text-2xl"
+                    className={`${area.boss && i % 2 === 0 ? "smoke-out" : "sparkle-up"} absolute text-2xl`}
                     style={{
                       left: `${8 + ((i * 29) % 84)}%`,
                       top: `${20 + ((i * 17) % 60)}%`,
@@ -591,7 +591,7 @@ export function Combate({
                       filter: `drop-shadow(0 0 8px ${area.gem})`,
                     }}
                   >
-                    ✨
+                    {area.boss ? (i % 2 === 0 ? "💨" : "✨") : "✨"}
                   </span>
                 ))}
               </span>
