@@ -56,6 +56,7 @@ export const CREATURES: Creature[] = [
   { id: "buhito", name: "Buhito", type: "planta", image: buhito, unlockLevel: 9 },
   { id: "estrelin", name: "Estrelin", type: "rayo", image: estrelin, unlockLevel: 10 },
   { id: "sombron", name: "Sombrón", type: "rayo", image: sombron, unlockLevel: 11 },
+  { id: LEGENDARY_ID, name: "Aurora", type: "rayo", image: legendaria, unlockLevel: 99, legendary: true },
 ];
 
 export const getCreature = (id: string): Creature =>
