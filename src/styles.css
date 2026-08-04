@@ -878,3 +878,13 @@
   50% { transform: rotate(1.2deg); }
 }
 @utility tail-wag { animation: tail-wag 2.2s ease-in-out infinite; transform-origin: 50% 90%; }
+
+/* --- Combate: botón de superpoder listo --- */
+@keyframes orb-ready {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  45% { transform: scale(1.07); filter: brightness(1.12); }
+}
+@utility orb-ready {
+  animation: orb-ready 1.1s ease-in-out infinite;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.28), 0 0 18px rgba(255,200,60,0.75);
+}
