@@ -360,17 +360,7 @@ export function MapaMundo({
                     )}
                   </span>
 
-                  {/* base propia del bioma */}
-                  <span
-                    className="relative z-10 h-4 w-[74px] rounded-[50%] border-2"
-                    style={{
-                      background: PEDESTAL[a.pedestal].fill,
-                      borderColor: PEDESTAL[a.pedestal].border,
-                      boxShadow: PEDESTAL[a.pedestal].shadow,
-                      filter: open ? "none" : "saturate(0.85) brightness(0.95)",
-                    }}
-                    aria-hidden="true"
-                  />
+
 
 
                   {/* medallón */}
