@@ -162,6 +162,11 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
           hasEggs={progress.eggs.length > 0}
           onArea={(a) => {
             setArea(a);
+            // en el combate final entra por defecto la criatura legendaria
+            if (a.boss && progress.unlocked.includes(LEGENDARY_ID)) {
+              setFighter(LEGENDARY_ID);
+              save({ ...progress, companion: LEGENDARY_ID });
+            }
             setScreen("elegir");
           }}
           onCollection={() => setScreen("coleccion")}
