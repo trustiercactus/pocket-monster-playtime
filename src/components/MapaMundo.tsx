@@ -398,6 +398,8 @@ export function MapaMundo({
             );
           })}
         </div>
+        </div>
+
       </div>
 
       {/* corona de esmeraldas */}
