@@ -83,7 +83,7 @@ function Hearts({ n, big }: { n: number; big?: boolean }) {
 
   return (
     <div
-      className={`flex justify-center gap-1 leading-none ${big ? "text-4xl" : "text-3xl"}`}
+      className={`flex justify-center gap-2 leading-none ${big ? "text-5xl" : "text-4xl"}`}
       aria-label={`${n} de ${MAX_HP} vidas`}
     >
       {Array.from({ length: MAX_HP }).map((_, i) => {
@@ -137,7 +137,7 @@ function AmbientLayer({ area }: { area: Area }) {
   );
 }
 
-/** botón enorme circular */
+/** botón enorme circular, degradado continuo y destello al pulsar */
 function RoundButton({
   onClick,
   disabled,
@@ -155,17 +155,34 @@ function RoundButton({
   className?: string;
   children: React.ReactNode;
 }) {
+  const [flash, setFlash] = useState(0);
+
   return (
     <button
-      onClick={onClick}
+      onClick={() => {
+        if (disabled) return;
+        setFlash((f) => f + 1);
+        onClick();
+      }}
       disabled={disabled}
       aria-label={label}
-      style={{ background: color }}
-      className={`btn-bounce btn-3d grid place-items-center rounded-full border-[6px] border-white text-white shadow-[0_10px_0_rgba(0,0,0,0.28)] disabled:opacity-60 ${
+      style={{
+        background: `radial-gradient(circle at 50% 22%, color-mix(in oklab, ${color} 65%, white), ${color} 62%, color-mix(in oklab, ${color} 72%, black))`,
+      }}
+      className={`btn-orb ${flash ? "orb-bounce" : ""} grid place-items-center rounded-full border-[6px] border-white text-white shadow-[0_10px_0_rgba(0,0,0,0.28)] disabled:opacity-60 ${
         size === "huge" ? "h-28 w-28 text-6xl" : "h-24 w-24 text-5xl"
       } ${className}`}
     >
-      {children}
+      <span className="relative z-10 grid place-items-center drop-shadow-[0_3px_0_rgba(0,0,0,0.25)]">
+        {children}
+      </span>
+      {flash > 0 && (
+        <span
+          key={flash}
+          className="orb-flash pointer-events-none absolute inset-0 rounded-full bg-white/70"
+          aria-hidden="true"
+        />
+      )}
     </button>
   );
 }
@@ -405,7 +422,7 @@ export function Combate({
                 src={guardian.image}
                 alt={guardian.name}
                 motion="float"
-                className={`w-64 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] transition-all duration-500 ${
+                className={`w-56 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] transition-all duration-500 ${
                   ending >= 2 ? "friend-glow" : ""
                 } ${ending === 1 ? "surprise-jump" : ""} ${ending >= 5 ? "into-ball" : ""}`}
               />
@@ -441,12 +458,12 @@ export function Combate({
               style={{ background: "rgba(0,0,0,0.3)" }}
               aria-hidden="true"
             />
-            <div className={`${hitMe ? "hit-shake knockback-down" : ""} ${lungeMe ? "lunge-up" : ""}`}>
+            <div className={`tail-wag ${hitMe ? "hit-shake knockback-down" : ""} ${lungeMe ? "lunge-up" : ""}`}>
               <LiveSprite
                 src={companion.image}
                 alt={companion.name}
                 motion="breathe"
-                className="w-52 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)]"
+                className="w-44 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)]"
               />
               {hitMe && <span className="pop-in absolute -right-2 top-2 text-4xl">😖</span>}
             </div>
@@ -456,7 +473,7 @@ export function Combate({
 
 
         {/* BOTONES */}
-        <div className="mt-2 flex items-center justify-center gap-5">
+        <div className="mt-2 flex items-center justify-center gap-7">
           <RoundButton
             label="Atacar"
             color="var(--arcade-orange)"
@@ -473,18 +490,21 @@ export function Combate({
             onClick={heal}
             disabled={busy || ending > 0 || heals === 0}
           >
-            <span
-              className="relative inline-block text-5xl"
-              style={{
-                filter:
-                  heals === 0
-                    ? "grayscale(1) brightness(0.9)"
-                    : heals === 1
-                      ? "grayscale(0.5)"
-                      : "none",
-              }}
-            >
-              💚
+            <span className="relative inline-grid h-14 w-14 place-items-center">
+              {/* corazón gris de base */}
+              <span
+                className="absolute inset-0 grid place-items-center text-5xl"
+                style={{ filter: "grayscale(1) brightness(0.85)" }}
+              >
+                💚
+              </span>
+              {/* parte verde restante: 100% → 50% → 0% */}
+              <span
+                className="absolute inset-0 grid place-items-center overflow-hidden text-5xl"
+                style={{ clipPath: `inset(0 ${100 - heals * 50}% 0 0)` }}
+              >
+                💚
+              </span>
             </span>
           </RoundButton>
 
@@ -496,6 +516,17 @@ export function Combate({
             size="huge"
             className={chargeReady ? "btn-pulse star-ready" : ""}
           >
+            {/* borde dorado que se ilumina con la carga */}
+            <span
+              className="pointer-events-none absolute -inset-[6px] rounded-full"
+              style={{
+                background: `conic-gradient(from -90deg, #ffd54a 0 ${chargePct}%, rgba(255,255,255,0.35) ${chargePct}% 100%)`,
+                mask: "radial-gradient(circle, transparent 60%, #000 62%)",
+                WebkitMask: "radial-gradient(circle, transparent 60%, #000 62%)",
+                filter: chargeReady ? "drop-shadow(0 0 10px #ffd54a)" : "none",
+              }}
+              aria-hidden="true"
+            />
             <span className="relative grid h-16 w-16 place-items-center">
               <span className="absolute inset-0 grid place-items-center text-6xl opacity-40">
                 ⭐
