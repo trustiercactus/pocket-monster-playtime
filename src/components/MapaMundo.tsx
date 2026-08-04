@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AREAS, GEM_ZONES, TERRAIN, PEDESTAL, type Area } from "@/lib/areas";
+import { AREAS, GEM_ZONES, TERRAIN, type Area } from "@/lib/areas";
 import { getCreature } from "@/lib/creatures";
 import mapaFondo from "@/assets/mapa-vertical.jpg";
 import legendariaImg from "@/assets/legendaria.png";
@@ -264,7 +264,13 @@ export function MapaMundo({
   return (
     <div className="fixed inset-0 z-0 bg-[#8fd8ff]">
       <div ref={scroller} className="h-full w-full overflow-y-auto overflow-x-hidden">
+        <div className="h-[120px] w-full bg-[#8fd8ff]" aria-hidden="true" />
         <div className="relative h-[240vh] min-h-[1400px] w-full">
+          <div
+            className="absolute inset-x-0 -top-[120px] h-[130px]"
+            style={{ background: "linear-gradient(to bottom, #8fd8ff, #bfe8ff)" }}
+            aria-hidden="true"
+          />
           <img
             src={mapaFondo}
             alt=""
@@ -327,13 +333,11 @@ export function MapaMundo({
                     />
                   )}
 
-                  {/* guardián sobre su pedestal mágico */}
-                  <span className="relative -mb-2 grid place-items-center">
+                  {/* guardián integrado en su terreno */}
+                  <span className="relative grid place-items-center">
                     <span
-                      className="pedestal-glow pointer-events-none absolute bottom-1 left-1/2 h-6 w-24 rounded-[50%] blur-[3px]"
-                      style={{
-                        background: `radial-gradient(circle, ${a.gem}, transparent 70%)`,
-                      }}
+                      className="pointer-events-none absolute bottom-1 left-1/2 h-3 w-16 -translate-x-1/2 rounded-[50%] blur-[3px]"
+                      style={{ background: "rgba(0,0,0,0.28)" }}
                       aria-hidden="true"
                     />
                     <img
@@ -362,17 +366,7 @@ export function MapaMundo({
                     )}
                   </span>
 
-                  {/* base propia del bioma */}
-                  <span
-                    className="relative z-10 h-4 w-[74px] rounded-[50%] border-2"
-                    style={{
-                      background: PEDESTAL[a.pedestal].fill,
-                      borderColor: PEDESTAL[a.pedestal].border,
-                      boxShadow: PEDESTAL[a.pedestal].shadow,
-                      filter: open ? "none" : "saturate(0.85) brightness(0.95)",
-                    }}
-                    aria-hidden="true"
-                  />
+
 
 
                   {/* medallón */}
