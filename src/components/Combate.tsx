@@ -1,11 +1,77 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getCreature, type Creature } from "@/lib/creatures";
-import type { Area } from "@/lib/areas";
+import { GEM_ZONES, type Area } from "@/lib/areas";
 import { LiveSprite } from "@/components/LiveSprite";
+import { Gema } from "@/components/Gema";
 import mapaFondo from "@/assets/mapa-vertical.jpg";
 
 const MAX_HP = 5;
 const SUPER_CHARGE = 3;
+const GEM_GAP = 34;
+
+/** sonido alegre de recompensa al conseguir la esmeralda */
+function reward() {
+  try {
+    const Ctx =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    [659.25, 783.99, 1046.5].forEach((f, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      const t = ctx.currentTime + i * 0.13;
+      o.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.25, t + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+      o.connect(g).connect(ctx.destination);
+      o.start(t);
+      o.stop(t + 0.5);
+    });
+  } catch {
+    /* sin sonido */
+  }
+}
+
+/** barra superior de esmeraldas, igual que en el mapa */
+function GemBar({ zonesDone, filling }: { zonesDone: string[]; filling: string | null }) {
+  return (
+    <div className="pointer-events-none absolute left-1/2 top-1 z-30 flex -translate-x-1/2 items-center rounded-full border-4 border-white/90 bg-ink/85 px-2 py-1 shadow-[0_6px_0_rgba(0,0,0,0.4)]">
+      {GEM_ZONES.map((z) => {
+        const on = zonesDone.includes(z.id) || filling === z.id;
+        return (
+          <span
+            key={z.id}
+            className="relative grid place-items-center"
+            style={{ width: GEM_GAP, height: 34 }}
+          >
+            <svg width="28" height="32" viewBox="0 0 24 28" aria-hidden="true">
+              <path
+                d="M7 2h10l5 6v12l-5 6H7l-5-6V8z"
+                fill="rgba(255,255,255,0.92)"
+                stroke="#ffffff"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {on && (
+              <span
+                className={`${filling === z.id ? "socket-fill" : ""} absolute inset-0 grid place-items-center`}
+              >
+                <Gema color={z.gem} cut={z.gemCut} size={24} />
+                {filling === z.id && (
+                  <span className="socket-flash absolute -inset-2 rounded-full bg-white" />
+                )}
+              </span>
+            )}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
 
 /** icono de ataque según el tipo/zona de la criatura */
 function attackIcon(c: Creature, area: Area): string {
@@ -208,15 +274,18 @@ type Fx = { id: number; emoji: string; big?: boolean };
 export function Combate({
   area,
   companion,
+  zonesDone = [],
   onFinish,
   onBack,
 }: {
   area: Area;
   companion: Creature;
+  zonesDone?: string[];
   onFinish: (won: boolean) => void;
   onBack: () => void;
 }) {
   const guardian = getCreature(area.guardian);
+  const gemIndex = GEM_ZONES.findIndex((z) => z.id === area.id);
   const [guardHp, setGuardHp] = useState(MAX_HP);
   const [myHp, setMyHp] = useState(MAX_HP);
   const [heals, setHeals] = useState(2);
@@ -330,14 +399,18 @@ export function Combate({
 
   function startEnding() {
     setEnding(1); // sorprendido
-    later(() => setEnding(2), 900); // sonríe y brilla
-    later(() => setEnding(3), 1900); // esmeralda
     later(() => {
-      setEnding(4); // poké ball
+      setEnding(2); // sonríe y brilla
       speak("¡Ahora es tu amigo!");
-    }, 2900);
-    later(() => setEnding(5), 4200); // entra en la ball
-    later(() => onFinish(true), 5600);
+    }, 900);
+    later(() => setEnding(3), 2100); // desaparece entre partículas de luz
+    later(() => setEnding(4), 3000); // aparece su esmeralda girando
+    later(() => setEnding(5), 4400); // vuela hacia la barra
+    later(() => {
+      setEnding(6); // entra en su hueco
+      reward();
+    }, 5400);
+    later(() => onFinish(true), 6600);
   }
 
   const healColor = heals === 2 ? "var(--arcade-green)" : heals === 1 ? "#9fe3a8" : "#b9b9b9";
@@ -395,7 +468,43 @@ export function Combate({
         )}
       </div>
 
+      {/* barra de esmeraldas y la nueva esmeralda volando a su hueco */}
+      {ending >= 4 && gemIndex >= 0 && (
+        <>
+          <GemBar zonesDone={zonesDone} filling={ending >= 6 ? area.id : null} />
+          {ending < 6 && (
+            <div
+              className="pointer-events-none absolute z-40"
+              style={{
+                left:
+                  ending >= 5
+                    ? `calc(50% + ${(gemIndex - (GEM_ZONES.length - 1) / 2) * GEM_GAP}px)`
+                    : "50%",
+                top: ending >= 5 ? "18px" : "42%",
+                transform:
+                  ending >= 5 ? "translate(-50%, 0) scale(0.85)" : "translate(-50%, -50%) scale(2)",
+                transition:
+                  "left 0.95s cubic-bezier(0.5,-0.1,0.4,1.25), top 0.95s cubic-bezier(0.5,-0.1,0.4,1.25), transform 0.95s ease",
+                filter: `drop-shadow(0 0 22px ${area.gem})`,
+              }}
+              aria-hidden="true"
+            >
+              {ending >= 5 && (
+                <span
+                  className="gem-trail absolute left-1/2 top-1/2 h-28 w-2 -translate-x-1/2 origin-top rounded-full blur-[3px]"
+                  style={{ background: `linear-gradient(to bottom, ${area.gem}, transparent)` }}
+                />
+              )}
+              <span className={ending === 4 ? "gem-reveal block" : "block"}>
+                <Gema color={area.gem} cut={area.gemCut} size={44} spin />
+              </span>
+            </div>
+          )}
+        </>
+      )}
+
       <div className="relative flex h-full flex-col px-3 pb-10 pt-2">
+
         {/* SUPERIOR — mismo lenguaje visual que el mapa */}
         <div className="relative flex items-start">
           <button
@@ -410,13 +519,7 @@ export function Combate({
             <span className="flex items-center gap-2 rounded-full border-4 border-white/90 bg-ink/85 px-4 py-1 text-lg font-black tracking-wide text-white shadow-[0_6px_0_rgba(0,0,0,0.4)]">
               <span>{area.emoji}</span>
               {guardian.name}
-              <span
-                className="grid h-6 w-6 place-items-center rounded-full border-2 border-white/90"
-                style={{
-                  background: `radial-gradient(circle at 50% 28%, ${area.gem}, rgba(0,0,0,0.3))`,
-                }}
-                aria-hidden="true"
-              />
+              <Gema color={area.gem} cut={area.gemCut} size={22} />
             </span>
             <Hearts n={guardHp} />
           </div>
@@ -452,7 +555,7 @@ export function Combate({
                 motion="float"
                 className={`${area.boss ? "w-64" : "w-52"} drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] transition-all duration-500 ${
                   ending >= 2 ? "friend-glow" : ""
-                } ${ending === 1 ? "surprise-jump" : ""} ${ending >= 5 ? "into-ball" : ""}`}
+                } ${ending === 1 ? "surprise-jump" : ""} ${ending >= 3 ? "guard-dissolve" : ""}`}
               />
 
               {/* ojos malvados mientras está hechizado */}
@@ -465,19 +568,31 @@ export function Combate({
               {hitGuard && ending === 0 && (
                 <span className="pop-in absolute -left-2 top-2 text-5xl">😖</span>
               )}
-              {ending >= 2 && <span className="absolute -right-2 top-2 text-5xl pop-in">😊</span>}
+              {ending === 2 && <span className="absolute -right-2 top-2 text-5xl pop-in">😊</span>}
               {ending === 1 && <span className="absolute -right-2 top-0 text-5xl pop-in">😲</span>}
             </div>
-            {ending >= 3 && (
-              <span
-                className="gem-drop absolute -top-2 text-6xl"
-                style={{ color: area.gem, filter: `drop-shadow(0 0 16px ${area.gem})` }}
-              >
-                💎
+
+            {/* partículas de luz al desaparecer */}
+            {ending >= 3 && ending < 5 && (
+              <span className="pointer-events-none absolute inset-0" aria-hidden="true">
+                {Array.from({ length: 14 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className="sparkle-up absolute text-2xl"
+                    style={{
+                      left: `${8 + ((i * 29) % 84)}%`,
+                      top: `${20 + ((i * 17) % 60)}%`,
+                      animationDelay: `${i * 0.08}s`,
+                      filter: `drop-shadow(0 0 8px ${area.gem})`,
+                    }}
+                  >
+                    ✨
+                  </span>
+                ))}
               </span>
             )}
-            {ending >= 4 && <span className="ball-in absolute bottom-0 text-7xl">⚪</span>}
           </div>
+
 
           {/* CRIATURA DEL JUGADOR */}
           <div className="relative -mt-6 flex flex-col items-center gap-1">

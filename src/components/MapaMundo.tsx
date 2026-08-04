@@ -3,6 +3,7 @@ import { AREAS, GEM_ZONES, TERRAIN, type Area } from "@/lib/areas";
 import { getCreature } from "@/lib/creatures";
 import mapaFondo from "@/assets/mapa-vertical.jpg";
 import legendariaImg from "@/assets/legendaria.png";
+import { Gema, type GemCut } from "@/components/Gema";
 
 
 const OPTS_KEY = "criaturitas-opciones";
@@ -32,8 +33,18 @@ function say(text: string) {
   }
 }
 
-/** Hueco de corona: cavidad blanca 3D que espera su esmeralda */
-function GemSocket({ color, on }: { color: string; on: boolean }) {
+/** Hueco de corona: cavidad blanca 3D que espera SU esmeralda */
+function GemSocket({
+  color,
+  cut,
+  on,
+  justFilled,
+}: {
+  color: string;
+  cut: GemCut;
+  on: boolean;
+  justFilled?: boolean;
+}) {
   return (
     <span className="relative grid h-9 w-8 place-items-center">
       <svg width="30" height="34" viewBox="0 0 24 28" aria-hidden="true">
@@ -62,22 +73,20 @@ function GemSocket({ color, on }: { color: string; on: boolean }) {
         </>
       )}
       {on && (
-        <span className="gem-drop absolute inset-0 grid place-items-center">
-          <svg width="26" height="30" viewBox="0 0 24 28" aria-hidden="true">
-            <path
-              d="M7 2h10l5 6v12l-5 6H7l-5-6V8z"
-              fill={color}
-              stroke="rgba(255,255,255,0.9)"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-            <path d="M7 2l5 12L7 26z" fill="rgba(255,255,255,0.45)" />
-            <path d="M17 2l-5 12 5 12z" fill="rgba(0,0,0,0.15)" />
-          </svg>
+        <span
+          className={`${justFilled ? "socket-fill" : "gem-drop"} absolute inset-0 grid place-items-center`}
+        >
+          <Gema color={color} cut={cut} size={26} />
           <span
             className="twinkle pointer-events-none absolute -inset-1 rounded-full"
             style={{ boxShadow: `0 0 14px 4px ${color}` }}
           />
+          {justFilled && (
+            <span
+              className="socket-flash pointer-events-none absolute -inset-2 rounded-full bg-white"
+              aria-hidden="true"
+            />
+          )}
         </span>
       )}
     </span>
@@ -190,7 +199,7 @@ export function MapaMundo({
 }) {
   const [cine, setCine] = useState(false);
   const [sound, setSound] = useState(true);
-  const [flying, setFlying] = useState<{ color: string; phase: 0 | 1 } | null>(null);
+  const [justFilled, setJustFilled] = useState<string | null>(null);
   const prevDone = useRef<string[]>(zonesDone);
   const scroller = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
@@ -199,15 +208,9 @@ export function MapaMundo({
     const added = zonesDone.find((id) => !prevDone.current.includes(id));
     prevDone.current = zonesDone;
     if (!added) return;
-    const zone = GEM_ZONES.find((z) => z.id === added);
-    if (!zone) return;
-    setFlying({ color: zone.gem, phase: 0 });
-    const t1 = setTimeout(() => setFlying((f) => (f ? { ...f, phase: 1 } : f)), 80);
-    const t2 = setTimeout(() => setFlying(null), 1500);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    setJustFilled(added);
+    const t = setTimeout(() => setJustFilled(null), 1200);
+    return () => clearTimeout(t);
   }, [zonesDone]);
 
 
@@ -433,33 +436,16 @@ export function MapaMundo({
       {/* corona de esmeraldas */}
       <div className="pointer-events-none absolute left-1/2 top-2 z-20 flex -translate-x-1/2 items-center gap-[2px] rounded-full border-4 border-white/90 bg-ink/85 px-3 py-1 shadow-[0_6px_0_rgba(0,0,0,0.4)]">
         {GEM_ZONES.map((z) => (
-          <GemSocket key={z.id} color={z.gem} on={zonesDone.includes(z.id)} />
+          <GemSocket
+            key={z.id}
+            color={z.gem}
+            cut={z.gemCut}
+            on={zonesDone.includes(z.id)}
+            justFilled={justFilled === z.id}
+          />
         ))}
       </div>
 
-      {/* esmeralda que vuela hasta la corona */}
-      {flying && (
-        <div
-          className="pointer-events-none absolute left-1/2 top-1/2 z-30"
-          style={{
-            transform:
-              flying.phase === 0
-                ? "translate(-50%, -50%) scale(1.8)"
-                : "translate(-50%, calc(-50vh + 22px)) scale(0.9)",
-            opacity: flying.phase === 0 ? 1 : 0.95,
-            transition: "transform 1s cubic-bezier(0.5, -0.2, 0.4, 1.3), opacity 1s ease",
-          }}
-          aria-hidden="true"
-        >
-          <span
-            className="gem-trail absolute left-1/2 top-1/2 h-24 w-2 -translate-x-1/2 origin-top rounded-full blur-[3px]"
-            style={{
-              background: `linear-gradient(to bottom, ${flying.color}, transparent)`,
-            }}
-          />
-          <GemSocket color={flying.color} on />
-        </div>
-      )}
 
       {/* botones permanentes */}
       <div className="absolute left-3 top-14 z-20 flex flex-row items-center gap-2">
@@ -492,59 +478,161 @@ export function MapaMundo({
   );
 }
 
+function fanfare() {
+  try {
+    if (!soundOn()) return;
+    const Ctx =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      o.frequency.setValueAtTime(f, ctx.currentTime + i * 0.16);
+      g.gain.setValueAtTime(0.0001, ctx.currentTime + i * 0.16);
+      g.gain.exponentialRampToValueAtTime(0.22, ctx.currentTime + i * 0.16 + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + i * 0.16 + 0.5);
+      o.connect(g).connect(ctx.destination);
+      o.start(ctx.currentTime + i * 0.16);
+      o.stop(ctx.currentTime + i * 0.16 + 0.55);
+    });
+  } catch {
+    /* sin sonido */
+  }
+}
+
+/** Cinemática: las 8 esmeraldas despiertan a la criatura legendaria */
 function Cinematica({ onDone }: { onDone: () => void }) {
-  const [fase, setFase] = useState<0 | 1 | 2>(0);
+  const [fase, setFase] = useState<0 | 1 | 2 | 3 | 4>(0);
+
   useEffect(() => {
-    const t1 = setTimeout(() => setFase(1), 1900);
-    const t2 = setTimeout(() => setFase(2), 3200);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    const ts = [
+      setTimeout(() => setFase(1), 1200),
+      setTimeout(() => setFase(2), 3000),
+      setTimeout(() => {
+        setFase(3);
+        fanfare();
+      }, 4600),
+      setTimeout(() => {
+        setFase(4);
+        say("¡Las ocho esmeraldas han despertado a Aurora!");
+      }, 5900),
+    ];
+    return () => ts.forEach(clearTimeout);
   }, []);
+
+  const n = GEM_ZONES.length;
+
   return (
-    <div className="absolute inset-0 z-30 grid place-items-center bg-ink/80">
-      <div className="relative grid place-items-center">
-        {fase === 0 &&
-          GEM_ZONES.map((z, i) => {
-            const ang = (i / GEM_ZONES.length) * Math.PI * 2;
-            return (
+    <div className="absolute inset-0 z-40 overflow-hidden bg-ink/95 backdrop-blur-sm">
+      {/* esmeraldas: de la barra superior al círculo mágico */}
+      {fase < 3 &&
+        GEM_ZONES.map((z, i) => {
+          const ang = (i / n) * 360;
+          const topStyle: React.CSSProperties = {
+            left: `calc(50% + ${(i - (n - 1) / 2) * 34}px)`,
+            top: "18px",
+            transform: "translate(-50%, 0) scale(1)",
+            filter: `drop-shadow(0 0 10px ${z.gem})`,
+            transition: "left 0.9s ease, top 0.9s ease, transform 0.9s ease",
+          };
+          const centerStyle: React.CSSProperties = {
+            left: "50%",
+            top: "42%",
+            transform: "translate(-50%, -50%)",
+            filter: `drop-shadow(0 0 16px ${z.gem})`,
+            transition: "left 0.9s ease, top 0.9s ease",
+          };
+          return (
+            <span key={z.id} className="absolute" style={fase === 0 ? topStyle : centerStyle}>
               <span
-                key={z.id}
-                className="gem-fly absolute"
+                className={fase === 0 ? "" : "gem-orbit block"}
                 style={
                   {
-                    "--gx": `${Math.cos(ang) * 120}px`,
-                    "--gy": `${Math.sin(ang) * 120}px`,
+                    "--a": `${ang}deg`,
+                    "--r": fase === 2 ? "70px" : "110px",
+                    "--spd": fase === 2 ? "0.6s" : "2.6s",
+                    transition: "all 0.6s ease",
                   } as React.CSSProperties
                 }
               >
-                <GemSocket color={z.gem} on />
+                <Gema color={z.gem} cut={z.gemCut} size={fase === 0 ? 26 : 34} spin />
               </span>
-            );
-          })}
-        {fase === 1 && (
-          <div className="big-gem-in text-9xl drop-shadow-[0_0_40px_rgba(120,255,200,0.9)]">💎</div>
-        )}
-        {fase === 2 && (
-          <div className="flex flex-col items-center gap-5">
+            </span>
+          );
+        })}
+
+      {/* fusión: gran esmeralda + destello */}
+      {fase === 3 && (
+        <>
+          <div className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2">
+            <span className="big-gem-in block">
+              <Gema color="#8affe0" cut="esmeralda" size={150} spin />
+            </span>
+          </div>
+          <span className="white-flash pointer-events-none absolute inset-0 bg-white" />
+        </>
+      )}
+
+      {/* criatura legendaria */}
+      {fase === 4 && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-6">
+          <div className="relative">
+            <span
+              className="pointer-events-none absolute -inset-10 rounded-full blur-2xl"
+              style={{
+                background:
+                  "radial-gradient(circle, rgba(255,255,255,0.85), rgba(160,220,255,0.35) 55%, transparent 75%)",
+              }}
+              aria-hidden="true"
+            />
             <img
               src={legendariaImg}
-              alt="Criaturita legendaria"
+              alt="Aurora, la criatura legendaria"
               width={768}
               height={768}
-              className="pop-in hop w-52 drop-shadow-2xl"
+              className="legend-rise relative w-64 drop-shadow-[0_0_40px_rgba(180,240,255,0.9)]"
             />
-            <button
-              onClick={onDone}
-              aria-label="Continuar"
-              className="btn-bounce rounded-[2rem] border-4 border-white bg-orange px-10 py-6 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
-            >
-              ✅
-            </button>
+            {/* las ocho esmeraldas se incrustan en su pecho y alas */}
+            {GEM_ZONES.map((z, i) => {
+              const ang = (i / n) * Math.PI * 2;
+              const x = Math.cos(ang) * 46;
+              const y = Math.sin(ang) * 30;
+              return (
+                <span
+                  key={z.id}
+                  className="gem-embed absolute left-1/2 top-1/2"
+                  style={
+                    {
+                      "--ex": `${Math.cos(ang) * 200}px`,
+                      "--ey": `${Math.sin(ang) * 200}px`,
+                      marginLeft: x,
+                      marginTop: y,
+                      animationDelay: `${0.9 + i * 0.12}s`,
+                      filter: `drop-shadow(0 0 8px ${z.gem})`,
+                    } as React.CSSProperties
+                  }
+                >
+                  <Gema color={z.gem} cut={z.gemCut} size={22} />
+                </span>
+              );
+            })}
           </div>
-        )}
-      </div>
+          <p className="rainbow-frame rounded-full border-4 bg-ink/80 px-6 py-2 text-3xl font-black text-white">
+            ✨ Aurora ✨
+          </p>
+          <button
+            onClick={onDone}
+            aria-label="Continuar"
+            className="btn-bounce btn-pulse rounded-[2rem] border-4 border-white bg-orange px-10 py-6 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
+          >
+            ✅
+          </button>
+        </div>
+      )}
     </div>
   );
 }
+

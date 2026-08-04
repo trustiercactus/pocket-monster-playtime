@@ -4,6 +4,7 @@ import {
   TYPE_EMOJI,
   TYPE_COLOR,
   XP_PER_LEVEL,
+  LEGENDARY_ID,
   getCreature,
   type Creature,
 } from "@/lib/creatures";
@@ -161,6 +162,11 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
           hasEggs={progress.eggs.length > 0}
           onArea={(a) => {
             setArea(a);
+            // en el combate final entra por defecto la criatura legendaria
+            if (a.boss && progress.unlocked.includes(LEGENDARY_ID)) {
+              setFighter(LEGENDARY_ID);
+              save({ ...progress, companion: LEGENDARY_ID });
+            }
             setScreen("elegir");
           }}
           onCollection={() => setScreen("coleccion")}
@@ -172,9 +178,10 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
             save({
               ...progress,
               legendary: true,
-              unlocked: progress.unlocked.includes("estrelin")
+              companion: LEGENDARY_ID,
+              unlocked: progress.unlocked.includes(LEGENDARY_ID)
                 ? progress.unlocked
-                : [...progress.unlocked, "estrelin"],
+                : [...progress.unlocked, LEGENDARY_ID],
             });
           }}
         />
@@ -234,6 +241,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
         <Combate
           area={area}
           companion={companion}
+          zonesDone={progress.zonesDone}
           onFinish={finishBattle}
           onBack={() => setScreen("mapa")}
         />
@@ -327,11 +335,20 @@ function Coleccion({
               key={c.id}
               onClick={() => owned && onPick(c.id)}
               aria-label={owned ? c.name : "Criatura bloqueada"}
-              style={{ borderColor: active ? TYPE_COLOR[c.type] : "transparent" }}
-              className={`pop-in flex flex-col items-center gap-1 rounded-3xl border-[6px] bg-white/95 p-3 shadow-[0_6px_0_rgba(0,0,0,0.12)] ${
+              style={
+                c.legendary && owned
+                  ? undefined
+                  : { borderColor: active ? TYPE_COLOR[c.type] : "transparent" }
+              }
+              className={`pop-in relative flex flex-col items-center gap-1 rounded-3xl border-[6px] bg-white/95 p-3 shadow-[0_6px_0_rgba(0,0,0,0.12)] ${
                 owned ? "btn-bounce" : ""
-              }`}
+              } ${c.legendary && owned ? "rainbow-frame" : ""}`}
             >
+              {c.legendary && owned && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border-2 border-white bg-gradient-to-r from-yellow via-orange to-green px-2 py-[2px] text-[0.7rem] font-black text-white shadow">
+                  ✨ LEGENDARIA
+                </span>
+              )}
               <LiveSprite
                 src={c.image}
                 alt={owned ? c.name : ""}
@@ -362,7 +379,11 @@ function Elegir({
   onPick: (id: string) => void;
   onBack: () => void;
 }) {
-  const mine = CREATURES.filter((c) => progress.unlocked.includes(c.id));
+  const owned = CREATURES.filter((c) => progress.unlocked.includes(c.id));
+  // en el combate final, la legendaria va primero y ya viene elegida
+  const mine = area.boss
+    ? [...owned].sort((a, b) => Number(!!b.legendary) - Number(!!a.legendary))
+    : owned;
   return (
     <div className="screen-in flex flex-col items-center gap-4">
       <div className="flex w-full items-center justify-between">
@@ -387,8 +408,10 @@ function Elegir({
             key={c.id}
             onClick={() => onPick(c.id)}
             aria-label={c.name}
-            style={{ borderColor: TYPE_COLOR[c.type] }}
-            className="pop-in btn-bounce flex flex-col items-center rounded-3xl border-[6px] bg-white/95 p-2 shadow-[0_6px_0_rgba(0,0,0,0.12)]"
+            style={c.legendary ? undefined : { borderColor: TYPE_COLOR[c.type] }}
+            className={`pop-in btn-bounce relative flex flex-col items-center rounded-3xl border-[6px] bg-white/95 p-2 shadow-[0_6px_0_rgba(0,0,0,0.12)] ${
+              c.legendary ? "rainbow-frame" : ""
+            } ${progress.companion === c.id ? "ring-4 ring-yellow" : ""}`}
           >
             <LiveSprite
               src={c.image}

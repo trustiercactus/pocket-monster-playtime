@@ -1,3 +1,4 @@
+import type { GemCut } from "@/components/Gema";
 import aldea from "@/assets/zona-aldea.png";
 import bosque from "@/assets/zona-bosque.png";
 import nieve from "@/assets/zona-nieve.png";
@@ -136,6 +137,8 @@ export type Area = {
   guardian: string;
   /** color de la esmeralda de la zona */
   gem: string;
+  /** corte/forma propio de la esmeralda de la zona */
+  gemCut: GemCut;
   /** partículas del bioma al despertar la zona */
   particles: string[];
   /** ambiente vivo del bioma */
@@ -150,17 +153,18 @@ export type Area = {
 };
 
 export const AREAS: Area[] = [
-  { id: "pueblo", name: "Pueblo", emoji: "🏡", image: aldea, color: "var(--arcade-green)", x: 50, y: 94, guardian: "chispi", gem: "#7cd992", particles: ["🌼", "🦋", "✨"], ambient: [{ emoji: "🦋", kind: "drift" }, { emoji: "🌼", kind: "rise" }], terrain: "tierra", pedestal: "tierra", winsNeeded: 0 },
-  { id: "bosque", name: "Bosque", emoji: "🌳", image: bosque, color: "var(--arcade-green)", x: 26, y: 79, guardian: "hojito", gem: "#2fb765", particles: ["🍃", "🦋", "🌰"], ambient: [{ emoji: "🍃", kind: "fall" }, { emoji: "🦋", kind: "drift" }], terrain: "hierba", pedestal: "tocon", winsNeeded: 0 },
-  { id: "nieve", name: "Montaña Nevada", emoji: "❄️", image: nieve, color: "#8fd8ff", x: 68, y: 63, guardian: "ballenin", gem: "#bfeaff", particles: ["❄️", "✨", "⛄"], ambient: [{ emoji: "❄️", kind: "fall" }, { emoji: "❄️", kind: "fall" }], terrain: "nieve", pedestal: "hielo", winsNeeded: 0 },
-  { id: "volcan", name: "Volcán", emoji: "🌋", image: volcan, color: "var(--arcade-orange)", x: 28, y: 50, guardian: "lavito", gem: "#ff7a3d", particles: ["🔥", "✨", "💥"], ambient: [{ emoji: "💨", kind: "rise" }, { emoji: "🔥", kind: "rise" }], terrain: "roca", pedestal: "lava", winsNeeded: 0 },
-  { id: "desierto", name: "Desierto", emoji: "🏜️", image: desierto, color: "#f6c85f", x: 66, y: 37, guardian: "cactino", gem: "#ffd83d", particles: ["🌵", "✨", "🪶"], ambient: [{ emoji: "🪶", kind: "drift" }, { emoji: "✨", kind: "rise" }], terrain: "arena", pedestal: "arenisca", winsNeeded: 0 },
-  { id: "playa", name: "Playa", emoji: "🏖️", image: playa, color: "var(--arcade-blue)", x: 30, y: 27, guardian: "aquip", gem: "#3fc7ff", particles: ["🐚", "🫧", "🐟"], ambient: [{ emoji: "🫧", kind: "rise" }, { emoji: "🌊", kind: "drift" }], terrain: "arena", pedestal: "rocamar", winsNeeded: 0 },
-  { id: "cielo", name: "Cielo", emoji: "☁️", image: cielo, color: "#cfe9ff", x: 66, y: 18, guardian: "buhito", gem: "#b98cff", particles: ["☁️", "🌈", "✨"], ambient: [{ emoji: "☁️", kind: "drift" }, { emoji: "✨", kind: "rise" }], terrain: "nube", pedestal: "nube", winsNeeded: 0 },
-  { id: "castillo", name: "Islas del Cielo", emoji: "🏯", image: castillo, color: "var(--arcade-yellow)", x: 30, y: 13, guardian: "fenix", gem: "#ff8ad1", particles: ["👑", "✨", "🎉"], ambient: [{ emoji: "✨", kind: "rise" }, { emoji: "🕊️", kind: "drift" }], terrain: "nube", pedestal: "nube", winsNeeded: 0 },
-  { id: "jefe", name: "Castillo Final", emoji: "🏰", image: jefe, color: "#7a2ff2", x: 52, y: 5, guardian: "sombron", gem: "#ff4fd8", particles: ["💜", "⚡", "✨"], ambient: [{ emoji: "💜", kind: "rise" }, { emoji: "⚡", kind: "drift" }], terrain: "oscura", pedestal: "piedra", boss: true, winsNeeded: 0 },
+  { id: "pueblo", name: "Pueblo", emoji: "🏡", image: aldea, color: "var(--arcade-green)", x: 50, y: 94, guardian: "chispi", gem: "#4fd97a", gemCut: "esmeralda", particles: ["🌼", "🦋", "✨"], ambient: [{ emoji: "🦋", kind: "drift" }, { emoji: "🌼", kind: "rise" }], terrain: "tierra", pedestal: "tierra", winsNeeded: 0 },
+  { id: "bosque", name: "Bosque", emoji: "🌳", image: bosque, color: "var(--arcade-green)", x: 26, y: 79, guardian: "hojito", gem: "#1f9e4d", gemCut: "hoja", particles: ["🍃", "🦋", "🌰"], ambient: [{ emoji: "🍃", kind: "fall" }, { emoji: "🦋", kind: "drift" }], terrain: "hierba", pedestal: "tocon", winsNeeded: 0 },
+  { id: "nieve", name: "Montaña Nevada", emoji: "❄️", image: nieve, color: "#8fd8ff", x: 68, y: 63, guardian: "ballenin", gem: "#a8e6ff", gemCut: "hielo", particles: ["❄️", "✨", "⛄"], ambient: [{ emoji: "❄️", kind: "fall" }, { emoji: "❄️", kind: "fall" }], terrain: "nieve", pedestal: "hielo", winsNeeded: 0 },
+  { id: "volcan", name: "Volcán", emoji: "🌋", image: volcan, color: "var(--arcade-orange)", x: 28, y: 50, guardian: "lavito", gem: "#ef2b2b", gemCut: "fuego", particles: ["🔥", "✨", "💥"], ambient: [{ emoji: "💨", kind: "rise" }, { emoji: "🔥", kind: "rise" }], terrain: "roca", pedestal: "lava", winsNeeded: 0 },
+  { id: "desierto", name: "Desierto", emoji: "🏜️", image: desierto, color: "#f6c85f", x: 66, y: 37, guardian: "cactino", gem: "#ffab21", gemCut: "sol", particles: ["🌵", "✨", "🪶"], ambient: [{ emoji: "🪶", kind: "drift" }, { emoji: "✨", kind: "rise" }], terrain: "arena", pedestal: "arenisca", winsNeeded: 0 },
+  { id: "playa", name: "Playa", emoji: "🏖️", image: playa, color: "var(--arcade-blue)", x: 30, y: 27, guardian: "aquip", gem: "#1fd8c4", gemCut: "gota", particles: ["🐚", "🫧", "🐟"], ambient: [{ emoji: "🫧", kind: "rise" }, { emoji: "🌊", kind: "drift" }], terrain: "arena", pedestal: "rocamar", winsNeeded: 0 },
+  { id: "cielo", name: "Cielo", emoji: "☁️", image: cielo, color: "#cfe9ff", x: 66, y: 18, guardian: "buhito", gem: "#5ec8ff", gemCut: "nube", particles: ["☁️", "🌈", "✨"], ambient: [{ emoji: "☁️", kind: "drift" }, { emoji: "✨", kind: "rise" }], terrain: "nube", pedestal: "nube", winsNeeded: 0 },
+  { id: "castillo", name: "Islas del Cielo", emoji: "🏯", image: castillo, color: "var(--arcade-yellow)", x: 30, y: 13, guardian: "fenix", gem: "#a259ff", gemCut: "estrella", particles: ["👑", "✨", "🎉"], ambient: [{ emoji: "✨", kind: "rise" }, { emoji: "🕊️", kind: "drift" }], terrain: "nube", pedestal: "nube", winsNeeded: 0 },
+  { id: "jefe", name: "Castillo Final", emoji: "🏰", image: jefe, color: "#7a2ff2", x: 52, y: 5, guardian: "sombron", gem: "#ff4fd8", gemCut: "estrella", particles: ["💜", "⚡", "✨"], ambient: [{ emoji: "💜", kind: "rise" }, { emoji: "⚡", kind: "drift" }], terrain: "oscura", pedestal: "piedra", boss: true, winsNeeded: 0 },
 ];
 
 export const GEM_ZONES = AREAS.filter((a) => !a.boss);
+
 
 
