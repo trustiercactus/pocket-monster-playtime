@@ -5,17 +5,16 @@ import {
   TYPE_COLOR,
   XP_PER_LEVEL,
   getCreature,
-  randomRival,
   type Creature,
 } from "@/lib/creatures";
 import { AREAS, type Area } from "@/lib/areas";
 import { Scenery } from "@/components/Scenery";
 import { Casa } from "@/components/Casa";
 import { MapaMundo } from "@/components/MapaMundo";
+import { Combate } from "@/components/Combate";
 import { randomEgg, type Egg } from "@/lib/eggs";
 import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
-import rivalTrainerImg from "@/assets/rival-trainer.png";
 import fondoImg from "@/assets/portada-fondo.jpg";
 
 export type Progress = {
@@ -47,15 +46,6 @@ const INITIAL: Progress = {
   legendary: false,
 };
 
-function Hearts({ n, max = MAX_HP }: { n: number; max?: number }) {
-  return (
-    <div className="flex gap-1 text-2xl leading-none" aria-label={`${n} vidas`}>
-      {Array.from({ length: max }).map((_, i) => (
-        <span key={i}>{i < n ? "❤️" : "🤍"}</span>
-      ))}
-    </div>
-  );
-}
 
 function Confetti() {
   const bits = ["⭐", "🎉", "✨", "🌟", "🎊", "💫"];
@@ -77,31 +67,6 @@ function Confetti() {
   );
 }
 
-function BigButton({
-  onClick,
-  color,
-  children,
-  disabled,
-  label,
-}: {
-  onClick: () => void;
-  color: string;
-  children: React.ReactNode;
-  disabled?: boolean;
-  label: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={label}
-      style={{ backgroundColor: color }}
-      className="btn-bounce min-h-[92px] flex-1 rounded-[1.75rem] border-4 border-white px-4 py-4 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] disabled:opacity-50"
-    >
-      {children}
-    </button>
-  );
-}
 
 export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}) {
   const [progress, setProgress] = useState<Progress | null>(null);
@@ -266,8 +231,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
         />
       )}
       {screen === "batalla" && (
-        <Batalla
-          progress={progress}
+        <Combate
           area={area}
           companion={companion}
           onFinish={finishBattle}
@@ -457,192 +421,6 @@ function Captura({ creature, onClose }: { creature: Creature; onClose: () => voi
       >
         ✅
       </button>
-    </div>
-  );
-}
-
-function Batalla({
-  progress,
-  area,
-  companion,
-  onFinish,
-  onBack,
-}: {
-  progress: Progress;
-  area: Area;
-  companion: Creature;
-  onFinish: (won: boolean) => void;
-  onBack: () => void;
-}) {
-  const [rival] = useState(() => randomRival(companion.id));
-  const [rivalTeam] = useState(() =>
-    Array.from({ length: 2 }, () => randomRival(companion.id)),
-  );
-  const [myHp, setMyHp] = useState(MAX_HP);
-  const [rivalHp, setRivalHp] = useState(MAX_HP);
-  const [fx, setFx] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [result, setResult] = useState<"win" | "lose" | null>(null);
-
-  const myTeam = CREATURES.filter(
-    (c) => progress.unlocked.includes(c.id) && c.id !== companion.id,
-  ).slice(0, 2);
-
-  function turn(kind: "fuerte" | "rapido" | "curar") {
-    if (busy || result) return;
-    setBusy(true);
-    let my = myHp;
-    let rh = rivalHp;
-
-    if (kind === "fuerte") {
-      const hit = Math.random() < 0.6 ? 2 : 1;
-      rh -= hit;
-      setFx("💥");
-    } else if (kind === "rapido") {
-      rh -= 1;
-      setFx("⚡");
-    } else {
-      my = Math.min(MAX_HP, my + 1);
-      setFx("💚");
-    }
-    setRivalHp(Math.max(0, rh));
-    setMyHp(my);
-
-    setTimeout(() => {
-      if (rh <= 0) {
-        setFx("🎉");
-        setResult("win");
-        setBusy(false);
-        return;
-      }
-      const dmg = Math.random() < 0.5 ? 1 : 0;
-      const after = Math.max(0, my - dmg);
-      setMyHp(after);
-      setFx(dmg ? "😵" : "😅");
-      setTimeout(() => {
-        setFx(null);
-        if (after <= 0) setResult("lose");
-        setBusy(false);
-      }, 600);
-    }, 700);
-  }
-
-  if (result) {
-    return (
-      <div className="screen-in relative flex min-h-[85vh] flex-col items-center justify-center gap-6 text-center">
-        {result === "win" && <Confetti />}
-        <div className="text-8xl pop-in">{result === "win" ? "🎉" : "🤗"}</div>
-        <LiveSprite src={trainerImg} alt="" motion="hop" className="w-32" />
-        <LiveSprite src={companion.image} alt={companion.name} motion="sway" className="w-40" />
-        <button
-          onClick={() => onFinish(result === "win")}
-          aria-label="Continuar"
-          className="btn-bounce btn-pulse w-full max-w-sm rounded-[2rem] border-4 border-white bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.2)]"
-        >
-          ✅
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="screen-in flex min-h-[90vh] flex-col justify-between">
-      <div className="flex items-start justify-between">
-        <button
-          onClick={onBack}
-          className="btn-bounce rounded-full border-4 border-white bg-white px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
-          aria-label="Volver"
-        >
-          ⬅️
-        </button>
-        <img src={area.image} alt={area.name} className="float-soft h-16 object-contain" />
-      </div>
-
-      {/* Rival: entrenadora a la derecha con sus criaturas detrás */}
-      <div className="flex items-end justify-end gap-1">
-        <div className="flex flex-col items-end gap-1">
-          <Hearts n={rivalHp} />
-          <LiveSprite
-            src={rival.image}
-            alt={rival.name}
-            motion="breathe"
-            className="w-24 drop-shadow-xl"
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          {rivalTeam.map((c, i) => (
-            <LiveSprite
-              key={i}
-              src={c.image}
-              alt=""
-              motion="sway"
-              delay={i * 0.4}
-              className="w-12 opacity-70"
-            />
-          ))}
-        </div>
-        <LiveSprite src={rivalTrainerImg} alt="Entrenadora rival" motion="hop" className="w-20" />
-      </div>
-
-      <div className="text-center text-7xl h-24">
-        <span className="pop-in inline-block" key={fx ?? "none"}>
-          {fx}
-        </span>
-      </div>
-
-      {/* Jugador: entrenador a la izquierda con sus criaturas detrás */}
-      <div className="flex items-end gap-1">
-        <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-24" />
-        <div className="flex flex-col gap-1">
-          {myTeam.map((c, i) => (
-            <LiveSprite
-              key={c.id}
-              src={c.image}
-              alt=""
-              motion="sway"
-              delay={i * 0.4}
-              className="w-12 opacity-70"
-            />
-          ))}
-        </div>
-        <div className="flex flex-col items-start gap-1">
-          <LiveSprite
-            src={companion.image}
-            alt={companion.name}
-            motion="breathe"
-            className="w-32 drop-shadow-xl"
-          />
-          <Hearts n={myHp} />
-        </div>
-      </div>
-
-
-      <div className="mt-4 flex gap-3">
-        <BigButton
-          label="Golpe fuerte"
-          color="var(--arcade-orange)"
-          onClick={() => turn("fuerte")}
-          disabled={busy}
-        >
-          💥
-        </BigButton>
-        <BigButton
-          label="Golpe rápido"
-          color="var(--arcade-blue)"
-          onClick={() => turn("rapido")}
-          disabled={busy}
-        >
-          ⚡
-        </BigButton>
-        <BigButton
-          label="Curarse"
-          color="var(--arcade-green)"
-          onClick={() => turn("curar")}
-          disabled={busy}
-        >
-          💚
-        </BigButton>
-      </div>
     </div>
   );
 }

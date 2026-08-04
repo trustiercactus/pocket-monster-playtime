@@ -686,3 +686,78 @@
 @utility pedestal-glow { animation: pedestal-glow 3s ease-in-out infinite; }
 @utility gem-trail { animation: gem-trail 1s ease-out both; }
 @utility socket-fill { animation: socket-fill 0.9s ease-out both; }
+
+/* ---------- Combate ---------- */
+@keyframes hit-shake {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  20% { transform: translateX(-14px) rotate(-5deg); }
+  40% { transform: translateX(12px) rotate(5deg); }
+  60% { transform: translateX(-8px) rotate(-3deg); }
+  80% { transform: translateX(6px) rotate(2deg); }
+}
+@keyframes screen-shake {
+  0%, 100% { transform: translate(0, 0); }
+  15% { transform: translate(-8px, 6px); }
+  30% { transform: translate(9px, -7px); }
+  45% { transform: translate(-7px, -5px); }
+  60% { transform: translate(6px, 8px); }
+  80% { transform: translate(-4px, 3px); }
+}
+@keyframes fx-pop {
+  0% { transform: scale(0.3) translateY(10px); opacity: 0; }
+  35% { transform: scale(1.25) translateY(-10px); opacity: 1; }
+  100% { transform: scale(0.9) translateY(-70px); opacity: 0; }
+}
+@keyframes heal-fly {
+  0% { transform: translateY(0) scale(0.6); opacity: 0; }
+  25% { transform: translateY(-10px) scale(1.3); opacity: 1; }
+  100% { transform: translateY(-46vh) scale(0.8); opacity: 0; }
+}
+@keyframes heart-beat {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+@keyframes friend-glow {
+  0%, 100% { filter: drop-shadow(0 0 14px rgba(255,255,180,0.9)) brightness(1.1); }
+  50% { filter: drop-shadow(0 0 34px rgba(255,255,120,1)) brightness(1.3); }
+}
+@keyframes surprise-jump {
+  0%, 100% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-18px) scale(1.08); }
+  60% { transform: translateY(0) scale(0.96); }
+}
+@keyframes into-ball {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.15) translateY(80px); opacity: 0; }
+}
+@keyframes ball-in {
+  0% { transform: translateY(-120px) scale(0.4) rotate(0deg); opacity: 0; }
+  40% { transform: translateY(0) scale(1.2) rotate(180deg); opacity: 1; }
+  60% { transform: translateY(0) scale(1) rotate(360deg); }
+  100% { transform: translateY(0) scale(1) rotate(420deg); opacity: 1; }
+}
+@keyframes evil-eye {
+  0%, 100% { opacity: 0.85; box-shadow: 0 0 10px 3px rgba(255,40,40,0.85); }
+  50% { opacity: 1; box-shadow: 0 0 16px 6px rgba(255,40,40,1); }
+}
+@keyframes star-ready {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(255,235,59,0.9)); }
+  50% { filter: drop-shadow(0 0 22px rgba(255,235,59,1)); }
+}
+@utility hit-shake { animation: hit-shake 0.5s ease-in-out; }
+@utility screen-shake { animation: screen-shake 0.6s ease-in-out; }
+@utility fx-pop { animation: fx-pop 0.9s ease-out forwards; }
+@utility heal-fly { animation: heal-fly 0.9s ease-out forwards; }
+@utility heart-beat { animation: heart-beat 1.6s ease-in-out infinite; }
+@utility friend-glow { animation: friend-glow 1.6s ease-in-out infinite; }
+@utility surprise-jump { animation: surprise-jump 0.7s ease-out; }
+@utility into-ball { animation: into-ball 1s ease-in forwards; }
+@utility ball-in { animation: ball-in 1.2s ease-out forwards; }
+@utility star-ready { animation: star-ready 1.2s ease-in-out infinite; }
+.evil-eye {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff2b2b;
+  animation: evil-eye 1.4s ease-in-out infinite;
+}
