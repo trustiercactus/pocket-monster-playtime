@@ -458,12 +458,12 @@ export function Combate({
               style={{ background: "rgba(0,0,0,0.3)" }}
               aria-hidden="true"
             />
-            <div className={`${hitMe ? "hit-shake knockback-down" : ""} ${lungeMe ? "lunge-up" : ""}`}>
+            <div className={`tail-wag ${hitMe ? "hit-shake knockback-down" : ""} ${lungeMe ? "lunge-up" : ""}`}>
               <LiveSprite
                 src={companion.image}
                 alt={companion.name}
                 motion="breathe"
-                className="w-52 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)]"
+                className="w-44 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)]"
               />
               {hitMe && <span className="pop-in absolute -right-2 top-2 text-4xl">😖</span>}
             </div>
