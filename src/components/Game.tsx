@@ -408,8 +408,10 @@ function Elegir({
             key={c.id}
             onClick={() => onPick(c.id)}
             aria-label={c.name}
-            style={{ borderColor: TYPE_COLOR[c.type] }}
-            className="pop-in btn-bounce flex flex-col items-center rounded-3xl border-[6px] bg-white/95 p-2 shadow-[0_6px_0_rgba(0,0,0,0.12)]"
+            style={c.legendary ? undefined : { borderColor: TYPE_COLOR[c.type] }}
+            className={`pop-in btn-bounce relative flex flex-col items-center rounded-3xl border-[6px] bg-white/95 p-2 shadow-[0_6px_0_rgba(0,0,0,0.12)] ${
+              c.legendary ? "rainbow-frame" : ""
+            } ${progress.companion === c.id ? "ring-4 ring-yellow" : ""}`}
           >
             <LiveSprite
               src={c.image}
