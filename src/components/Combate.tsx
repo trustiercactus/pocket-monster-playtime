@@ -422,7 +422,7 @@ export function Combate({
                 src={guardian.image}
                 alt={guardian.name}
                 motion="float"
-                className={`w-64 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] transition-all duration-500 ${
+                className={`w-56 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] transition-all duration-500 ${
                   ending >= 2 ? "friend-glow" : ""
                 } ${ending === 1 ? "surprise-jump" : ""} ${ending >= 5 ? "into-ball" : ""}`}
               />
