@@ -452,7 +452,6 @@ export function Combate({
 
           {/* CRIATURA DEL JUGADOR */}
           <div className="relative -mt-6 flex flex-col items-center gap-1">
-            {flyHeart && <span className="heal-fly absolute -top-4 text-5xl">💚</span>}
             <span
               className="pointer-events-none absolute bottom-12 left-1/2 h-4 w-28 -translate-x-1/2 rounded-[50%] blur-[4px]"
               style={{ background: "rgba(0,0,0,0.3)" }}
