@@ -362,16 +362,18 @@ export function MapaMundo({
                     )}
                   </span>
 
-                  {/* pedestal de piedra */}
+                  {/* base propia del bioma */}
                   <span
-                    className="relative z-10 h-4 w-[74px] rounded-[50%] border-2 border-white/80 shadow-[0_4px_0_rgba(0,0,0,0.35)]"
+                    className="relative z-10 h-4 w-[74px] rounded-[50%] border-2"
                     style={{
-                      background:
-                        "radial-gradient(circle at 50% 25%, #f4efe3, #b9ad97 70%, #8c8171)",
-                      filter: open ? "none" : "saturate(0.8) brightness(0.92)",
+                      background: PEDESTAL[a.pedestal].fill,
+                      borderColor: PEDESTAL[a.pedestal].border,
+                      boxShadow: PEDESTAL[a.pedestal].shadow,
+                      filter: open ? "none" : "saturate(0.85) brightness(0.95)",
                     }}
                     aria-hidden="true"
                   />
+
 
                   {/* medallón */}
                   <span
