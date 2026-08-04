@@ -11,6 +11,7 @@ import chispi from "@/assets/chispi.png";
 import truenin from "@/assets/truenin.png";
 import estrelin from "@/assets/estrelin.png";
 import sombron from "@/assets/sombron.png";
+import legendaria from "@/assets/legendaria.png";
 
 export type ElementType = "fuego" | "agua" | "planta" | "rayo";
 
@@ -20,7 +21,12 @@ export type Creature = {
   type: ElementType;
   image: string;
   unlockLevel: number;
+  /** criatura legendaria nacida de las ocho esmeraldas */
+  legendary?: boolean;
 };
+
+/** id de la criatura legendaria final */
+export const LEGENDARY_ID = "aurora";
 
 export const TYPE_EMOJI: Record<ElementType, string> = {
   fuego: "🔥",
