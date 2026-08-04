@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AREAS, GEM_ZONES, TERRAIN, PEDESTAL, type Area } from "@/lib/areas";
+import { AREAS, GEM_ZONES, TERRAIN, type Area } from "@/lib/areas";
 import { getCreature } from "@/lib/creatures";
 import mapaFondo from "@/assets/mapa-vertical.jpg";
 import legendariaImg from "@/assets/legendaria.png";
