@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getCreature, type Creature } from "@/lib/creatures";
 import type { Area } from "@/lib/areas";
 import { LiveSprite } from "@/components/LiveSprite";
+import mapaFondo from "@/assets/mapa-vertical.jpg";
 
 const MAX_HP = 5;
 const SUPER_CHARGE = 3;
