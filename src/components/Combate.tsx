@@ -274,15 +274,18 @@ type Fx = { id: number; emoji: string; big?: boolean };
 export function Combate({
   area,
   companion,
+  zonesDone = [],
   onFinish,
   onBack,
 }: {
   area: Area;
   companion: Creature;
+  zonesDone?: string[];
   onFinish: (won: boolean) => void;
   onBack: () => void;
 }) {
   const guardian = getCreature(area.guardian);
+  const gemIndex = GEM_ZONES.findIndex((z) => z.id === area.id);
   const [guardHp, setGuardHp] = useState(MAX_HP);
   const [myHp, setMyHp] = useState(MAX_HP);
   const [heals, setHeals] = useState(2);
