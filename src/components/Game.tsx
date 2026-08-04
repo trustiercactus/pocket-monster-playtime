@@ -241,6 +241,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
         <Combate
           area={area}
           companion={companion}
+          zonesDone={progress.zonesDone}
           onFinish={finishBattle}
           onBack={() => setScreen("mapa")}
         />
