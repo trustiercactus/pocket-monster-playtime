@@ -475,7 +475,7 @@ export function Combate({
                 src={companion.image}
                 alt={companion.name}
                 motion="breathe"
-                className="w-44 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)]"
+                className="w-40 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)]"
               />
               {hitMe && <span className="pop-in absolute -right-2 top-2 text-4xl">😖</span>}
             </div>
@@ -485,7 +485,15 @@ export function Combate({
 
 
         {/* BOTONES */}
-        <div className="mt-2 flex items-center justify-center gap-7">
+        <div className="relative mt-2 flex items-center justify-center gap-7">
+          {flyHeart && (
+            <span
+              className="heal-to-bar pointer-events-none absolute left-1/2 top-0 z-20 text-5xl drop-shadow-[0_0_14px_rgba(120,255,160,0.9)]"
+              aria-hidden="true"
+            >
+              💚
+            </span>
+          )}
           <RoundButton
             label="Atacar"
             color="var(--arcade-orange)"
