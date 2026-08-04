@@ -468,7 +468,43 @@ export function Combate({
         )}
       </div>
 
+      {/* barra de esmeraldas y la nueva esmeralda volando a su hueco */}
+      {ending >= 4 && gemIndex >= 0 && (
+        <>
+          <GemBar zonesDone={zonesDone} filling={ending >= 6 ? area.id : null} />
+          {ending < 6 && (
+            <div
+              className="pointer-events-none absolute z-40"
+              style={{
+                left:
+                  ending >= 5
+                    ? `calc(50% + ${(gemIndex - (GEM_ZONES.length - 1) / 2) * GEM_GAP}px)`
+                    : "50%",
+                top: ending >= 5 ? "18px" : "42%",
+                transform:
+                  ending >= 5 ? "translate(-50%, 0) scale(0.85)" : "translate(-50%, -50%) scale(2)",
+                transition:
+                  "left 0.95s cubic-bezier(0.5,-0.1,0.4,1.25), top 0.95s cubic-bezier(0.5,-0.1,0.4,1.25), transform 0.95s ease",
+                filter: `drop-shadow(0 0 22px ${area.gem})`,
+              }}
+              aria-hidden="true"
+            >
+              {ending >= 5 && (
+                <span
+                  className="gem-trail absolute left-1/2 top-1/2 h-28 w-2 -translate-x-1/2 origin-top rounded-full blur-[3px]"
+                  style={{ background: `linear-gradient(to bottom, ${area.gem}, transparent)` }}
+                />
+              )}
+              <span className={ending === 4 ? "gem-reveal block" : "block"}>
+                <Gema color={area.gem} cut={area.gemCut} size={44} spin />
+              </span>
+            </div>
+          )}
+        </>
+      )}
+
       <div className="relative flex h-full flex-col px-3 pb-10 pt-2">
+
         {/* SUPERIOR — mismo lenguaje visual que el mapa */}
         <div className="relative flex items-start">
           <button
