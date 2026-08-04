@@ -266,8 +266,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
         />
       )}
       {screen === "batalla" && (
-        <Batalla
-          progress={progress}
+        <Combate
           area={area}
           companion={companion}
           onFinish={finishBattle}
