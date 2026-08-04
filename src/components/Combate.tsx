@@ -60,15 +60,76 @@ function boom(strong: boolean) {
   }
 }
 
+/** corazones que nunca desaparecen de golpe: rebotan, se encogen y destellan */
 function Hearts({ n, big }: { n: number; big?: boolean }) {
+  const [shown, setShown] = useState(n);
+  const [losing, setLosing] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (n === shown) return;
+    if (n > shown) {
+      setShown(n);
+      return;
+    }
+    const idx = Array.from({ length: shown - n }, (_, i) => shown - 1 - i);
+    setLosing(idx);
+    const t = window.setTimeout(() => {
+      setShown(n);
+      setLosing([]);
+    }, 520);
+    return () => clearTimeout(t);
+  }, [n, shown]);
+
   return (
     <div
       className={`flex justify-center gap-1 leading-none ${big ? "text-4xl" : "text-3xl"}`}
       aria-label={`${n} de ${MAX_HP} vidas`}
     >
-      {Array.from({ length: MAX_HP }).map((_, i) => (
-        <span key={i} className={i < n ? "heart-beat inline-block" : "inline-block opacity-70"}>
-          {i < n ? "❤️" : "🤍"}
+      {Array.from({ length: MAX_HP }).map((_, i) => {
+        const lost = losing.includes(i);
+        const full = i < shown;
+        return (
+          <span
+            key={i}
+            className={
+              lost
+                ? "heart-lose inline-block"
+                : full
+                  ? "heart-beat inline-block"
+                  : "inline-block opacity-70"
+            }
+          >
+            {full ? "❤️" : "🤍"}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+/** ambiente vivo del bioma: hojas, copos, humo, olas... */
+function AmbientLayer({ area }: { area: Area }) {
+  const kindClass = { fall: "amb-fall", rise: "amb-rise", drift: "amb-drift" } as const;
+  const items = Array.from({ length: 16 }, (_, i) => {
+    const a = area.ambient[i % area.ambient.length]!;
+    return { a, i };
+  });
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      {items.map(({ a, i }) => (
+        <span
+          key={i}
+          className={`absolute ${kindClass[a.kind]}`}
+          style={{
+            left: `${(i * 37) % 96}%`,
+            top: `${(i * 53) % 88}%`,
+            fontSize: `${1.1 + ((i * 7) % 5) * 0.28}rem`,
+            animationDelay: `${(i % 8) * 0.9}s`,
+            animationDuration: `${5 + (i % 5)}s`,
+            opacity: 0.85,
+          }}
+        >
+          {a.emoji}
         </span>
       ))}
     </div>
@@ -129,7 +190,11 @@ export function Combate({
   const [busy, setBusy] = useState(false);
   const [hitGuard, setHitGuard] = useState(false);
   const [hitMe, setHitMe] = useState(false);
+  const [lungeMe, setLungeMe] = useState(false);
+  const [lungeGuard, setLungeGuard] = useState(false);
   const [shake, setShake] = useState(false);
+  const [micro, setMicro] = useState(false);
+  const [ring, setRing] = useState(false);
   const [flyHeart, setFlyHeart] = useState(false);
   const [fx, setFx] = useState<Fx[]>([]);
   /** 0 = luchando, 1..5 fases del final feliz */
@@ -150,38 +215,57 @@ export function Combate({
 
   function guardianTurn(current: number) {
     later(() => {
-      setHitMe(true);
-      pop("💨");
-      // nunca puede perder: el último corazón no se quita
-      setMyHp(Math.max(1, current - 1));
-      later(() => setHitMe(false), 500);
-      later(() => setBusy(false), 700);
-    }, 750);
+      setLungeGuard(true);
+      later(() => setLungeGuard(false), 560);
+      later(() => {
+        setHitMe(true);
+        setMicro(true);
+        boom(false);
+        pop("💨");
+        // nunca puede perder: el último corazón no se quita
+        setMyHp(Math.max(1, current - 1));
+        later(() => setMicro(false), 300);
+        later(() => setHitMe(false), 500);
+        later(() => setBusy(false), 700);
+      }, 260);
+    }, 620);
   }
 
   function damage(amount: number, icon: string, strong: boolean) {
     if (busy || ending) return;
     setBusy(true);
-    boom(strong);
-    pop(icon, strong);
-    setHitGuard(true);
-    if (strong) {
-      setShake(true);
-      later(() => setShake(false), 600);
-      for (let i = 0; i < 14; i++) later(() => pop(["✨", "💥", "⭐", "🌟"][i % 4] as string), i * 45);
-    }
-    const next = Math.max(0, guardHp - amount);
-    setGuardHp(next);
-    later(() => setHitGuard(false), 500);
+    setLungeMe(true);
+    later(() => setLungeMe(false), 560);
 
-    if (next === 0) {
-      later(() => startEnding(), 800);
-      return;
-    }
-    guardianTurn(myHp);
+    later(() => {
+      boom(strong);
+      pop(icon, strong);
+      setHitGuard(true);
+      if (strong) {
+        setRing(true);
+        setShake(true);
+        later(() => setRing(false), 720);
+        later(() => setShake(false), 600);
+        for (let i = 0; i < 14; i++)
+          later(() => pop(["✨", "💥", "⭐", "🌟"][i % 4] as string), i * 45);
+      } else {
+        setMicro(true);
+        later(() => setMicro(false), 300);
+      }
+      const next = Math.max(0, guardHp - amount);
+      setGuardHp(next);
+      later(() => setHitGuard(false), 500);
+
+      if (next === 0) {
+        later(() => startEnding(), 800);
+        return;
+      }
+      guardianTurn(myHp);
+    }, 260);
   }
 
   function normalAttack() {
+    if (busy || ending) return;
     setCharge((c) => Math.min(SUPER_CHARGE, c + 1));
     damage(1, attackIcon(companion, area), false);
   }
@@ -195,7 +279,7 @@ export function Combate({
   function heal() {
     if (busy || ending || heals <= 0 || myHp >= MAX_HP) {
       if (!busy && !ending && heals > 0) {
-        // vida llena: igualmente gasta nada, solo brillo
+        // vida llena: no gasta nada, solo brillo
         pop("✨");
       }
       return;
@@ -222,19 +306,25 @@ export function Combate({
     later(() => onFinish(true), 5600);
   }
 
-  const healColor =
-    heals === 2 ? "var(--arcade-green)" : heals === 1 ? "#9fe3a8" : "#b9b9b9";
+  const healColor = heals === 2 ? "var(--arcade-green)" : heals === 1 ? "#9fe3a8" : "#b9b9b9";
   const chargeReady = charge >= SUPER_CHARGE;
   const chargePct = (charge / SUPER_CHARGE) * 100;
 
   return (
     <div
-      className={`fixed inset-0 z-40 overflow-hidden ${shake ? "screen-shake" : ""}`}
+      className={`fixed inset-0 z-40 overflow-hidden ${shake ? "screen-shake" : micro ? "micro-shake" : ""}`}
       style={{ touchAction: "manipulation" }}
     >
-      {/* Fondo de la zona */}
-      <img src={area.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-white/10" />
+      {/* Fondo de la zona a pantalla completa */}
+      <img
+        src={area.image}
+        alt=""
+        className="absolute inset-0 h-full w-full scale-105 object-cover"
+      />
+      <div className="absolute inset-0 bg-white/5" />
+
+      {/* ambiente vivo del bioma */}
+      <AmbientLayer area={area} />
 
       {/* efectos flotantes */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -251,9 +341,15 @@ export function Combate({
             {f.emoji}
           </span>
         ))}
+        {ring && (
+          <span
+            className="boom-ring absolute left-1/2 top-[38%] h-40 w-40 rounded-full border-8 border-white/90"
+            style={{ boxShadow: "0 0 40px rgba(255,255,255,0.9)" }}
+          />
+        )}
       </div>
 
-      <div className="relative flex h-full flex-col justify-between px-4 pb-5 pt-3">
+      <div className="relative flex h-full flex-col px-4 pb-10 pt-3">
         {/* SUPERIOR */}
         <div className="relative flex items-start">
           <button
@@ -271,54 +367,57 @@ export function Combate({
           </div>
         </div>
 
-        {/* GUARDIÁN */}
-        <div className="relative mt-6 flex justify-center">
-          <div className={hitGuard ? "hit-shake" : ""}>
-            <LiveSprite
-              src={guardian.image}
-              alt={guardian.name}
-              motion="float"
-              className={`w-56 drop-shadow-2xl transition-all duration-500 ${
-                ending >= 2 ? "friend-glow" : ""
-              } ${ending === 1 ? "surprise-jump" : ""} ${ending >= 5 ? "into-ball" : ""}`}
-            />
-            {/* ojos malvados mientras está hechizado */}
-            {ending < 2 && (
-              <>
-                <span className="evil-eye absolute left-[38%] top-[34%]" />
-                <span className="evil-eye absolute left-[54%] top-[34%]" />
-              </>
+        {/* ZONA DE COMBATE: los dos muy cerca */}
+        <div className="flex flex-1 flex-col items-center justify-center gap-1">
+          {/* GUARDIÁN */}
+          <div className="relative flex justify-center">
+            <div className={`${hitGuard ? "hit-shake" : ""} ${lungeGuard ? "lunge-down" : ""}`}>
+              <LiveSprite
+                src={guardian.image}
+                alt={guardian.name}
+                motion="float"
+                className={`w-52 drop-shadow-2xl transition-all duration-500 ${
+                  ending >= 2 ? "friend-glow" : ""
+                } ${ending === 1 ? "surprise-jump" : ""} ${ending >= 5 ? "into-ball" : ""}`}
+              />
+              {/* ojos malvados mientras está hechizado */}
+              {ending < 2 && (
+                <>
+                  <span className="evil-eye absolute left-[38%] top-[34%]" />
+                  <span className="evil-eye absolute left-[54%] top-[34%]" />
+                </>
+              )}
+              {ending >= 2 && <span className="absolute -right-2 top-2 text-5xl pop-in">😊</span>}
+              {ending === 1 && <span className="absolute -right-2 top-0 text-5xl pop-in">😲</span>}
+            </div>
+            {ending >= 3 && (
+              <span
+                className="gem-drop absolute -top-2 text-6xl"
+                style={{ color: area.gem, filter: `drop-shadow(0 0 16px ${area.gem})` }}
+              >
+                💎
+              </span>
             )}
-            {ending >= 2 && <span className="absolute -right-2 top-2 text-5xl pop-in">😊</span>}
-            {ending === 1 && <span className="absolute -right-2 top-0 text-5xl pop-in">😲</span>}
+            {ending >= 4 && <span className="ball-in absolute bottom-0 text-7xl">⚪</span>}
           </div>
-          {ending >= 3 && (
-            <span
-              className="gem-drop absolute -top-2 text-6xl"
-              style={{ color: area.gem, filter: `drop-shadow(0 0 16px ${area.gem})` }}
-            >
-              💎
-            </span>
-          )}
-          {ending >= 4 && <span className="ball-in absolute bottom-0 text-7xl">⚪</span>}
-        </div>
 
-        {/* CRIATURA DEL JUGADOR */}
-        <div className="relative flex flex-col items-center gap-1">
-          {flyHeart && <span className="heal-fly absolute -top-4 text-5xl">💚</span>}
-          <div className={hitMe ? "hit-shake" : ""}>
-            <LiveSprite
-              src={companion.image}
-              alt={companion.name}
-              motion="breathe"
-              className="w-40 drop-shadow-2xl"
-            />
+          {/* CRIATURA DEL JUGADOR */}
+          <div className="relative -mt-3 flex flex-col items-center gap-1">
+            {flyHeart && <span className="heal-fly absolute -top-4 text-5xl">💚</span>}
+            <div className={`${hitMe ? "hit-shake" : ""} ${lungeMe ? "lunge-up" : ""}`}>
+              <LiveSprite
+                src={companion.image}
+                alt={companion.name}
+                motion="breathe"
+                className="w-40 drop-shadow-2xl"
+              />
+            </div>
+            <Hearts n={myHp} big />
           </div>
-          <Hearts n={myHp} big />
         </div>
 
         {/* BOTONES */}
-        <div className="mt-3 flex items-center justify-center gap-5">
+        <div className="mt-2 flex items-center justify-center gap-5">
           <RoundButton
             label="Atacar"
             color="var(--arcade-orange)"
@@ -368,6 +467,9 @@ export function Combate({
               >
                 ⭐
               </span>
+              {chargeReady && (
+                <span className="absolute -right-1 -top-1 text-2xl twinkle">✨</span>
+              )}
             </span>
           </RoundButton>
         </div>
