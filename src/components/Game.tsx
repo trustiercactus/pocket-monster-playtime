@@ -4,6 +4,7 @@ import {
   TYPE_EMOJI,
   TYPE_COLOR,
   XP_PER_LEVEL,
+  LEGENDARY_ID,
   getCreature,
   type Creature,
 } from "@/lib/creatures";
@@ -172,9 +173,10 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
             save({
               ...progress,
               legendary: true,
-              unlocked: progress.unlocked.includes("estrelin")
+              companion: LEGENDARY_ID,
+              unlocked: progress.unlocked.includes(LEGENDARY_ID)
                 ? progress.unlocked
-                : [...progress.unlocked, "estrelin"],
+                : [...progress.unlocked, LEGENDARY_ID],
             });
           }}
         />
