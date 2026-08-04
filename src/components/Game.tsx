@@ -335,11 +335,20 @@ function Coleccion({
               key={c.id}
               onClick={() => owned && onPick(c.id)}
               aria-label={owned ? c.name : "Criatura bloqueada"}
-              style={{ borderColor: active ? TYPE_COLOR[c.type] : "transparent" }}
-              className={`pop-in flex flex-col items-center gap-1 rounded-3xl border-[6px] bg-white/95 p-3 shadow-[0_6px_0_rgba(0,0,0,0.12)] ${
+              style={
+                c.legendary && owned
+                  ? undefined
+                  : { borderColor: active ? TYPE_COLOR[c.type] : "transparent" }
+              }
+              className={`pop-in relative flex flex-col items-center gap-1 rounded-3xl border-[6px] bg-white/95 p-3 shadow-[0_6px_0_rgba(0,0,0,0.12)] ${
                 owned ? "btn-bounce" : ""
-              }`}
+              } ${c.legendary && owned ? "rainbow-frame" : ""}`}
             >
+              {c.legendary && owned && (
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border-2 border-white bg-gradient-to-r from-yellow via-orange to-green px-2 py-[2px] text-[0.7rem] font-black text-white shadow">
+                  ✨ LEGENDARIA
+                </span>
+              )}
               <LiveSprite
                 src={c.image}
                 alt={owned ? c.name : ""}
