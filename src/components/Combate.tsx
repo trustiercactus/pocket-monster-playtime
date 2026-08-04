@@ -401,9 +401,14 @@ export function Combate({
     setEnding(1); // sorprendido
     later(() => {
       setEnding(2); // sonríe y brilla
-      speak("¡Ahora es tu amigo!");
+      speak(area.boss ? "¡Has salvado el reino!" : "¡Ahora es tu amigo!");
     }, 900);
     later(() => setEnding(3), 2100); // desaparece entre partículas de luz
+    if (area.boss) {
+      // el jefe final se deshace en humo oscuro y la pantalla se llena de luz
+      later(() => onFinish(true), 4200);
+      return;
+    }
     later(() => setEnding(4), 3000); // aparece su esmeralda girando
     later(() => setEnding(5), 4400); // vuela hacia la barra
     later(() => {
