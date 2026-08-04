@@ -519,13 +519,7 @@ export function Combate({
             <span className="flex items-center gap-2 rounded-full border-4 border-white/90 bg-ink/85 px-4 py-1 text-lg font-black tracking-wide text-white shadow-[0_6px_0_rgba(0,0,0,0.4)]">
               <span>{area.emoji}</span>
               {guardian.name}
-              <span
-                className="grid h-6 w-6 place-items-center rounded-full border-2 border-white/90"
-                style={{
-                  background: `radial-gradient(circle at 50% 28%, ${area.gem}, rgba(0,0,0,0.3))`,
-                }}
-                aria-hidden="true"
-              />
+              <Gema color={area.gem} cut={area.gemCut} size={22} />
             </span>
             <Hearts n={guardHp} />
           </div>
