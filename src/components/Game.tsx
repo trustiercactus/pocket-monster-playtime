@@ -5,7 +5,6 @@ import {
   TYPE_COLOR,
   XP_PER_LEVEL,
   getCreature,
-  randomRival,
   type Creature,
 } from "@/lib/creatures";
 import { AREAS, type Area } from "@/lib/areas";
@@ -16,7 +15,6 @@ import { Combate } from "@/components/Combate";
 import { randomEgg, type Egg } from "@/lib/eggs";
 import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
-import rivalTrainerImg from "@/assets/rival-trainer.png";
 import fondoImg from "@/assets/portada-fondo.jpg";
 
 export type Progress = {
@@ -48,15 +46,6 @@ const INITIAL: Progress = {
   legendary: false,
 };
 
-function Hearts({ n, max = MAX_HP }: { n: number; max?: number }) {
-  return (
-    <div className="flex gap-1 text-2xl leading-none" aria-label={`${n} vidas`}>
-      {Array.from({ length: max }).map((_, i) => (
-        <span key={i}>{i < n ? "❤️" : "🤍"}</span>
-      ))}
-    </div>
-  );
-}
 
 function Confetti() {
   const bits = ["⭐", "🎉", "✨", "🌟", "🎊", "💫"];
@@ -78,31 +67,6 @@ function Confetti() {
   );
 }
 
-function BigButton({
-  onClick,
-  color,
-  children,
-  disabled,
-  label,
-}: {
-  onClick: () => void;
-  color: string;
-  children: React.ReactNode;
-  disabled?: boolean;
-  label: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={label}
-      style={{ backgroundColor: color }}
-      className="btn-bounce min-h-[92px] flex-1 rounded-[1.75rem] border-4 border-white px-4 py-4 text-4xl font-black text-white shadow-[0_8px_0_rgba(0,0,0,0.2)] disabled:opacity-50"
-    >
-      {children}
-    </button>
-  );
-}
 
 export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}) {
   const [progress, setProgress] = useState<Progress | null>(null);
