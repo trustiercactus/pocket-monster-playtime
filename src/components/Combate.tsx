@@ -315,13 +315,25 @@ export function Combate({
       className={`fixed inset-0 z-40 overflow-hidden ${shake ? "screen-shake" : micro ? "micro-shake" : ""}`}
       style={{ touchAction: "manipulation" }}
     >
-      {/* Fondo de la zona a pantalla completa */}
-      <img
-        src={area.image}
-        alt=""
-        className="absolute inset-0 h-full w-full scale-105 object-cover"
+      {/* El mismo mapa, con la cámara ampliada sobre esta zona */}
+      <div
+        className="battle-zoom absolute inset-0"
+        style={{
+          backgroundImage: `url(${mapaFondo})`,
+          backgroundSize: "cover",
+          backgroundPosition: `${area.x}% ${area.y}%`,
+        }}
+        aria-hidden="true"
       />
-      <div className="absolute inset-0 bg-white/5" />
+      <div className="absolute inset-0 bg-white/10" />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background: `radial-gradient(circle at 50% 45%, transparent 40%, ${area.color}22 75%, rgba(20,26,40,0.35) 100%)`,
+        }}
+        aria-hidden="true"
+      />
+
 
       {/* ambiente vivo del bioma */}
       <AmbientLayer area={area} />
