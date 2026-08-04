@@ -10,6 +10,7 @@ import buhito from "@/assets/buhito.png";
 import chispi from "@/assets/chispi.png";
 import truenin from "@/assets/truenin.png";
 import estrelin from "@/assets/estrelin.png";
+import sombron from "@/assets/sombron.png";
 
 export type ElementType = "fuego" | "agua" | "planta" | "rayo";
 

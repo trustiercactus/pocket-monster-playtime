@@ -158,7 +158,7 @@ export const AREAS: Area[] = [
   { id: "playa", name: "Playa", emoji: "🏖️", image: playa, color: "var(--arcade-blue)", x: 30, y: 27, guardian: "aquip", gem: "#3fc7ff", particles: ["🐚", "🫧", "🐟"], ambient: [{ emoji: "🫧", kind: "rise" }, { emoji: "🌊", kind: "drift" }], terrain: "arena", pedestal: "rocamar", winsNeeded: 0 },
   { id: "cielo", name: "Cielo", emoji: "☁️", image: cielo, color: "#cfe9ff", x: 66, y: 18, guardian: "buhito", gem: "#b98cff", particles: ["☁️", "🌈", "✨"], ambient: [{ emoji: "☁️", kind: "drift" }, { emoji: "✨", kind: "rise" }], terrain: "nube", pedestal: "nube", winsNeeded: 0 },
   { id: "castillo", name: "Islas del Cielo", emoji: "🏯", image: castillo, color: "var(--arcade-yellow)", x: 30, y: 13, guardian: "fenix", gem: "#ff8ad1", particles: ["👑", "✨", "🎉"], ambient: [{ emoji: "✨", kind: "rise" }, { emoji: "🕊️", kind: "drift" }], terrain: "nube", pedestal: "nube", winsNeeded: 0 },
-  { id: "jefe", name: "Castillo Final", emoji: "🏰", image: jefe, color: "#7a2ff2", x: 52, y: 5, guardian: "estrelin", gem: "#ff4fd8", particles: ["💜", "⚡", "✨"], ambient: [{ emoji: "💜", kind: "rise" }, { emoji: "⚡", kind: "drift" }], terrain: "oscura", pedestal: "piedra", boss: true, winsNeeded: 0 },
+  { id: "jefe", name: "Castillo Final", emoji: "🏰", image: jefe, color: "#7a2ff2", x: 52, y: 5, guardian: "sombron", gem: "#ff4fd8", particles: ["💜", "⚡", "✨"], ambient: [{ emoji: "💜", kind: "rise" }, { emoji: "⚡", kind: "drift" }], terrain: "oscura", pedestal: "piedra", boss: true, winsNeeded: 0 },
 ];
 
 export const GEM_ZONES = AREAS.filter((a) => !a.boss);
