@@ -450,6 +450,11 @@ export function Combate({
       {/* ambiente vivo del bioma */}
       <AmbientLayer area={area} />
 
+      {/* el jefe final se deshace y la pantalla se llena de luz */}
+      {area.boss && ending >= 3 && (
+        <span className="final-flash pointer-events-none absolute inset-0 z-40 bg-white" aria-hidden="true" />
+      )}
+
       {/* efectos flotantes */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         {fx.map((f, i) => (
