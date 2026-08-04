@@ -379,7 +379,11 @@ function Elegir({
   onPick: (id: string) => void;
   onBack: () => void;
 }) {
-  const mine = CREATURES.filter((c) => progress.unlocked.includes(c.id));
+  const owned = CREATURES.filter((c) => progress.unlocked.includes(c.id));
+  // en el combate final, la legendaria va primero y ya viene elegida
+  const mine = area.boss
+    ? [...owned].sort((a, b) => Number(!!b.legendary) - Number(!!a.legendary))
+    : owned;
   return (
     <div className="screen-in flex flex-col items-center gap-4">
       <div className="flex w-full items-center justify-between">
