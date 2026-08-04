@@ -399,14 +399,18 @@ export function Combate({
 
   function startEnding() {
     setEnding(1); // sorprendido
-    later(() => setEnding(2), 900); // sonríe y brilla
-    later(() => setEnding(3), 1900); // esmeralda
     later(() => {
-      setEnding(4); // poké ball
+      setEnding(2); // sonríe y brilla
       speak("¡Ahora es tu amigo!");
-    }, 2900);
-    later(() => setEnding(5), 4200); // entra en la ball
-    later(() => onFinish(true), 5600);
+    }, 900);
+    later(() => setEnding(3), 2100); // desaparece entre partículas de luz
+    later(() => setEnding(4), 3000); // aparece su esmeralda girando
+    later(() => setEnding(5), 4400); // vuela hacia la barra
+    later(() => {
+      setEnding(6); // entra en su hueco
+      reward();
+    }, 5400);
+    later(() => onFinish(true), 6600);
   }
 
   const healColor = heals === 2 ? "var(--arcade-green)" : heals === 1 ? "#9fe3a8" : "#b9b9b9";
