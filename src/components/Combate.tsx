@@ -525,7 +525,7 @@ export function Combate({
                 motion="float"
                 className={`${area.boss ? "w-64" : "w-52"} drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] transition-all duration-500 ${
                   ending >= 2 ? "friend-glow" : ""
-                } ${ending === 1 ? "surprise-jump" : ""} ${ending >= 5 ? "into-ball" : ""}`}
+                } ${ending === 1 ? "surprise-jump" : ""} ${ending >= 3 ? "guard-dissolve" : ""}`}
               />
 
               {/* ojos malvados mientras está hechizado */}
@@ -538,19 +538,31 @@ export function Combate({
               {hitGuard && ending === 0 && (
                 <span className="pop-in absolute -left-2 top-2 text-5xl">😖</span>
               )}
-              {ending >= 2 && <span className="absolute -right-2 top-2 text-5xl pop-in">😊</span>}
+              {ending === 2 && <span className="absolute -right-2 top-2 text-5xl pop-in">😊</span>}
               {ending === 1 && <span className="absolute -right-2 top-0 text-5xl pop-in">😲</span>}
             </div>
-            {ending >= 3 && (
-              <span
-                className="gem-drop absolute -top-2 text-6xl"
-                style={{ color: area.gem, filter: `drop-shadow(0 0 16px ${area.gem})` }}
-              >
-                💎
+
+            {/* partículas de luz al desaparecer */}
+            {ending >= 3 && ending < 5 && (
+              <span className="pointer-events-none absolute inset-0" aria-hidden="true">
+                {Array.from({ length: 14 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className="sparkle-up absolute text-2xl"
+                    style={{
+                      left: `${8 + ((i * 29) % 84)}%`,
+                      top: `${20 + ((i * 17) % 60)}%`,
+                      animationDelay: `${i * 0.08}s`,
+                      filter: `drop-shadow(0 0 8px ${area.gem})`,
+                    }}
+                  >
+                    ✨
+                  </span>
+                ))}
               </span>
             )}
-            {ending >= 4 && <span className="ball-in absolute bottom-0 text-7xl">⚪</span>}
           </div>
+
 
           {/* CRIATURA DEL JUGADOR */}
           <div className="relative -mt-6 flex flex-col items-center gap-1">
