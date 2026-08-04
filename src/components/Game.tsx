@@ -76,6 +76,8 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
   const [area, setArea] = useState<Area>(AREAS[0] as Area);
   const [fighter, setFighter] = useState<string | null>(null);
   const [captured, setCaptured] = useState<Creature | null>(null);
+  /** aventura completada: la colección vuelve a la pantalla final */
+  const [ended, setEnded] = useState(false);
 
   useEffect(() => {
     try {
@@ -148,6 +150,12 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
         wins: progress.wins + 1,
         eggs,
       });
+    }
+    if (won && area.boss) {
+      // la aventura termina: nunca se vuelve al mapa
+      setEnded(true);
+      setScreen("final");
+      return;
     }
     setScreen("mapa");
     if (nuevo) setCaptured(nuevo);
