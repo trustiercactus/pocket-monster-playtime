@@ -526,7 +526,7 @@ function Cinematica({ onDone }: { onDone: () => void }) {
   const n = GEM_ZONES.length;
 
   return (
-    <div className="absolute inset-0 z-40 overflow-hidden bg-ink/90">
+    <div className="absolute inset-0 z-40 overflow-hidden bg-ink/95 backdrop-blur-sm">
       {/* esmeraldas: de la barra superior al círculo mágico */}
       {fase < 3 &&
         GEM_ZONES.map((z, i) => {
