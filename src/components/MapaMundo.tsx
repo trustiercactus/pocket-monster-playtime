@@ -264,7 +264,13 @@ export function MapaMundo({
   return (
     <div className="fixed inset-0 z-0 bg-[#8fd8ff]">
       <div ref={scroller} className="h-full w-full overflow-y-auto overflow-x-hidden">
+        <div className="h-[120px] w-full bg-[#8fd8ff]" aria-hidden="true" />
         <div className="relative h-[240vh] min-h-[1400px] w-full">
+          <div
+            className="absolute inset-x-0 -top-[120px] h-[130px]"
+            style={{ background: "linear-gradient(to bottom, #8fd8ff, #bfe8ff)" }}
+            aria-hidden="true"
+          />
           <img
             src={mapaFondo}
             alt=""
