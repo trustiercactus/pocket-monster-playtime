@@ -353,11 +353,9 @@ export function MapaMundo({
                       <>
                         <span className="absolute left-[34%] top-[42%] h-[5px] w-[7px] rounded-[50%] bg-[#ff5c5c] shadow-[0_0_7px_#ff2b2b]" />
                         <span className="absolute left-[57%] top-[42%] h-[5px] w-[7px] rounded-[50%] bg-[#ff5c5c] shadow-[0_0_7px_#ff2b2b]" />
-                        <span className="absolute -right-2 -top-1 grid h-7 w-7 place-items-center rounded-full border-2 border-white bg-ink/85 text-sm shadow-[0_3px_0_rgba(0,0,0,0.35)]">
-                          🔒
-                        </span>
                       </>
                     )}
+
                     {done && (
                       <span className="pop-in absolute -right-1 -top-1 text-xl drop-shadow">😊</span>
                     )}
