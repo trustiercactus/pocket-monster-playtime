@@ -1,11 +1,77 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getCreature, type Creature } from "@/lib/creatures";
-import type { Area } from "@/lib/areas";
+import { GEM_ZONES, type Area } from "@/lib/areas";
 import { LiveSprite } from "@/components/LiveSprite";
+import { Gema } from "@/components/Gema";
 import mapaFondo from "@/assets/mapa-vertical.jpg";
 
 const MAX_HP = 5;
 const SUPER_CHARGE = 3;
+const GEM_GAP = 34;
+
+/** sonido alegre de recompensa al conseguir la esmeralda */
+function reward() {
+  try {
+    const Ctx =
+      window.AudioContext ??
+      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx();
+    [659.25, 783.99, 1046.5].forEach((f, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = "triangle";
+      const t = ctx.currentTime + i * 0.13;
+      o.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.25, t + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+      o.connect(g).connect(ctx.destination);
+      o.start(t);
+      o.stop(t + 0.5);
+    });
+  } catch {
+    /* sin sonido */
+  }
+}
+
+/** barra superior de esmeraldas, igual que en el mapa */
+function GemBar({ zonesDone, filling }: { zonesDone: string[]; filling: string | null }) {
+  return (
+    <div className="pointer-events-none absolute left-1/2 top-1 z-30 flex -translate-x-1/2 items-center rounded-full border-4 border-white/90 bg-ink/85 px-2 py-1 shadow-[0_6px_0_rgba(0,0,0,0.4)]">
+      {GEM_ZONES.map((z) => {
+        const on = zonesDone.includes(z.id) || filling === z.id;
+        return (
+          <span
+            key={z.id}
+            className="relative grid place-items-center"
+            style={{ width: GEM_GAP, height: 34 }}
+          >
+            <svg width="28" height="32" viewBox="0 0 24 28" aria-hidden="true">
+              <path
+                d="M7 2h10l5 6v12l-5 6H7l-5-6V8z"
+                fill="rgba(255,255,255,0.92)"
+                stroke="#ffffff"
+                strokeWidth="2.5"
+                strokeLinejoin="round"
+              />
+            </svg>
+            {on && (
+              <span
+                className={`${filling === z.id ? "socket-fill" : ""} absolute inset-0 grid place-items-center`}
+              >
+                <Gema color={z.gem} cut={z.gemCut} size={24} />
+                {filling === z.id && (
+                  <span className="socket-flash absolute -inset-2 rounded-full bg-white" />
+                )}
+              </span>
+            )}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
 
 /** icono de ataque según el tipo/zona de la criatura */
 function attackIcon(c: Creature, area: Area): string {
