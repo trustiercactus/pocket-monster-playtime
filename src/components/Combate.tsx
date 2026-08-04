@@ -410,8 +410,20 @@ export function Combate({
         <div className="flex flex-1 flex-col items-center justify-center gap-0">
           {/* GUARDIÁN */}
           <div className="relative flex justify-center">
+            {area.boss && (
+              <span
+                className="boss-aura pointer-events-none absolute -inset-10 rounded-full blur-2xl"
+                style={{
+                  background:
+                    "radial-gradient(circle, rgba(122,47,242,0.8), rgba(30,8,55,0.5) 55%, transparent 75%)",
+                }}
+                aria-hidden="true"
+              />
+            )}
             <span
-              className="pointer-events-none absolute -bottom-1 left-1/2 h-4 w-32 -translate-x-1/2 rounded-[50%] blur-[4px]"
+              className={`pointer-events-none absolute -bottom-1 left-1/2 h-4 -translate-x-1/2 rounded-[50%] blur-[4px] ${
+                area.boss ? "w-40" : "w-32"
+              }`}
               style={{ background: "rgba(0,0,0,0.3)" }}
               aria-hidden="true"
             />
@@ -422,10 +434,11 @@ export function Combate({
                 src={guardian.image}
                 alt={guardian.name}
                 motion="float"
-                className={`w-56 drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] transition-all duration-500 ${
+                className={`${area.boss ? "w-64" : "w-52"} drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] transition-all duration-500 ${
                   ending >= 2 ? "friend-glow" : ""
                 } ${ending === 1 ? "surprise-jump" : ""} ${ending >= 5 ? "into-ball" : ""}`}
               />
+
               {/* ojos malvados mientras está hechizado */}
               {ending < 2 && (
                 <>
