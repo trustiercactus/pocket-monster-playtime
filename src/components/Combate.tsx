@@ -515,7 +515,6 @@ export function Combate({
             color="var(--arcade-orange)"
             onClick={normalAttack}
             disabled={busy || ending > 0}
-            size="huge"
           >
             {attackIcon(companion, area)}
           </RoundButton>
@@ -526,7 +525,7 @@ export function Combate({
             onClick={heal}
             disabled={busy || ending > 0 || heals === 0}
           >
-            <span className="relative inline-grid h-14 w-14 place-items-center">
+            <span className="relative inline-grid h-12 w-12 place-items-center">
               {/* corazón gris de base */}
               <span
                 className="absolute inset-0 grid place-items-center text-5xl"
@@ -549,35 +548,12 @@ export function Combate({
             color="var(--arcade-yellow)"
             onClick={superAttack}
             disabled={busy || ending > 0 || !chargeReady}
-            size="huge"
-            className={chargeReady ? "btn-pulse star-ready" : ""}
+            charge={chargePct / 100}
+            ready={chargeReady}
           >
-            {/* borde dorado que se ilumina con la carga */}
-            <span
-              className="pointer-events-none absolute -inset-[6px] rounded-full"
-              style={{
-                background: `conic-gradient(from -90deg, #ffd54a 0 ${chargePct}%, rgba(255,255,255,0.35) ${chargePct}% 100%)`,
-                mask: "radial-gradient(circle, transparent 60%, #000 62%)",
-                WebkitMask: "radial-gradient(circle, transparent 60%, #000 62%)",
-                filter: chargeReady ? "drop-shadow(0 0 10px #ffd54a)" : "none",
-              }}
-              aria-hidden="true"
-            />
-            <span className="relative grid h-16 w-16 place-items-center">
-              <span className="absolute inset-0 grid place-items-center text-6xl opacity-40">
-                ⭐
-              </span>
-              <span
-                className="absolute inset-0 grid place-items-center overflow-hidden text-6xl"
-                style={{ clipPath: `inset(${100 - chargePct}% 0 0 0)` }}
-              >
-                ⭐
-              </span>
-              {chargeReady && (
-                <span className="absolute -right-1 -top-1 text-2xl twinkle">✨</span>
-              )}
-            </span>
+            <span className={chargeReady ? "star-ready" : "opacity-90"}>⭐</span>
           </RoundButton>
+
         </div>
       </div>
     </div>
