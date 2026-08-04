@@ -83,7 +83,7 @@ function Hearts({ n, big }: { n: number; big?: boolean }) {
 
   return (
     <div
-      className={`flex justify-center gap-1 leading-none ${big ? "text-4xl" : "text-3xl"}`}
+      className={`flex justify-center gap-2 leading-none ${big ? "text-5xl" : "text-4xl"}`}
       aria-label={`${n} de ${MAX_HP} vidas`}
     >
       {Array.from({ length: MAX_HP }).map((_, i) => {
