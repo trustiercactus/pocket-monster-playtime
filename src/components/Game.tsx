@@ -13,6 +13,7 @@ import { Scenery } from "@/components/Scenery";
 import { Casa } from "@/components/Casa";
 import { MapaMundo } from "@/components/MapaMundo";
 import { Combate } from "@/components/Combate";
+import { FinalScreen } from "@/components/FinalScreen";
 import { randomEgg, type Egg } from "@/lib/eggs";
 import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
@@ -30,7 +31,7 @@ export type Progress = {
   legendary: boolean;
 };
 
-type Screen = "mapa" | "casa" | "coleccion" | "elegir" | "batalla";
+type Screen = "mapa" | "casa" | "coleccion" | "elegir" | "batalla" | "final";
 
 const MAX_HP = 5;
 const SAVE_KEY = "criaturitas-partida";
@@ -75,6 +76,8 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
   const [area, setArea] = useState<Area>(AREAS[0] as Area);
   const [fighter, setFighter] = useState<string | null>(null);
   const [captured, setCaptured] = useState<Creature | null>(null);
+  /** aventura completada: la colección vuelve a la pantalla final */
+  const [ended, setEnded] = useState(false);
 
   useEffect(() => {
     try {
@@ -147,6 +150,12 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
         wins: progress.wins + 1,
         eggs,
       });
+    }
+    if (won && area.boss) {
+      // la aventura termina: nunca se vuelve al mapa
+      setEnded(true);
+      setScreen("final");
+      return;
     }
     setScreen("mapa");
     if (nuevo) setCaptured(nuevo);
@@ -222,7 +231,21 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
         <Coleccion
           progress={progress}
           onPick={(id) => save({ ...progress, companion: id })}
-          onBack={() => setScreen("mapa")}
+          onBack={() => setScreen(ended ? "final" : "mapa")}
+        />
+      )}
+      {screen === "final" && (
+        <FinalScreen
+          name={progress.name}
+          unlocked={progress.unlocked}
+          onCollection={() => setScreen("coleccion")}
+          onNewGame={() => {
+            setEnded(false);
+            setFighter(null);
+            setArea(AREAS[0] as Area);
+            save({ ...INITIAL, name: progress.name });
+            setScreen("mapa");
+          }}
         />
       )}
       {screen === "elegir" && (

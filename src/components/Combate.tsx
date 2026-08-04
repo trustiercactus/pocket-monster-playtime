@@ -401,9 +401,14 @@ export function Combate({
     setEnding(1); // sorprendido
     later(() => {
       setEnding(2); // sonríe y brilla
-      speak("¡Ahora es tu amigo!");
+      speak(area.boss ? "¡Has salvado el reino!" : "¡Ahora es tu amigo!");
     }, 900);
     later(() => setEnding(3), 2100); // desaparece entre partículas de luz
+    if (area.boss) {
+      // el jefe final se deshace en humo oscuro y la pantalla se llena de luz
+      later(() => onFinish(true), 4200);
+      return;
+    }
     later(() => setEnding(4), 3000); // aparece su esmeralda girando
     later(() => setEnding(5), 4400); // vuela hacia la barra
     later(() => {
@@ -444,6 +449,11 @@ export function Combate({
 
       {/* ambiente vivo del bioma */}
       <AmbientLayer area={area} />
+
+      {/* el jefe final se deshace y la pantalla se llena de luz */}
+      {area.boss && ending >= 3 && (
+        <span className="final-flash pointer-events-none absolute inset-0 z-40 bg-white" aria-hidden="true" />
+      )}
 
       {/* efectos flotantes */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -572,13 +582,13 @@ export function Combate({
               {ending === 1 && <span className="absolute -right-2 top-0 text-5xl pop-in">😲</span>}
             </div>
 
-            {/* partículas de luz al desaparecer */}
+            {/* partículas de luz (o humo oscuro para el jefe) al desaparecer */}
             {ending >= 3 && ending < 5 && (
               <span className="pointer-events-none absolute inset-0" aria-hidden="true">
-                {Array.from({ length: 14 }).map((_, i) => (
+                {Array.from({ length: area.boss ? 20 : 14 }).map((_, i) => (
                   <span
                     key={i}
-                    className="sparkle-up absolute text-2xl"
+                    className={`${area.boss && i % 2 === 0 ? "smoke-out" : "sparkle-up"} absolute text-2xl`}
                     style={{
                       left: `${8 + ((i * 29) % 84)}%`,
                       top: `${20 + ((i * 17) % 60)}%`,
@@ -586,7 +596,7 @@ export function Combate({
                       filter: `drop-shadow(0 0 8px ${area.gem})`,
                     }}
                   >
-                    ✨
+                    {area.boss ? (i % 2 === 0 ? "💨" : "✨") : "✨"}
                   </span>
                 ))}
               </span>

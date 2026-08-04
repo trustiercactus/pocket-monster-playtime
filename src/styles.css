@@ -959,3 +959,45 @@
   100% { border-color: #c084fc; box-shadow: 0 0 14px #c084fcaa; }
 }
 @utility rainbow-frame { animation: rainbow-frame 3s linear infinite alternate; }
+
+/* ===== Final de la aventura ===== */
+@keyframes final-flash {
+  0% { opacity: 0; }
+  35% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@utility final-flash { animation: final-flash 1.6s ease-out forwards; }
+
+@keyframes smoke-out {
+  0% { transform: translateY(0) scale(0.6); opacity: 0.9; }
+  100% { transform: translateY(-120px) scale(2.2); opacity: 0; }
+}
+@utility smoke-out { animation: smoke-out 1.6s ease-out forwards; }
+
+@keyframes friend-in {
+  0% { transform: translateY(40px) scale(0.5); opacity: 0; }
+  70% { transform: translateY(-6px) scale(1.08); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+@utility friend-in { animation: friend-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+@keyframes cheer {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-16px) rotate(-8deg); }
+  50% { transform: translateY(0) rotate(6deg); }
+  75% { transform: translateY(-9px) rotate(-4deg); }
+}
+@utility cheer { animation: cheer 0.7s ease-in-out; }
+
+@keyframes firework {
+  0% { transform: scale(0.2); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+@utility firework { animation: firework 1.8s ease-out infinite; }
+
+@keyframes wings-open {
+  0%, 100% { transform: scaleX(1) translateY(0); filter: drop-shadow(0 0 14px rgba(255,230,150,0.7)); }
+  50% { transform: scaleX(1.07) translateY(-10px); filter: drop-shadow(0 0 30px rgba(255,240,180,0.95)); }
+}
+@utility wings-open { animation: wings-open 2.6s ease-in-out infinite; }
