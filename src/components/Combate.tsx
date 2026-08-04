@@ -161,7 +161,7 @@ function RoundButton({
       disabled={disabled}
       aria-label={label}
       style={{ background: color }}
-      className={`btn-bounce grid place-items-center rounded-full border-[6px] border-white text-white shadow-[0_10px_0_rgba(0,0,0,0.28)] disabled:opacity-60 ${
+      className={`btn-bounce btn-3d grid place-items-center rounded-full border-[6px] border-white text-white shadow-[0_10px_0_rgba(0,0,0,0.28)] disabled:opacity-60 ${
         size === "huge" ? "h-28 w-28 text-6xl" : "h-24 w-24 text-5xl"
       } ${className}`}
     >
