@@ -168,7 +168,7 @@ export function Combate({
     if (strong) {
       setShake(true);
       later(() => setShake(false), 600);
-      for (let i = 0; i < 14; i++) later(() => pop(["✨", "💥", "⭐", "🌟"][i % 4]), i * 45);
+      for (let i = 0; i < 14; i++) later(() => pop(["✨", "💥", "⭐", "🌟"][i % 4] as string), i * 45);
     }
     const next = Math.max(0, guardHp - amount);
     setGuardHp(next);
