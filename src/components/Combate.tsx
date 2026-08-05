@@ -699,6 +699,8 @@ export function Combate({
             color="var(--arcade-yellow)"
             onClick={superAttack}
             disabled={busy || ending > 0 || !chargeReady}
+            invite={miTurno && chargeReady}
+            inviteDelay={280}
             charge={chargePct / 100}
             ready={chargeReady}
           >
