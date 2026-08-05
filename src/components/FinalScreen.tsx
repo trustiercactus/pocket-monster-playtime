@@ -119,31 +119,31 @@ export function FinalScreen({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-between overflow-hidden bg-gradient-to-b from-[#2b1b5e] via-[#5b3fa8] to-[#ffb46b] px-4 py-6">
+    <div className="safe-pad fixed inset-0 z-50 flex flex-col items-center justify-between gap-1 overflow-hidden bg-gradient-to-b from-[#2b1b5e] via-[#5b3fa8] to-[#ffb46b]">
       <span className="final-flash pointer-events-none absolute inset-0 bg-white" aria-hidden="true" />
       <Fireworks />
 
       {/* héroes */}
-      <div className="relative mt-6 flex flex-col items-center gap-2">
+      <div className="relative flex shrink-0 flex-col items-center gap-1">
         <button
           onClick={() => tap(LEGENDARY_ID)}
           aria-label={aurora.name}
           className={`relative ${tapped === LEGENDARY_ID ? "cheer" : "wings-open"}`}
         >
-          <LiveSprite src={aurora.image} alt={aurora.name} motion="float" className="w-52" />
+          <LiveSprite src={aurora.image} alt={aurora.name} motion="float" className="max-h-[22vh] w-40 object-contain" />
           {tapped === LEGENDARY_ID && (
             <span className="pop-in absolute -right-2 top-0 text-5xl">💖</span>
           )}
         </button>
         <div className="flex items-end gap-2">
-          <LiveSprite src={trainerImg} alt={name} motion="hop" className="w-24" />
-          <span className="wiggle text-4xl">🎉</span>
+          <LiveSprite src={trainerImg} alt={name} motion="hop" className="max-h-[10vh] w-16 object-contain" />
+          <span className="wiggle text-3xl">🎉</span>
         </div>
       </div>
 
       {/* guardianes liberados */}
       {phase >= 1 && (
-        <div className="relative z-10 flex max-w-sm flex-wrap items-end justify-center gap-1">
+        <div className="relative z-10 flex max-w-sm shrink-0 flex-wrap items-end justify-center gap-1">
           {friends.map((c, i) => (
             <button
               key={c.id}
@@ -157,7 +157,7 @@ export function FinalScreen({
                 alt={c.name}
                 motion={i % 2 === 0 ? "breathe" : "sway"}
                 delay={(i % 4) * 0.3}
-                className="w-20"
+                className="max-h-[8vh] w-14 object-contain"
               />
               {tapped === c.id && (
                 <span className="pop-in absolute -top-1 right-0 text-3xl">✨</span>
@@ -168,36 +168,36 @@ export function FinalScreen({
       )}
 
       {/* mensajes */}
-      <div className="relative z-10 flex w-full max-w-sm flex-col items-center gap-3 text-center">
+      <div className="relative z-10 flex w-full max-w-sm shrink-0 flex-col items-center gap-2 text-center">
         {phase >= 2 && (
-          <div className="pop-in rounded-[1.75rem] border-4 border-white bg-ink/80 px-4 py-3 shadow-[0_8px_0_rgba(0,0,0,0.35)]">
-            <p className="text-2xl font-black leading-tight text-white">
+          <div className="pop-in rounded-[1.75rem] border-4 border-white bg-ink/80 px-3 py-2 shadow-[0_8px_0_rgba(0,0,0,0.35)]">
+            <p className="text-xl font-black leading-tight text-white">
               🏆 ¡Has salvado el Reino de las Criaturitas!
             </p>
-            <p className="mt-1 text-lg font-black text-white/90">
+            <p className="mt-1 text-base font-black text-white/90">
               ✨ Gracias por liberar a todos los guardianes.
             </p>
           </div>
         )}
         {phase >= 3 && (
-          <p className="pop-in text-2xl font-black text-white drop-shadow-[0_3px_0_rgba(0,0,0,0.4)]">
+          <p className="pop-in text-xl font-black text-white drop-shadow-[0_3px_0_rgba(0,0,0,0.4)]">
             ⭐ ¡La aventura ha terminado!
           </p>
         )}
 
         {phase >= 3 && (
-          <div className="pop-in flex w-full flex-col gap-3">
+          <div className="pop-in flex w-full flex-col gap-2">
             <button
               onClick={onNewGame}
               aria-label="Nueva aventura"
-              className="btn-bounce btn-3d w-full rounded-[2rem] border-4 border-white bg-green px-5 py-6 text-3xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
+              className="btn-bounce btn-3d w-full rounded-[2rem] border-4 border-white bg-green px-4 py-4 text-2xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
             >
               🟢 Nueva aventura
             </button>
             <button
               onClick={onCollection}
               aria-label="Ver colección"
-              className="btn-bounce btn-3d w-full rounded-[2rem] border-4 border-white bg-blue px-5 py-6 text-3xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
+              className="btn-bounce btn-3d w-full rounded-[2rem] border-4 border-white bg-blue px-4 py-4 text-2xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
             >
               🔵 Ver colección
             </button>

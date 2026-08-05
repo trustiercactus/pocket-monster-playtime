@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CREATURES, TYPE_EMOJI, getCreature, type Creature } from "@/lib/creatures";
+import { COLLECTION, TYPE_EMOJI, getCreature, type Creature } from "@/lib/creatures";
 import {
   CARE_TO_HATCH,
   EGG_COLOR,
@@ -23,7 +23,7 @@ function EggShape({ egg, big = false }: { egg: Egg; big?: boolean }) {
     >
       <span
         className={`flex items-center justify-center rounded-[50%_50%_50%_50%/60%_60%_40%_40%] border-4 border-white shadow-[0_6px_0_rgba(0,0,0,0.15)] ${
-          big ? "h-32 w-24 text-4xl" : "h-20 w-16 text-2xl"
+          big ? "h-[16vh] w-[12vh] text-4xl" : "h-20 w-16 text-2xl"
         }`}
         style={{ backgroundColor: EGG_COLOR[egg.element] }}
       >
@@ -56,7 +56,7 @@ export function Casa({
   const [selected, setSelected] = useState(0);
   const [fx, setFx] = useState<string | null>(null);
 
-  const amigos = CREATURES.filter((c) => unlocked.includes(c.id)).slice(0, 6);
+  const amigos = COLLECTION.filter((c) => unlocked.includes(c.id)).slice(0, 6);
   const egg = eggs[selected];
 
   function care(icon: string) {
@@ -74,7 +74,7 @@ export function Casa({
   }
 
   return (
-    <div className="screen-in relative flex flex-col items-center gap-4">
+    <div className="screen-in relative flex h-full min-h-0 w-full flex-col items-center gap-2 overflow-hidden">
       <img
         src={casaImg}
         alt=""
@@ -84,7 +84,7 @@ export function Casa({
         className="pointer-events-none absolute inset-0 -z-10 h-full w-full rounded-[2rem] object-cover opacity-90"
       />
 
-      <div className="flex w-full items-center justify-between">
+      <div className="flex w-full shrink-0 items-center justify-between">
         <button
           onClick={onBack}
           className="btn-bounce rounded-full border-4 border-white bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
@@ -112,7 +112,7 @@ export function Casa({
             alt={c.name}
             motion={i % 3 === 0 ? "hop" : i % 3 === 1 ? "sway" : "breathe"}
             delay={(i % 5) * 0.3}
-            className="w-16"
+            className="w-[13vw] max-w-16"
           />
         ))}
       </div>
@@ -142,7 +142,7 @@ export function Casa({
 
           {egg && (
             <>
-              <div className="relative flex h-40 items-center justify-center">
+              <div className="relative flex h-[18vh] items-center justify-center">
                 <EggShape egg={egg} big />
                 {fx && (
                   <span className="pop-in absolute -top-1 text-5xl">{fx}</span>
@@ -167,7 +167,7 @@ export function Casa({
                     onClick={() => care(b.icon)}
                     aria-label={b.label}
                     style={{ backgroundColor: b.color }}
-                    className="btn-bounce min-h-[86px] flex-1 rounded-[1.75rem] border-4 border-white text-4xl shadow-[0_8px_0_rgba(0,0,0,0.2)]"
+                    className="btn-bounce min-h-[11vh] flex-1 rounded-[1.75rem] border-4 border-white text-4xl shadow-[0_8px_0_rgba(0,0,0,0.2)]"
                   >
                     {b.icon}
                   </button>

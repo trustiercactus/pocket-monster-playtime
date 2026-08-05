@@ -1,4 +1,4 @@
-import { CREATURES, type ElementType } from "@/lib/creatures";
+import { COLLECTION, type ElementType } from "@/lib/creatures";
 
 export type EggElement = Extract<ElementType, "fuego" | "agua" | "planta">;
 
@@ -46,9 +46,9 @@ export function randomEgg(): Egg {
   return { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, element, care: 0 };
 }
 
-/** Criatura que nace del huevo: prioriza una que aún no se tenga de ese elemento. */
+/** Criatura que nace del huevo: siempre dentro de la colección de 10. */
 export function hatchFrom(element: EggElement, unlocked: string[]) {
-  const sameType = CREATURES.filter((c) => c.type === element);
+  const sameType = COLLECTION.filter((c) => c.type === element && !c.legendary);
   const nueva = sameType.find((c) => !unlocked.includes(c.id));
   return nueva ?? sameType[0]!;
 }

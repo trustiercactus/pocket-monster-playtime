@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import {
-  CREATURES,
+  COLLECTION,
   TYPE_EMOJI,
   TYPE_COLOR,
   XP_PER_LEVEL,
@@ -100,13 +100,13 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
 
   if (!progress) {
     return (
-      <main className="min-h-screen bg-sky flex items-center justify-center text-5xl">⏳</main>
+      <main className="flex h-[100dvh] items-center justify-center bg-sky text-5xl">⏳</main>
     );
   }
 
   if (!progress.name) {
     return (
-      <main className="relative min-h-screen overflow-hidden px-5">
+      <main className="safe-pad relative h-[100dvh] overflow-hidden">
         <img
           src={fondoImg}
           alt=""
@@ -115,7 +115,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <Scenery dense />
-        <div className="relative flex min-h-screen items-center justify-center">
+        <div className="relative flex h-full items-center justify-center">
           <NombreForm onDone={(name) => save({ ...progress, name })} />
         </div>
       </main>
@@ -200,7 +200,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-sky px-4 py-5 pb-16">
+    <main className="safe-pad relative h-[100dvh] w-full overflow-hidden bg-sky">
       <img
         src={fondoImg}
         alt=""
@@ -210,7 +210,8 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
         className="fixed inset-0 h-full w-full object-cover opacity-25"
       />
       <Scenery />
-      <div className="relative">
+      <div className="relative flex h-full min-h-0 w-full flex-col items-center overflow-hidden">
+
 
       {screen === "casa" && (
         <Casa
@@ -320,73 +321,83 @@ function Coleccion({
   onPick: (id: string) => void;
   onBack: () => void;
 }) {
-  const pct = Math.round((progress.unlocked.length / CREATURES.length) * 100);
+  const total = COLLECTION.length;
+  const owned = COLLECTION.filter((c) => progress.unlocked.includes(c.id)).length;
+  const pct = Math.round((owned / total) * 100);
+  const completa = owned === total;
   return (
-    <div className="screen-in flex flex-col items-center gap-4">
-      <div className="flex w-full max-w-sm items-center gap-3">
+    <div className="screen-in flex h-full min-h-0 w-full flex-col items-center gap-2">
+      <div className="flex w-full max-w-sm shrink-0 items-center gap-2">
         <button
           onClick={onBack}
-          className="btn-bounce rounded-full border-4 border-white bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
+          className="btn-bounce shrink-0 rounded-full border-4 border-white bg-white px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Volver"
         >
           ⬅️
         </button>
         <div
-          className="relative h-12 flex-1 overflow-hidden rounded-full bg-white shadow-[0_5px_0_rgba(0,0,0,0.12)]"
+          className="relative h-10 min-w-0 flex-1 overflow-hidden rounded-full bg-white shadow-[0_5px_0_rgba(0,0,0,0.12)]"
           role="progressbar"
-          aria-valuenow={progress.unlocked.length}
+          aria-valuenow={owned}
           aria-valuemin={0}
-          aria-valuemax={CREATURES.length}
+          aria-valuemax={total}
           aria-label="Criaturas conseguidas"
         >
           <div
             className="h-full rounded-full bg-gradient-to-r from-yellow via-orange to-green transition-all duration-700"
             style={{ width: `${pct}%` }}
           />
-          <span className="absolute inset-0 flex items-center justify-center text-2xl font-black text-ink">
-            🐣 {progress.unlocked.length}/{CREATURES.length}
+          <span className="absolute inset-0 flex items-center justify-center text-xl font-black text-ink">
+            🐣 {owned}/{total}
           </span>
         </div>
       </div>
 
-      <div className="grid w-full max-w-sm grid-cols-2 gap-3">
-        {CREATURES.map((c, i) => {
-          const owned = progress.unlocked.includes(c.id);
+      {completa && (
+        <div className="pop-in shrink-0 rounded-full border-4 border-white bg-gradient-to-r from-yellow via-orange to-green px-4 py-1 text-center text-lg font-black text-white shadow-[0_5px_0_rgba(0,0,0,0.2)]">
+          ⭐ ¡Colección completada! 100%
+        </div>
+      )}
+
+      <div className="grid min-h-0 w-full max-w-sm flex-1 grid-cols-3 content-start gap-2 overflow-hidden">
+        {COLLECTION.map((c, i) => {
+          const has = progress.unlocked.includes(c.id);
           const active = progress.companion === c.id;
           return (
             <button
               key={c.id}
-              onClick={() => owned && onPick(c.id)}
-              aria-label={owned ? c.name : "Criatura bloqueada"}
+              onClick={() => has && onPick(c.id)}
+              aria-label={has ? c.name : "Criatura bloqueada"}
               style={
-                c.legendary && owned
+                c.legendary && has
                   ? undefined
                   : { borderColor: active ? TYPE_COLOR[c.type] : "transparent" }
               }
-              className={`pop-in relative flex flex-col items-center gap-1 rounded-3xl border-[6px] bg-white/95 p-3 shadow-[0_6px_0_rgba(0,0,0,0.12)] ${
-                owned ? "btn-bounce" : ""
-              } ${c.legendary && owned ? "rainbow-frame" : ""}`}
+              className={`pop-in relative flex min-h-0 flex-col items-center justify-center rounded-2xl border-4 bg-white/95 p-1 shadow-[0_5px_0_rgba(0,0,0,0.12)] ${
+                has ? "btn-bounce" : ""
+              } ${c.legendary && has ? "rainbow-frame" : ""}`}
             >
-              {c.legendary && owned && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full border-2 border-white bg-gradient-to-r from-yellow via-orange to-green px-2 py-[2px] text-[0.7rem] font-black text-white shadow">
+              {c.legendary && has && (
+                <span className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full border-2 border-white bg-gradient-to-r from-yellow via-orange to-green px-1.5 text-[0.55rem] font-black text-white shadow">
                   ✨ LEGENDARIA
                 </span>
               )}
               <LiveSprite
                 src={c.image}
-                alt={owned ? c.name : ""}
-                dim={!owned}
+                alt={has ? c.name : ""}
+                dim={!has}
                 motion={i % 3 === 0 ? "sway" : i % 3 === 1 ? "breathe" : "float"}
                 delay={(i % 5) * 0.3}
-                className="w-24"
+                className="max-h-[9vh] w-full max-w-[72px] object-contain"
               />
-              <span className="text-xl font-black text-ink">
-                {owned ? `${TYPE_EMOJI[c.type]} ${c.name}` : "🔒"}
+              <span className="truncate text-sm font-black text-ink">
+                {has ? `${TYPE_EMOJI[c.type]} ${c.name}` : "🔒"}
               </span>
             </button>
           );
         })}
       </div>
+      {completa && <Confetti />}
     </div>
   );
 }
@@ -402,30 +413,31 @@ function Elegir({
   onPick: (id: string) => void;
   onBack: () => void;
 }) {
-  const owned = CREATURES.filter((c) => progress.unlocked.includes(c.id));
+  const owned = COLLECTION.filter((c) => progress.unlocked.includes(c.id));
   // en el combate final, la legendaria va primero y ya viene elegida
   const mine = area.boss
     ? [...owned].sort((a, b) => Number(!!b.legendary) - Number(!!a.legendary))
     : owned;
   return (
-    <div className="screen-in flex flex-col items-center gap-4">
-      <div className="flex w-full items-center justify-between">
+    <div className="screen-in flex h-full min-h-0 w-full flex-col items-center gap-2">
+      <div className="flex w-full shrink-0 items-center justify-between">
         <button
           onClick={onBack}
-          className="btn-bounce rounded-full border-4 border-white bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
+          className="btn-bounce rounded-full border-4 border-white bg-white px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Volver"
         >
           ⬅️
         </button>
-        <img src={area.image} alt={area.name} className="float-soft h-20 object-contain" />
+        <img src={area.image} alt={area.name} className="float-soft h-[9vh] object-contain" />
       </div>
 
-      <div className="flex items-center gap-3">
-        <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-24" />
-        <span className="wiggle text-5xl">👉</span>
+      <div className="flex shrink-0 items-center gap-3">
+        <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-[16vw] max-w-24" />
+        <span className="wiggle text-4xl">👉</span>
       </div>
 
-      <div className="grid w-full max-w-sm grid-cols-3 gap-3">
+      <div className="grid min-h-0 w-full max-w-sm flex-1 grid-cols-3 content-start gap-2 overflow-hidden">
+
         {mine.map((c, i) => (
           <button
             key={c.id}
