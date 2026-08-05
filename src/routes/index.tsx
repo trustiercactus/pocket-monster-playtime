@@ -51,11 +51,15 @@ function Index() {
   useEffect(() => {
     setOpciones(loadOpciones());
     playMusic("inicio");
-    const saluda = () => {
+    const saluda = (e: PointerEvent) => {
       unlockAudio();
       playMusic("inicio");
+      // si el primer toque ya es un botón, el niño manda: no narramos encima
+      const t = e.target as HTMLElement | null;
+      if (t && t.closest("button,[role='button'],a")) return;
       void narrar("¡Hola! ¡Bienvenido a Criaturitas! Hoy viviremos una aventura increíble.", {
         once: "bienvenida",
+        delay: 400,
       });
     };
     window.addEventListener("pointerdown", saluda, { once: true });

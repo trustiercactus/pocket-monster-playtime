@@ -483,6 +483,7 @@ function Captura({ creature, onClose }: { creature: Creature; onClose: () => voi
       creature.legendary
         ? "¡Increíble! ¡Has despertado a Aurora!"
         : `¡${creature.name} ya es tu amiga!`,
+      { delay: 700 },
     );
   }, [creature]);
   return (
