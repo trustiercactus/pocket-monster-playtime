@@ -362,6 +362,15 @@ export function Combate({
 
   function normalAttack() {
     if (busy || ending) return;
+    if (hint) {
+      setHint(false);
+      try {
+        window.localStorage.setItem("criaturitas-primer-combate", "1");
+      } catch {
+        /* sin guardado */
+      }
+    }
+
     setCharge((c) => {
       const n = Math.min(SUPER_CHARGE, c + 1);
       if (n > c) sfx("cargar");
