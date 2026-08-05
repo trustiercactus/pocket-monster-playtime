@@ -1,4 +1,4 @@
-import { CREATURES, type ElementType } from "@/lib/creatures";
+import { COLLECTION, type ElementType } from "@/lib/creatures";
 
 export type EggElement = Extract<ElementType, "fuego" | "agua" | "planta">;
 
