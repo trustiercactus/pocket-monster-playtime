@@ -658,6 +658,8 @@ export function Combate({
             color="var(--arcade-orange)"
             onClick={normalAttack}
             disabled={busy || ending > 0}
+            invite={miTurno}
+            hint={miTurno && hint}
           >
             {attackIcon(companion, area)}
           </RoundButton>
@@ -667,24 +669,30 @@ export function Combate({
             color={healColor}
             onClick={heal}
             disabled={busy || ending > 0 || heals === 0}
+            invite={miTurno && heals > 0}
+            inviteDelay={140}
           >
-            <span className="relative inline-grid h-12 w-12 place-items-center">
+            <span
+              className="relative grid h-14 w-14 place-items-center overflow-visible leading-none"
+              style={{ fontSize: "2.5rem" }}
+            >
               {/* corazón gris de base */}
               <span
-                className="absolute inset-0 grid place-items-center text-5xl"
+                className="absolute inset-0 grid place-items-center leading-none"
                 style={{ filter: "grayscale(1) brightness(0.85)" }}
               >
                 💚
               </span>
               {/* parte verde restante: 100% → 50% → 0% */}
               <span
-                className="absolute inset-0 grid place-items-center overflow-hidden text-5xl"
+                className="absolute inset-0 grid place-items-center leading-none"
                 style={{ clipPath: `inset(0 ${100 - heals * 50}% 0 0)` }}
               >
                 💚
               </span>
             </span>
           </RoundButton>
+
 
           <RoundButton
             label="Superataque"
