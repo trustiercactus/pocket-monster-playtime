@@ -201,7 +201,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-sky px-4 py-5 pb-16">
+    <main className="safe-pad relative h-[100dvh] w-full overflow-hidden bg-sky px-3 py-3">
       <img
         src={fondoImg}
         alt=""
@@ -211,7 +211,8 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
         className="fixed inset-0 h-full w-full object-cover opacity-25"
       />
       <Scenery />
-      <div className="relative">
+      <div className="relative flex h-full min-h-0 w-full flex-col items-center overflow-hidden">
+
 
       {screen === "casa" && (
         <Casa
