@@ -101,13 +101,13 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
 
   if (!progress) {
     return (
-      <main className="min-h-screen bg-sky flex items-center justify-center text-5xl">⏳</main>
+      <main className="flex h-[100dvh] items-center justify-center bg-sky text-5xl">⏳</main>
     );
   }
 
   if (!progress.name) {
     return (
-      <main className="relative min-h-screen overflow-hidden px-5">
+      <main className="safe-pad relative h-[100dvh] overflow-hidden px-5">
         <img
           src={fondoImg}
           alt=""
@@ -116,7 +116,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
           className="absolute inset-0 h-full w-full object-cover"
         />
         <Scenery dense />
-        <div className="relative flex min-h-screen items-center justify-center">
+        <div className="relative flex h-full items-center justify-center">
           <NombreForm onDone={(name) => save({ ...progress, name })} />
         </div>
       </main>
