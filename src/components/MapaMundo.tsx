@@ -275,7 +275,7 @@ export function MapaMundo({
             height={1920}
             className="absolute inset-0 h-full w-full object-cover"
           />
-        <div className="absolute inset-x-0 bottom-[env(safe-area-inset-bottom)] top-[calc(env(safe-area-inset-top)+3.5rem)]">
+        <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1.6rem)] top-[calc(env(safe-area-inset-top)+5.4rem)]">
 
 
           {/* sendero de piedras */}
