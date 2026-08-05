@@ -281,6 +281,28 @@ export function Combate({
     return () => playMusic("mapa");
   }, []);
 
+  /** es el turno del niño: los botones invitan a pulsar (sin texto) */
+  const miTurno = !busy && ending === 0;
+  /** primer combate: una flecha simpática señala el ataque */
+  const [hint, setHint] = useState(false);
+  useEffect(() => {
+    try {
+      setHint(!window.localStorage.getItem("criaturitas-primer-combate"));
+    } catch {
+      setHint(false);
+    }
+  }, []);
+  const firstTurn = useRef(true);
+  useEffect(() => {
+    if (!miTurno) return;
+    if (firstTurn.current) {
+      firstTurn.current = false;
+      return;
+    }
+    sfx("turno");
+  }, [miTurno]);
+
+
   function pop(emoji: string, big = false) {
     const id = Date.now() + Math.random();
     setFx((f) => [...f, { id, emoji, big }]);
