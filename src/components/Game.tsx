@@ -418,7 +418,7 @@ function Elegir({
 }) {
   const owned = COLLECTION.filter((c) => progress.unlocked.includes(c.id));
   useEffect(() => {
-    void narrar("¡Elige a tu Criaturita!", { once: "elegir" });
+    void narrar("¡Elige a tu Criaturita!", { once: "elegir", delay: 450 });
   }, []);
   // en el combate final, la legendaria va primero y ya viene elegida
   const mine = area.boss

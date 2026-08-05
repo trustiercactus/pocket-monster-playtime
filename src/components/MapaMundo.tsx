@@ -16,7 +16,7 @@ import {
 
 
 function say(text: string, once?: string) {
-  void narrar(text, once ? { once } : {});
+  void narrar(text, once ? { once, delay: 400 } : { delay: 400 });
 }
 
 /** Hueco de corona: cavidad blanca 3D que espera SU esmeralda */
@@ -196,7 +196,7 @@ export function MapaMundo({
     if (!added) return;
     setJustFilled(added);
     sfx("esmeralda");
-    void narrar("¡Has conseguido una nueva esmeralda!");
+    void narrar("¡Has conseguido una nueva esmeralda!", { delay: 450 });
     const t = setTimeout(() => setJustFilled(null), 1200);
     return () => clearTimeout(t);
   }, [zonesDone]);
@@ -302,7 +302,7 @@ export function MapaMundo({
                   onClick={() => {
                     if (!open) return;
                     sfx("tap");
-                    if (a.boss) void narrar("¡Ha llegado el momento de salvar el Reino!");
+                    if (a.boss) void narrar("¡Ha llegado el momento de salvar el Reino!", { delay: 400 });
                     onArea(a);
                   }}
                   aria-label={open ? a.name : `${a.name} bloqueada`}
