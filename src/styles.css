@@ -1001,3 +1001,10 @@
   50% { transform: scaleX(1.07) translateY(-10px); filter: drop-shadow(0 0 30px rgba(255,240,180,0.95)); }
 }
 @utility wings-open { animation: wings-open 2.6s ease-in-out infinite; }
+
+@utility safe-pad {
+  padding-top: max(env(safe-area-inset-top), 0px);
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  padding-left: max(env(safe-area-inset-left), 0px);
+  padding-right: max(env(safe-area-inset-right), 0px);
+}
