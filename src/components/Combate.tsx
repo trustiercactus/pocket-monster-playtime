@@ -157,6 +157,9 @@ function RoundButton({
   color,
   charge,
   ready,
+  invite,
+  hint,
+  inviteDelay = 0,
   className = "",
   children,
 }: {
@@ -167,6 +170,11 @@ function RoundButton({
   /** 0..1 — dibuja el aro de carga en el propio borde del botón */
   charge?: number;
   ready?: boolean;
+  /** es el turno del niño: rebota y brilla invitando a pulsar */
+  invite?: boolean;
+  /** flecha simpática que señala este botón */
+  hint?: boolean;
+  inviteDelay?: number;
   className?: string;
   children: React.ReactNode;
 }) {
@@ -174,46 +182,58 @@ function RoundButton({
   const pct = Math.round((charge ?? 0) * 100);
 
   return (
-    <button
-      onClick={() => {
-        if (disabled) return;
-        setFlash((f) => f + 1);
-        onClick();
-      }}
-      disabled={disabled}
-      aria-label={label}
-      style={{
-        background: `radial-gradient(circle at 50% 20%, color-mix(in oklab, ${color} 62%, white), ${color} 60%, color-mix(in oklab, ${color} 78%, black))`,
-      }}
-      className={`btn-orb ${flash ? "orb-bounce" : ""} ${ready ? "orb-ready" : ""} relative grid h-24 w-24 place-items-center rounded-full border-[3px] border-white/90 text-5xl text-white shadow-[0_6px_14px_rgba(0,0,0,0.28)] disabled:opacity-55 ${className}`}
-    >
-      {charge !== undefined && (
+    <div className="relative">
+      {hint && (
         <span
-          className="pointer-events-none absolute -inset-[7px] rounded-full"
-          style={{
-            background: ready
-              ? "conic-gradient(from -90deg, #ffe27a, #ffb300 40%, #ffe27a 70%, #ffb300)"
-              : `conic-gradient(from -90deg, #ffd54a 0 ${pct}%, rgba(255,255,255,0.32) ${pct}% 100%)`,
-            mask: "radial-gradient(circle, transparent 78%, #000 79%)",
-            WebkitMask: "radial-gradient(circle, transparent 78%, #000 79%)",
-            filter: ready ? "drop-shadow(0 0 10px rgba(255,200,60,0.95))" : "none",
-          }}
+          className="hint-arrow pointer-events-none absolute -top-12 left-1/2 z-20 text-4xl drop-shadow-[0_3px_0_rgba(0,0,0,0.35)]"
           aria-hidden="true"
-        />
+        >
+          👇
+        </span>
       )}
-      <span className="relative z-10 grid place-items-center drop-shadow-[0_2px_2px_rgba(0,0,0,0.28)]">
-        {children}
-      </span>
-      {flash > 0 && (
-        <span
-          key={flash}
-          className="orb-flash pointer-events-none absolute inset-0 rounded-full bg-white/70"
-          aria-hidden="true"
-        />
-      )}
-    </button>
+      <button
+        onClick={() => {
+          if (disabled) return;
+          setFlash((f) => f + 1);
+          onClick();
+        }}
+        disabled={disabled}
+        aria-label={label}
+        style={{
+          background: `radial-gradient(circle at 50% 20%, color-mix(in oklab, ${color} 62%, white), ${color} 60%, color-mix(in oklab, ${color} 78%, black))`,
+          animationDelay: invite ? `${inviteDelay}ms` : undefined,
+        }}
+        className={`btn-orb ${flash ? "orb-bounce" : ""} ${ready ? "orb-ready" : invite ? "turn-bob turn-glow" : ""} relative grid h-24 w-24 place-items-center rounded-full border-[3px] border-white/90 text-5xl text-white shadow-[0_6px_14px_rgba(0,0,0,0.28)] disabled:opacity-55 ${className}`}
+      >
+        {charge !== undefined && (
+          <span
+            className="pointer-events-none absolute -inset-[7px] rounded-full"
+            style={{
+              background: ready
+                ? "conic-gradient(from -90deg, #ffe27a, #ffb300 40%, #ffe27a 70%, #ffb300)"
+                : `conic-gradient(from -90deg, #ffd54a 0 ${pct}%, rgba(255,255,255,0.32) ${pct}% 100%)`,
+              mask: "radial-gradient(circle, transparent 78%, #000 79%)",
+              WebkitMask: "radial-gradient(circle, transparent 78%, #000 79%)",
+              filter: ready ? "drop-shadow(0 0 10px rgba(255,200,60,0.95))" : "none",
+            }}
+            aria-hidden="true"
+          />
+        )}
+        <span className="relative z-10 grid place-items-center drop-shadow-[0_2px_2px_rgba(0,0,0,0.28)]">
+          {children}
+        </span>
+        {flash > 0 && (
+          <span
+            key={flash}
+            className="orb-flash pointer-events-none absolute inset-0 rounded-full bg-white/70"
+            aria-hidden="true"
+          />
+        )}
+      </button>
+    </div>
   );
 }
+
 
 type Fx = { id: number; emoji: string; big?: boolean };
 
