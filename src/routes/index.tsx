@@ -85,7 +85,7 @@ function Index() {
       <div className="absolute inset-0 bg-gradient-to-b from-sky/20 via-transparent to-green/30" />
       <Scenery dense />
 
-      <div className="relative flex h-full flex-col items-center px-4 pt-3 pb-4 text-center">
+      <div className="relative flex h-full flex-col items-center px-2 text-center">
         <button
           type="button"
           aria-label="Ajustes"

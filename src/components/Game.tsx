@@ -106,7 +106,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
 
   if (!progress.name) {
     return (
-      <main className="safe-pad relative h-[100dvh] overflow-hidden px-5">
+      <main className="safe-pad relative h-[100dvh] overflow-hidden">
         <img
           src={fondoImg}
           alt=""
@@ -200,7 +200,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
   }
 
   return (
-    <main className="safe-pad relative h-[100dvh] w-full overflow-hidden bg-sky px-3 py-3">
+    <main className="safe-pad relative h-[100dvh] w-full overflow-hidden bg-sky">
       <img
         src={fondoImg}
         alt=""
