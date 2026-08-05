@@ -233,7 +233,7 @@ export function MapaMundo({
 
   useEffect(() => {
     const t = setTimeout(() => {
-      nextRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      /* el mapa completo cabe en pantalla: no hace falta desplazar */
     }, 350);
     return () => clearTimeout(t);
   }, [zonesDone.length]);
@@ -266,8 +266,8 @@ export function MapaMundo({
 
   return (
     <div className="fixed inset-0 z-0 bg-[#8fd8ff]">
-      <div ref={scroller} className="h-full w-full overflow-y-auto overflow-x-hidden">
-        <div className="relative w-full">
+      <div ref={scroller} className="h-full w-full overflow-hidden">
+        <div className="relative h-full w-full">
           <img
             src={mapaFondo}
             alt=""
@@ -275,8 +275,7 @@ export function MapaMundo({
             height={1920}
             className="absolute inset-0 h-full w-full object-cover"
           />
-          <div className="relative h-[150px] w-full" aria-hidden="true" />
-        <div className="relative h-[240vh] min-h-[1400px] w-full">
+        <div className="absolute inset-x-0 bottom-[env(safe-area-inset-bottom)] top-[calc(env(safe-area-inset-top)+3.5rem)]">
 
 
           {/* sendero de piedras */}
@@ -294,7 +293,7 @@ export function MapaMundo({
               <div
                 key={a.id}
                 ref={isNext ? nextRef : undefined}
-                className="absolute -translate-x-1/2 -translate-y-1/2"
+                className="absolute -translate-x-1/2 -translate-y-1/2 scale-[0.62] sm:scale-75"
                 style={{ left: `${a.x}%`, top: `${a.y}%` }}
               >
                 <Ambiente area={a} />
@@ -434,7 +433,7 @@ export function MapaMundo({
       </div>
 
       {/* corona de esmeraldas */}
-      <div className="pointer-events-none absolute left-1/2 top-2 z-20 flex -translate-x-1/2 items-center gap-[2px] rounded-full border-4 border-white/90 bg-ink/85 px-3 py-1 shadow-[0_6px_0_rgba(0,0,0,0.4)]">
+      <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+0.4rem)] z-20 flex -translate-x-1/2 items-center gap-[2px] rounded-full border-4 border-white/90 bg-ink/85 px-3 py-1 shadow-[0_6px_0_rgba(0,0,0,0.4)]">
         {GEM_ZONES.map((z) => (
           <GemSocket
             key={z.id}
@@ -448,7 +447,7 @@ export function MapaMundo({
 
 
       {/* botones permanentes */}
-      <div className="absolute left-3 top-14 z-20 flex flex-row items-center gap-2">
+      <div className="absolute left-3 top-[calc(env(safe-area-inset-top)+3.2rem)] z-20 flex flex-row items-center gap-2">
 
         <RoundButton onClick={onSettings} label="Opciones" icon="⚙️" color="var(--arcade-blue)" />
         <RoundButton
