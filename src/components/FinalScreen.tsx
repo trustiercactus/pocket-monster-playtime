@@ -3,56 +3,7 @@ import { getCreature, LEGENDARY_ID } from "@/lib/creatures";
 import { GEM_ZONES } from "@/lib/areas";
 import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
-
-/** musiquilla alegre y épica de cierre */
-function victoryMusic() {
-  try {
-    const Ctx =
-      window.AudioContext ??
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
-    const notes = [523.25, 659.25, 783.99, 1046.5, 987.77, 1046.5, 1318.5];
-    notes.forEach((f, i) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = "triangle";
-      const t = ctx.currentTime + i * 0.26;
-      o.frequency.setValueAtTime(f, t);
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(0.22, t + 0.05);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
-      o.connect(g).connect(ctx.destination);
-      o.start(t);
-      o.stop(t + 0.65);
-    });
-  } catch {
-    /* sin sonido */
-  }
-}
-
-/** sonidito simpático al tocar una criatura */
-function poke() {
-  try {
-    const Ctx =
-      window.AudioContext ??
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = "sine";
-    o.frequency.setValueAtTime(620, ctx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(1180, ctx.currentTime + 0.18);
-    g.gain.setValueAtTime(0.2, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3);
-    o.connect(g).connect(ctx.destination);
-    o.start();
-    o.stop(ctx.currentTime + 0.32);
-  } catch {
-    /* sin sonido */
-  }
-}
+import { narrar, playMusic, sfx } from "@/lib/audio";
 
 function Fireworks() {
   const colors = ["#ffd54a", "#ff6b6b", "#4ade80", "#38bdf8", "#c084fc"];
@@ -105,15 +56,22 @@ export function FinalScreen({
   const [tapped, setTapped] = useState<string | null>(null);
 
   useEffect(() => {
-    victoryMusic();
+    playMusic("final");
+    sfx("celebracion");
+    sfx("confeti");
+    const fw = window.setInterval(() => sfx("fuego"), 2600);
+    void narrar("¡Lo has conseguido! ¡Has salvado a todas las Criaturitas!", { once: "final" });
     const t1 = window.setTimeout(() => setPhase(1), 1600); // guardianes
     const t2 = window.setTimeout(() => setPhase(2), 4200); // primer mensaje
     const t3 = window.setTimeout(() => setPhase(3), 7600); // segundo mensaje + botones
-    return () => [t1, t2, t3].forEach(clearTimeout);
+    return () => {
+      window.clearInterval(fw);
+      [t1, t2, t3].forEach(clearTimeout);
+    };
   }, []);
 
   function tap(id: string) {
-    poke();
+    sfx("tap");
     setTapped(id);
     window.setTimeout(() => setTapped((v) => (v === id ? null : v)), 720);
   }
@@ -188,14 +146,20 @@ export function FinalScreen({
         {phase >= 3 && (
           <div className="pop-in flex w-full flex-col gap-2">
             <button
-              onClick={onNewGame}
+              onClick={() => {
+                sfx("tap");
+                onNewGame();
+              }}
               aria-label="Nueva aventura"
               className="btn-bounce btn-3d w-full rounded-[2rem] border-4 border-white bg-green px-4 py-4 text-2xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
             >
               🟢 Nueva aventura
             </button>
             <button
-              onClick={onCollection}
+              onClick={() => {
+                sfx("abrir");
+                onCollection();
+              }}
               aria-label="Ver colección"
               className="btn-bounce btn-3d w-full rounded-[2rem] border-4 border-white bg-blue px-4 py-4 text-2xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
             >

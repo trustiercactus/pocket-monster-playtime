@@ -4,33 +4,19 @@ import { getCreature } from "@/lib/creatures";
 import mapaFondo from "@/assets/mapa-vertical.jpg";
 import legendariaImg from "@/assets/legendaria.png";
 import { Gema, type GemCut } from "@/components/Gema";
+import {
+  narrar,
+  playMusic,
+  musicPause,
+  sfx,
+  getOpciones,
+  setOpcion,
+  loadOpciones,
+} from "@/lib/audio";
 
 
-const OPTS_KEY = "criaturitas-opciones";
-
-function soundOn() {
-  try {
-    const raw = window.localStorage.getItem(OPTS_KEY);
-    return raw ? (JSON.parse(raw).sonidos ?? true) : true;
-  } catch {
-    return true;
-  }
-}
-
-function say(text: string) {
-  try {
-    if (!soundOn()) return;
-    const s = window.speechSynthesis;
-    if (!s) return;
-    s.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "es-ES";
-    u.rate = 0.85;
-    u.pitch = 1.3;
-    s.speak(u);
-  } catch {
-    /* sin voz */
-  }
+function say(text: string, once?: string) {
+  void narrar(text, once ? { once } : {});
 }
 
 /** Hueco de corona: cavidad blanca 3D que espera SU esmeralda */
@@ -209,6 +195,8 @@ export function MapaMundo({
     prevDone.current = zonesDone;
     if (!added) return;
     setJustFilled(added);
+    sfx("esmeralda");
+    void narrar("¡Has conseguido una nueva esmeralda!");
     const t = setTimeout(() => setJustFilled(null), 1200);
     return () => clearTimeout(t);
   }, [zonesDone]);
@@ -228,7 +216,9 @@ export function MapaMundo({
   }, [zonesDone, allGems]);
 
   useEffect(() => {
-    setSound(soundOn());
+    const o = loadOpciones();
+    setSound(o.musica || o.efectos || o.narrador);
+    playMusic("mapa");
   }, []);
 
   useEffect(() => {
@@ -244,7 +234,7 @@ export function MapaMundo({
 
   useEffect(() => {
     const t = setTimeout(() => {
-      if (nextZone) say(`¡Vamos ${name}! Toca ${nextZone.name}.`);
+      if (nextZone) say(`¡Vamos ${name}! Toca ${nextZone.name}.`, `zona-${nextZone.id}`);
     }, 1100);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -253,15 +243,11 @@ export function MapaMundo({
   const toggleSound = () => {
     const next = !sound;
     setSound(next);
-    try {
-      const raw = window.localStorage.getItem(OPTS_KEY);
-      const prev = raw ? JSON.parse(raw) : {};
-      window.localStorage.setItem(OPTS_KEY, JSON.stringify({ ...prev, sonidos: next }));
-    } catch {
-      /* sin guardado */
+    (["musica", "efectos", "narrador"] as const).forEach((k) => setOpcion(k, next));
+    if (next) {
+      playMusic("mapa");
+      if (nextZone) say(`Toca ${nextZone.name}.`);
     }
-    if (next && nextZone) say(`Toca ${nextZone.name}.`);
-    else window.speechSynthesis?.cancel();
   };
 
   return (
@@ -313,7 +299,12 @@ export function MapaMundo({
                 )}
 
                 <button
-                  onClick={() => open && onArea(a)}
+                  onClick={() => {
+                    if (!open) return;
+                    sfx("tap");
+                    if (a.boss) void narrar("¡Ha llegado el momento de salvar el Reino!");
+                    onArea(a);
+                  }}
                   aria-label={open ? a.name : `${a.name} bloqueada`}
                   disabled={!open}
                   className={`relative flex flex-col items-center ${open ? "btn-bounce" : ""} ${
@@ -449,7 +440,12 @@ export function MapaMundo({
       {/* botones permanentes */}
       <div className="absolute left-3 top-[calc(env(safe-area-inset-top)+3.2rem)] z-20 flex flex-row items-center gap-2">
 
-        <RoundButton onClick={onSettings} label="Opciones" icon="⚙️" color="var(--arcade-blue)" />
+        <RoundButton
+          onClick={() => {
+            sfx("abrir");
+            onSettings();
+          }}
+          label="Opciones" icon="⚙️" color="var(--arcade-blue)" />
         <RoundButton
           onClick={toggleSound}
           label={sound ? "Silenciar" : "Activar sonido"}
@@ -457,7 +453,10 @@ export function MapaMundo({
           color="var(--arcade-green)"
         />
         <RoundButton
-          onClick={onCollection}
+          onClick={() => {
+            sfx("abrir");
+            onCollection();
+          }}
           label="Colección"
           icon="🎒"
           color="var(--arcade-yellow)"
@@ -479,7 +478,7 @@ export function MapaMundo({
 
 function fanfare() {
   try {
-    if (!soundOn()) return;
+    if (!getOpciones().efectos) return;
     const Ctx =
       window.AudioContext ??
       (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -511,12 +510,14 @@ function Cinematica({ onDone }: { onDone: () => void }) {
       setTimeout(() => setFase(1), 1200),
       setTimeout(() => setFase(2), 3000),
       setTimeout(() => {
+        musicPause(500);
         setFase(3);
+        sfx("aurora");
         fanfare();
       }, 4600),
       setTimeout(() => {
         setFase(4);
-        say("¡Las ocho esmeraldas han despertado a Aurora!");
+        say("¡Increíble! ¡Has despertado a Aurora!");
       }, 5900),
     ];
     return () => ts.forEach(clearTimeout);
@@ -623,7 +624,10 @@ function Cinematica({ onDone }: { onDone: () => void }) {
             ✨ Aurora ✨
           </p>
           <button
-            onClick={onDone}
+            onClick={() => {
+              sfx("tap");
+              onDone();
+            }}
             aria-label="Continuar"
             className="btn-bounce btn-pulse rounded-[2rem] border-4 border-white bg-orange px-10 py-6 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
           >

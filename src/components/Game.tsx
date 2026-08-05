@@ -18,6 +18,7 @@ import { randomEgg, type Egg } from "@/lib/eggs";
 import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
 import fondoImg from "@/assets/portada-fondo.jpg";
+import { narrar, playMusic, sfx, loadOpciones } from "@/lib/audio";
 
 export type Progress = {
   name: string;
@@ -80,6 +81,8 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
   const [ended, setEnded] = useState(false);
 
   useEffect(() => {
+    loadOpciones();
+    playMusic("mapa");
     try {
       const raw = window.localStorage.getItem(SAVE_KEY);
       const loaded = raw ? { ...INITIAL, ...(JSON.parse(raw) as Progress) } : INITIAL;
@@ -414,6 +417,9 @@ function Elegir({
   onBack: () => void;
 }) {
   const owned = COLLECTION.filter((c) => progress.unlocked.includes(c.id));
+  useEffect(() => {
+    void narrar("¡Elige a tu Criaturita!", { once: "elegir" });
+  }, []);
   // en el combate final, la legendaria va primero y ya viene elegida
   const mine = area.boss
     ? [...owned].sort((a, b) => Number(!!b.legendary) - Number(!!a.legendary))
@@ -422,7 +428,10 @@ function Elegir({
     <div className="screen-in flex h-full min-h-0 w-full flex-col items-center gap-2">
       <div className="flex w-full shrink-0 items-center justify-between">
         <button
-          onClick={onBack}
+          onClick={() => {
+            sfx("cerrar");
+            onBack();
+          }}
           className="btn-bounce rounded-full border-4 border-white bg-white px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Volver"
         >
@@ -441,7 +450,10 @@ function Elegir({
         {mine.map((c, i) => (
           <button
             key={c.id}
-            onClick={() => onPick(c.id)}
+            onClick={() => {
+              sfx("tap");
+              onPick(c.id);
+            }}
             aria-label={c.name}
             style={c.legendary ? undefined : { borderColor: TYPE_COLOR[c.type] }}
             className={`pop-in btn-bounce relative flex flex-col items-center rounded-3xl border-[6px] bg-white/95 p-2 shadow-[0_6px_0_rgba(0,0,0,0.12)] ${
@@ -464,6 +476,15 @@ function Elegir({
 }
 
 function Captura({ creature, onClose }: { creature: Creature; onClose: () => void }) {
+  useEffect(() => {
+    sfx(creature.legendary ? "aurora" : "desbloqueo");
+    sfx("confeti");
+    void narrar(
+      creature.legendary
+        ? "¡Increíble! ¡Has despertado a Aurora!"
+        : `¡${creature.name} ya es tu amiga!`,
+    );
+  }, [creature]);
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-ink/70 px-6">
       <Confetti />
@@ -473,7 +494,10 @@ function Captura({ creature, onClose }: { creature: Creature; onClose: () => voi
       </p>
       <LiveSprite src={trainerImg} alt="" motion="hop" className="w-28" />
       <button
-        onClick={onClose}
+        onClick={() => {
+          sfx("tap");
+          onClose();
+        }}
         aria-label="Continuar"
         className="btn-bounce btn-pulse w-full max-w-sm rounded-[2rem] border-4 border-white bg-orange px-6 py-7 text-4xl font-black text-white shadow-[0_10px_0_rgba(0,0,0,0.25)]"
       >
