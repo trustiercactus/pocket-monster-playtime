@@ -72,3 +72,25 @@ export function randomRival(exclude: string): Creature {
   const pool = CREATURES.filter((c) => c.id !== exclude);
   return pool[Math.floor(Math.random() * pool.length)] as Creature;
 }
+
+/** Criatura inicial del jugador */
+export const STARTER_ID = "flami";
+
+/**
+ * La colección del juego: 1 inicial + 8 guardianes + 1 legendaria = 10.
+ * Coincide exactamente con la historia de la aventura.
+ */
+export const COLLECTION_IDS = [
+  STARTER_ID,
+  "chispi",
+  "hojito",
+  "ballenin",
+  "lavito",
+  "cactino",
+  "aquip",
+  "buhito",
+  "fenix",
+  LEGENDARY_ID,
+];
+
+export const COLLECTION: Creature[] = COLLECTION_IDS.map((id) => getCreature(id));
