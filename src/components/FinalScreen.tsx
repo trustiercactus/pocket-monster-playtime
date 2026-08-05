@@ -60,7 +60,7 @@ export function FinalScreen({
     sfx("celebracion");
     sfx("confeti");
     const fw = window.setInterval(() => sfx("fuego"), 2600);
-    void narrar("¡Lo has conseguido! ¡Has salvado a todas las Criaturitas!", { once: "final" });
+    void narrar("¡Lo has conseguido! ¡Has salvado a todas las Criaturitas!", { once: "final", delay: 500 });
     const t1 = window.setTimeout(() => setPhase(1), 1600); // guardianes
     const t2 = window.setTimeout(() => setPhase(2), 4200); // primer mensaje
     const t3 = window.setTimeout(() => setPhase(3), 7600); // segundo mensaje + botones
