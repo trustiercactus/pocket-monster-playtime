@@ -506,9 +506,14 @@ export function sfx(kind: Sfx) {
 
 const voiceCache = new Map<string, string>();
 let current: HTMLAudioElement | null = null;
+let pending: number | null = null;
 const said = new Set<string>();
 
 export function stopNarrator() {
+  if (pending) {
+    window.clearTimeout(pending);
+    pending = null;
+  }
   if (current) {
     current.pause();
     current = null;
@@ -516,15 +521,38 @@ export function stopNarrator() {
   duck(false);
 }
 
+/** el niño siempre manda: al tocar cualquier botón, el narrador calla */
+if (typeof window !== "undefined") {
+  window.addEventListener(
+    "pointerdown",
+    (e) => {
+      const t = e.target as HTMLElement | null;
+      if (t && t.closest("button,[role='button'],a")) stopNarrator();
+    },
+    { capture: true, passive: true },
+  );
+}
+
 /**
  * Narra una frase con voz neuronal cálida.
  * `once` evita repetir la misma frase en la misma sesión.
+ * `delay` espera a que termine la animación antes de hablar (300-500 ms).
  */
-export async function narrar(text: string, opts: { once?: string } = {}) {
+export async function narrar(text: string, opts: { once?: string; delay?: number } = {}) {
   if (!opciones.narrador || typeof window === "undefined") return;
   if (opts.once) {
     if (said.has(opts.once)) return;
     said.add(opts.once);
+  }
+  if (opts.delay && opts.delay > 0) {
+    const ms = opts.delay;
+    const { delay: _d, ...rest } = opts;
+    if (pending) window.clearTimeout(pending);
+    pending = window.setTimeout(() => {
+      pending = null;
+      void narrar(text, rest);
+    }, ms);
+    return;
   }
   try {
     let url = voiceCache.get(text);
@@ -555,3 +583,4 @@ export async function narrar(text: string, opts: { once?: string } = {}) {
     duck(false);
   }
 }
+
