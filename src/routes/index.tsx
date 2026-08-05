@@ -74,7 +74,7 @@ function Index() {
 
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
+    <main className="safe-pad relative h-[100dvh] overflow-hidden">
       <img
         src={fondo}
         alt="Pradera con casita, castillo, montañas y arcoíris"
@@ -85,7 +85,7 @@ function Index() {
       <div className="absolute inset-0 bg-gradient-to-b from-sky/20 via-transparent to-green/30" />
       <Scenery dense />
 
-      <div className="relative flex min-h-screen flex-col items-center px-4 pt-4 pb-6 text-center">
+      <div className="relative flex h-full flex-col items-center px-4 pt-3 pb-4 text-center">
         <button
           type="button"
           aria-label="Ajustes"
@@ -95,8 +95,8 @@ function Index() {
           ⚙️
         </button>
 
-        <div className="title-bob mt-20 flex flex-col items-center gap-2">
-          <h1 className="text-[3.25rem] font-black leading-none tracking-tight text-yellow [text-shadow:0_0_0_#fff,3px_3px_0_var(--arcade-ink),-3px_3px_0_var(--arcade-ink),3px_-3px_0_var(--arcade-ink),-3px_-3px_0_var(--arcade-ink),0_10px_0_rgba(0,0,0,0.3)]">
+        <div className="title-bob mt-[12vh] flex flex-col items-center gap-2">
+          <h1 className="text-[min(3.25rem,13vw)] font-black leading-none tracking-tight text-yellow [text-shadow:0_0_0_#fff,3px_3px_0_var(--arcade-ink),-3px_3px_0_var(--arcade-ink),3px_-3px_0_var(--arcade-ink),-3px_-3px_0_var(--arcade-ink),0_10px_0_rgba(0,0,0,0.3)]">
             CRIATURITAS
           </h1>
           <p className="rounded-full border-4 border-white bg-orange px-5 py-1.5 text-sm font-black uppercase tracking-wide text-white shadow-[0_5px_0_rgba(0,0,0,0.22)]">
