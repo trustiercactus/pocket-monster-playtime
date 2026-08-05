@@ -4,36 +4,11 @@ import { GEM_ZONES, type Area } from "@/lib/areas";
 import { LiveSprite } from "@/components/LiveSprite";
 import { Gema } from "@/components/Gema";
 import mapaFondo from "@/assets/mapa-vertical.jpg";
+import { narrar, playMusic, sfx, musicPause } from "@/lib/audio";
 
 const MAX_HP = 5;
 const SUPER_CHARGE = 3;
 const GEM_GAP = 34;
-
-/** sonido alegre de recompensa al conseguir la esmeralda */
-function reward() {
-  try {
-    const Ctx =
-      window.AudioContext ??
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
-    [659.25, 783.99, 1046.5].forEach((f, i) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = "triangle";
-      const t = ctx.currentTime + i * 0.13;
-      o.frequency.setValueAtTime(f, t);
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(0.25, t + 0.04);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
-      o.connect(g).connect(ctx.destination);
-      o.start(t);
-      o.stop(t + 0.5);
-    });
-  } catch {
-    /* sin sonido */
-  }
-}
 
 /** barra superior de esmeraldas, igual que en el mapa */
 function GemBar({ zonesDone, filling }: { zonesDone: string[]; filling: string | null }) {
@@ -91,40 +66,11 @@ function attackIcon(c: Creature, area: Area): string {
 }
 
 function speak(text: string) {
-  try {
-    const s = window.speechSynthesis;
-    if (!s) return;
-    s.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "es-ES";
-    u.rate = 0.9;
-    u.pitch = 1.3;
-    s.speak(u);
-  } catch {
-    /* sin voz */
-  }
+  void narrar(text);
 }
 
 function boom(strong: boolean) {
-  try {
-    const Ctx =
-      window.AudioContext ??
-      (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!Ctx) return;
-    const ctx = new Ctx();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = strong ? "sawtooth" : "triangle";
-    o.frequency.setValueAtTime(strong ? 180 : 520, ctx.currentTime);
-    o.frequency.exponentialRampToValueAtTime(strong ? 40 : 220, ctx.currentTime + 0.35);
-    g.gain.setValueAtTime(strong ? 0.35 : 0.18, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-    o.connect(g).connect(ctx.destination);
-    o.start();
-    o.stop(ctx.currentTime + 0.42);
-  } catch {
-    /* sin sonido */
-  }
+  sfx(strong ? "super" : "ataque");
 }
 
 /** corazones que nunca desaparecen de golpe: rebotan, se encogen y destellan */
@@ -310,6 +256,11 @@ export function Combate({
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
+  useEffect(() => {
+    playMusic("combate");
+    return () => playMusic("mapa");
+  }, []);
+
   function pop(emoji: string, big = false) {
     const id = Date.now() + Math.random();
     setFx((f) => [...f, { id, emoji, big }]);
@@ -323,7 +274,7 @@ export function Combate({
       later(() => {
         setHitMe(true);
         setMicro(true);
-        boom(false);
+        sfx("dano");
         pop("💨");
         // nunca puede perder: el último corazón no se quita
         setMyHp(Math.max(1, current - 1));
@@ -369,7 +320,11 @@ export function Combate({
 
   function normalAttack() {
     if (busy || ending) return;
-    setCharge((c) => Math.min(SUPER_CHARGE, c + 1));
+    setCharge((c) => {
+      const n = Math.min(SUPER_CHARGE, c + 1);
+      if (n > c) sfx("cargar");
+      return n;
+    });
     damage(1, attackIcon(companion, area), false);
   }
 
@@ -389,6 +344,7 @@ export function Combate({
     }
     setBusy(true);
     setHeals((h) => h - 1);
+    sfx("curar");
     setFlyHeart(true);
     later(() => {
       setFlyHeart(false);
@@ -399,9 +355,15 @@ export function Combate({
 
   function startEnding() {
     setEnding(1); // sorprendido
+    if (area.boss) {
+      musicPause(500);
+      sfx("jefe");
+    } else {
+      sfx("desbloqueo");
+    }
     later(() => {
       setEnding(2); // sonríe y brilla
-      speak(area.boss ? "¡Has salvado el reino!" : "¡Ahora es tu amigo!");
+      speak(area.boss ? "¡Muy bien! ¡Has salvado el Reino!" : "¡Muy bien! ¡Ya es tu amiga!");
     }, 900);
     later(() => setEnding(3), 2100); // desaparece entre partículas de luz
     if (area.boss) {
@@ -413,7 +375,7 @@ export function Combate({
     later(() => setEnding(5), 4400); // vuela hacia la barra
     later(() => {
       setEnding(6); // entra en su hueco
-      reward();
+      sfx("esmeralda");
     }, 5400);
     later(() => onFinish(true), 6600);
   }
@@ -518,7 +480,10 @@ export function Combate({
         {/* SUPERIOR — mismo lenguaje visual que el mapa */}
         <div className="relative flex items-start">
           <button
-            onClick={onBack}
+            onClick={() => {
+              sfx("cerrar");
+              onBack();
+            }}
             aria-label="Volver"
             style={{ backgroundColor: area.color }}
             className="btn-bounce btn-3d z-10 grid h-11 w-11 place-items-center rounded-full border-[3px] border-white text-xl text-white shadow-[0_5px_0_rgba(0,0,0,0.35)]"

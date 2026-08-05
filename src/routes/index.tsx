@@ -7,6 +7,17 @@ import trainer from "@/assets/trainer.png";
 import fondo from "@/assets/portada-fondo.jpg";
 import { Scenery } from "@/components/Scenery";
 import { LiveSprite } from "@/components/LiveSprite";
+import {
+  loadOpciones,
+  setOpcion,
+  playMusic,
+  sfx,
+  narrar,
+  unlockAudio,
+  OPTS_DEFAULT,
+  type Opciones,
+} from "@/lib/audio";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,10 +41,6 @@ export const Route = createFileRoute("/")({
 });
 
 const SAVE_KEY = "criaturitas-partida";
-const OPTS_KEY = "criaturitas-opciones";
-
-type Opciones = { sonidos: boolean; musica: boolean; vibracion: boolean };
-const OPTS_DEFAULT: Opciones = { sonidos: true, musica: true, vibracion: true };
 
 function Index() {
   const [ajustes, setAjustes] = useState(false);
@@ -42,24 +49,26 @@ function Index() {
   const [opciones, setOpciones] = useState<Opciones>(OPTS_DEFAULT);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(OPTS_KEY);
-      if (raw) setOpciones({ ...OPTS_DEFAULT, ...JSON.parse(raw) });
-    } catch {
-      /* sin guardado */
-    }
+    setOpciones(loadOpciones());
+    playMusic("inicio");
+    const saluda = () => {
+      unlockAudio();
+      playMusic("inicio");
+      void narrar("¡Hola! ¡Bienvenido a Criaturitas! Hoy viviremos una aventura increíble.", {
+        once: "bienvenida",
+      });
+    };
+    window.addEventListener("pointerdown", saluda, { once: true });
+    return () => window.removeEventListener("pointerdown", saluda);
   }, []);
 
   const toggle = (key: keyof Opciones) => {
     setOpciones((prev) => {
       const next = { ...prev, [key]: !prev[key] };
-      try {
-        window.localStorage.setItem(OPTS_KEY, JSON.stringify(next));
-      } catch {
-        /* sin guardado */
-      }
+      setOpcion(key, next[key]);
       return next;
     });
+    sfx("tap");
   };
 
   const borrarTodo = () => {
@@ -68,9 +77,11 @@ function Index() {
     } catch {
       /* sin guardado */
     }
+    sfx("cerrar");
     setConfirmar(false);
     setAjustes(false);
   };
+
 
 
   return (
@@ -89,7 +100,10 @@ function Index() {
         <button
           type="button"
           aria-label="Ajustes"
-          onClick={() => setAjustes(true)}
+          onClick={() => {
+            sfx("abrir");
+            setAjustes(true);
+          }}
           className="btn-bounce absolute left-4 top-4 flex h-16 w-16 items-center justify-center rounded-full border-[5px] border-white bg-blue text-3xl shadow-[0_6px_0_rgba(0,0,0,0.25)]"
         >
           ⚙️
@@ -137,6 +151,7 @@ function Index() {
         <div className="mt-6 flex w-full max-w-sm flex-col items-center gap-4">
           <Link
             to="/jugar"
+            onClick={() => sfx("tap")}
             aria-label="Jugar"
             className="btn-3d btn-pulse flex w-full items-center justify-center gap-3 border-[6px] border-white bg-orange px-6 py-6 text-4xl font-black text-white shadow-[0_14px_0_rgba(0,0,0,0.28),0_20px_26px_rgba(0,0,0,0.28),inset_0_-6px_0_rgba(0,0,0,0.18)] [text-shadow:0_3px_0_rgba(0,0,0,0.28)]"
           >
@@ -147,6 +162,7 @@ function Index() {
           </Link>
           <Link
             to="/coleccion"
+            onClick={() => sfx("tap")}
             aria-label="Colección"
             className="btn-3d flex w-11/12 items-center justify-center gap-3 rounded-[2rem] border-[5px] border-white bg-blue px-5 py-4 text-2xl font-black text-white shadow-[0_11px_0_rgba(0,0,0,0.28),0_16px_22px_rgba(0,0,0,0.25),inset_0_-5px_0_rgba(0,0,0,0.16)] [text-shadow:0_3px_0_rgba(0,0,0,0.25)]"
           >
@@ -167,10 +183,12 @@ function Index() {
             <div className="flex flex-col gap-3">
               {(
                 [
-                  ["sonidos", "🔊", "Sonidos"],
                   ["musica", "🎵", "Música"],
+                  ["efectos", "🔊", "Efectos de sonido"],
+                  ["narrador", "🗣️", "Narrador"],
                   ["vibracion", "📳", "Vibración"],
                 ] as const
+
               ).map(([key, icon, label]) => (
                 <button
                   key={key}
@@ -228,7 +246,10 @@ function Index() {
 
               <button
                 type="button"
-                onClick={() => setAjustes(false)}
+                onClick={() => {
+                  sfx("cerrar");
+                  setAjustes(false);
+                }}
                 aria-label="Cerrar"
                 className="btn-3d rounded-[1.5rem] border-4 border-white bg-green px-4 py-4 text-3xl shadow-[0_8px_0_rgba(0,0,0,0.22)]"
               >

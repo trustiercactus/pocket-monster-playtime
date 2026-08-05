@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ColeccionRouteImport } from './routes/coleccion'
 import { Route as JugarRouteImport } from './routes/jugar'
+import { Route as ApiNarradorRouteImport } from './routes/api/narrador'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const JugarRoute = JugarRouteImport.update({
   path: '/jugar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiNarradorRoute = ApiNarradorRouteImport.update({
+  id: '/api/narrador',
+  path: '/api/narrador',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/coleccion': typeof ColeccionRoute
   '/jugar': typeof JugarRoute
+  '/api/narrador': typeof ApiNarradorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/coleccion': typeof ColeccionRoute
   '/jugar': typeof JugarRoute
+  '/api/narrador': typeof ApiNarradorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/coleccion': typeof ColeccionRoute
   '/jugar': typeof JugarRoute
+  '/api/narrador': typeof ApiNarradorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/coleccion' | '/jugar'
+  fullPaths: '/' | '/coleccion' | '/jugar' | '/api/narrador'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/coleccion' | '/jugar'
-  id: '__root__' | '/' | '/coleccion' | '/jugar'
+  to: '/' | '/coleccion' | '/jugar' | '/api/narrador'
+  id: '__root__' | '/' | '/coleccion' | '/jugar' | '/api/narrador'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ColeccionRoute: typeof ColeccionRoute
   JugarRoute: typeof JugarRoute
+  ApiNarradorRoute: typeof ApiNarradorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JugarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/narrador': {
+      id: '/api/narrador'
+      path: '/api/narrador'
+      fullPath: '/api/narrador'
+      preLoaderRoute: typeof ApiNarradorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ColeccionRoute: ColeccionRoute,
   JugarRoute: JugarRoute,
+  ApiNarradorRoute: ApiNarradorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
