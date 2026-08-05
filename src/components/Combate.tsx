@@ -65,9 +65,11 @@ function attackIcon(c: Creature, area: Area): string {
   }
 }
 
-function speak(text: string) {
-  void narrar(text);
+/** el narrador habla siempre DESPUÉS de la animación, con una pequeña pausa */
+function speak(text: string, delay = 400) {
+  void narrar(text, { delay });
 }
+
 
 function boom(strong: boolean) {
   sfx(strong ? "super" : "ataque");
