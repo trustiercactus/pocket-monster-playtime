@@ -375,6 +375,7 @@ export type Sfx =
   | "tap"
   | "abrir"
   | "cerrar"
+  | "turno"
   | "ataque"
   | "dano"
   | "curar"
