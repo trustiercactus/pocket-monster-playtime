@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   CREATURES,
+  COLLECTION,
   TYPE_EMOJI,
   TYPE_COLOR,
   XP_PER_LEVEL,
