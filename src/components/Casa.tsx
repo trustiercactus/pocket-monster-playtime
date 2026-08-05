@@ -1,3 +1,4 @@
+import { sfx } from "@/lib/audio";
 import { useState } from "react";
 import { COLLECTION, TYPE_EMOJI, getCreature, type Creature } from "@/lib/creatures";
 import {
@@ -86,7 +87,10 @@ export function Casa({
 
       <div className="flex w-full shrink-0 items-center justify-between">
         <button
-          onClick={onBack}
+          onClick={() => {
+            sfx("cerrar");
+            onBack();
+          }}
           className="btn-bounce rounded-full border-4 border-white bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Volver al mapa"
         >
@@ -94,7 +98,10 @@ export function Casa({
         </button>
         <span className="rounded-full bg-white/90 px-4 py-2 text-3xl">🏠</span>
         <button
-          onClick={onCollection}
+          onClick={() => {
+            sfx("abrir");
+            onCollection();
+          }}
           className="btn-bounce btn-pulse rounded-full border-4 border-white bg-yellow px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Abrir la colección"
         >
@@ -129,7 +136,10 @@ export function Casa({
             {eggs.map((e, i) => (
               <button
                 key={e.id}
-                onClick={() => setSelected(i)}
+                onClick={() => {
+                  sfx("tap");
+                  setSelected(i);
+                }}
                 aria-label={`Huevo ${EGG_EMOJI[e.element]}`}
                 className={`btn-bounce rounded-3xl p-1 ${
                   i === selected ? "bg-yellow/60 ring-4 ring-white" : ""
@@ -164,7 +174,10 @@ export function Casa({
                 ].map((b) => (
                   <button
                     key={b.icon}
-                    onClick={() => care(b.icon)}
+                    onClick={() => {
+                      sfx("tap");
+                      care(b.icon);
+                    }}
                     aria-label={b.label}
                     style={{ backgroundColor: b.color }}
                     className="btn-bounce min-h-[11vh] flex-1 rounded-[1.75rem] border-4 border-white text-4xl shadow-[0_8px_0_rgba(0,0,0,0.2)]"
