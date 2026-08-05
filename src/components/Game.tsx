@@ -414,30 +414,31 @@ function Elegir({
   onPick: (id: string) => void;
   onBack: () => void;
 }) {
-  const owned = CREATURES.filter((c) => progress.unlocked.includes(c.id));
+  const owned = COLLECTION.filter((c) => progress.unlocked.includes(c.id));
   // en el combate final, la legendaria va primero y ya viene elegida
   const mine = area.boss
     ? [...owned].sort((a, b) => Number(!!b.legendary) - Number(!!a.legendary))
     : owned;
   return (
-    <div className="screen-in flex flex-col items-center gap-4">
-      <div className="flex w-full items-center justify-between">
+    <div className="screen-in flex h-full min-h-0 w-full flex-col items-center gap-2">
+      <div className="flex w-full shrink-0 items-center justify-between">
         <button
           onClick={onBack}
-          className="btn-bounce rounded-full border-4 border-white bg-white px-5 py-3 text-3xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
+          className="btn-bounce rounded-full border-4 border-white bg-white px-4 py-2 text-2xl shadow-[0_5px_0_rgba(0,0,0,0.15)]"
           aria-label="Volver"
         >
           ⬅️
         </button>
-        <img src={area.image} alt={area.name} className="float-soft h-20 object-contain" />
+        <img src={area.image} alt={area.name} className="float-soft h-[9vh] object-contain" />
       </div>
 
-      <div className="flex items-center gap-3">
-        <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-24" />
-        <span className="wiggle text-5xl">👉</span>
+      <div className="flex shrink-0 items-center gap-3">
+        <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-[16vw] max-w-24" />
+        <span className="wiggle text-4xl">👉</span>
       </div>
 
-      <div className="grid w-full max-w-sm grid-cols-3 gap-3">
+      <div className="grid min-h-0 w-full max-w-sm flex-1 grid-cols-3 content-start gap-2 overflow-hidden">
+
         {mine.map((c, i) => (
           <button
             key={c.id}
