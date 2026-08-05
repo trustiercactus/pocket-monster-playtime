@@ -424,6 +424,9 @@ export function sfx(kind: Sfx) {
     case "abrir":
       ["C5", "E5", "G5", "C6"].forEach((n, i) => note(d, f(n), t + i * 0.05, 0.2, "xilofono", 0.45));
       break;
+    case "turno":
+      ["G5", "C6", "E6"].forEach((n, i) => note(d, f(n), t + i * 0.08, 0.28, "campana", 0.45));
+      break;
     case "cerrar":
       ["C6", "G5", "E5"].forEach((n, i) => note(d, f(n), t + i * 0.05, 0.2, "ukelele", 0.45));
       break;
