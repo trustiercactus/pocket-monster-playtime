@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { guardInstallPrompt, isStandalone } from "../lib/pwa";
 
 function NotFoundComponent() {
   return (
@@ -131,6 +132,12 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    const stop = guardInstallPrompt();
+    if (isStandalone()) document.documentElement.dataset["standalone"] = "true";
+    return stop;
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
