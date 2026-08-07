@@ -4,6 +4,7 @@ import { getCreature } from "@/lib/creatures";
 import mapaFondo from "@/assets/mapa-vertical.jpg";
 import legendariaImg from "@/assets/legendaria.png";
 import { Gema, type GemCut } from "@/components/Gema";
+import { Mundo } from "@/components/Mundo";
 import {
   narrar,
   playMusic,
@@ -380,7 +381,7 @@ export function MapaMundo({
                     if (!open) return;
                     sfx("tap");
                     if (a.boss) void narrar("¡Ha llegado el momento de salvar el Reino!", { delay: 400 });
-                    onArea(a);
+                    irAlMundo(a.id);
                   }}
                   aria-label={open ? a.name : `${a.name} bloqueada`}
                   disabled={!open}
