@@ -240,14 +240,47 @@ export function MapaMundo({
     if (allGems && !legendary) setCine(true);
   }, [allGems, legendary]);
 
-  /** intro cinematográfica: mapa completo → zoom a la zona actual */
+  /** transición cinematográfica mapa general → escenario del mundo */
+  const irAlMundo = (id: string) => {
+    setFocusId(id);
+    setSweep(true);
+    sfx("abrir");
+    try {
+      navigator.vibrate?.(30);
+    } catch {
+      /* sin vibración */
+    }
+    timers.current.push(setTimeout(() => setVista("mundo"), 470));
+    timers.current.push(setTimeout(() => setSweep(false), 980));
+  };
+
+  const volverAlMapa = () => {
+    setSweep(true);
+    timers.current.push(setTimeout(() => setVista("mapa"), 470));
+    timers.current.push(setTimeout(() => setSweep(false), 980));
+  };
+
+  useEffect(
+    () => () => {
+      timers.current.forEach(clearTimeout);
+    },
+    [],
+  );
+
+  /** intro: se ve todo el reino unos segundos y luego entramos en la zona actual */
+  const introRef = useRef(false);
   useEffect(() => {
-    setCam("wide");
-    const t = setTimeout(() => setCam("zoom"), 2800);
+    if (introRef.current) return;
+    introRef.current = true;
+    const t = setTimeout(() => {
+      const target = nextZone ?? AREAS[0]!;
+      irAlMundo(target.id);
+    }, 2600);
     return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** al conseguir una esmeralda: alejar, revelar la siguiente zona y volver a acercar */
+  /** al conseguir una esmeralda: mapa general, revelar la siguiente zona y entrar en ella */
   const doneCount = zonesDone.length;
   const firstRun = useRef(true);
   useEffect(() => {
@@ -255,14 +288,16 @@ export function MapaMundo({
       firstRun.current = false;
       return;
     }
-    setCam("wide");
+    setVista("mapa");
     try {
       navigator.vibrate?.(40);
     } catch {
       /* sin vibración */
     }
     const t1 = setTimeout(() => setRevealed(nextZone?.id ?? null), 1800);
-    const t2 = setTimeout(() => setCam("zoom"), 3000);
+    const t2 = setTimeout(() => {
+      if (nextZone) irAlMundo(nextZone.id);
+    }, 3200);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -270,12 +305,8 @@ export function MapaMundo({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doneCount]);
 
-  /** origen de cámara: la zona objetivo (aprox. del área interior del mapa) */
-  const focus = nextZone ?? AREAS[0]!;
-  const camStyle: React.CSSProperties = {
-    transformOrigin: `${focus.x}% ${14.6 + focus.y * 0.79}%`,
-    transform: cam === "zoom" ? "scale(2)" : "scale(1)",
-  };
+  const mundoArea = AREAS.find((a) => a.id === focusId) ?? nextZone ?? AREAS[0]!;
+
 
   useEffect(() => {
     const t = setTimeout(() => {
