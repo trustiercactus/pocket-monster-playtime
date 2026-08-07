@@ -534,6 +534,16 @@ export function MapaMundo({
           icon="🎒"
           color="var(--arcade-yellow)"
         />
+        <RoundButton
+          onClick={() => {
+            sfx("tap");
+            setCam((c) => (c === "zoom" ? "wide" : "zoom"));
+          }}
+          label={cam === "zoom" ? "Ver todo el mapa" : "Ir a mi zona"}
+          icon={cam === "zoom" ? "🗺️" : "🔍"}
+          color="var(--arcade-orange)"
+        />
+
       </div>
 
 
