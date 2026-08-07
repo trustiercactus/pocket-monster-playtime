@@ -4,6 +4,7 @@ import { getCreature } from "@/lib/creatures";
 import mapaFondo from "@/assets/mapa-vertical.jpg";
 import legendariaImg from "@/assets/legendaria.png";
 import { Gema, type GemCut } from "@/components/Gema";
+import { Mundo } from "@/components/Mundo";
 import {
   narrar,
   playMusic,
@@ -186,12 +187,16 @@ export function MapaMundo({
   const [cine, setCine] = useState(false);
   const [sound, setSound] = useState(true);
   const [justFilled, setJustFilled] = useState<string | null>(null);
-  /** cámara: "wide" = mapa completo, "zoom" = zona actual a pantalla casi completa */
-  const [cam, setCam] = useState<"wide" | "zoom">("wide");
+  /** vista: "mapa" = todo el reino, "mundo" = escenario propio de la zona */
+  const [vista, setVista] = useState<"mapa" | "mundo">("mapa");
+  const [sweep, setSweep] = useState(false);
+  const [focusId, setFocusId] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<string | null>(null);
   const prevDone = useRef<string[]>(zonesDone);
   const scroller = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
 
   useEffect(() => {
     const added = zonesDone.find((id) => !prevDone.current.includes(id));
@@ -236,14 +241,47 @@ export function MapaMundo({
     if (allGems && !legendary) setCine(true);
   }, [allGems, legendary]);
 
-  /** intro cinematográfica: mapa completo → zoom a la zona actual */
+  /** transición cinematográfica mapa general → escenario del mundo */
+  const irAlMundo = (id: string) => {
+    setFocusId(id);
+    setSweep(true);
+    sfx("abrir");
+    try {
+      navigator.vibrate?.(30);
+    } catch {
+      /* sin vibración */
+    }
+    timers.current.push(setTimeout(() => setVista("mundo"), 470));
+    timers.current.push(setTimeout(() => setSweep(false), 980));
+  };
+
+  const volverAlMapa = () => {
+    setSweep(true);
+    timers.current.push(setTimeout(() => setVista("mapa"), 470));
+    timers.current.push(setTimeout(() => setSweep(false), 980));
+  };
+
+  useEffect(
+    () => () => {
+      timers.current.forEach(clearTimeout);
+    },
+    [],
+  );
+
+  /** intro: se ve todo el reino unos segundos y luego entramos en la zona actual */
+  const introRef = useRef(false);
   useEffect(() => {
-    setCam("wide");
-    const t = setTimeout(() => setCam("zoom"), 2800);
+    if (introRef.current) return;
+    introRef.current = true;
+    const t = setTimeout(() => {
+      const target = nextZone ?? AREAS[0]!;
+      irAlMundo(target.id);
+    }, 2600);
     return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** al conseguir una esmeralda: alejar, revelar la siguiente zona y volver a acercar */
+  /** al conseguir una esmeralda: mapa general, revelar la siguiente zona y entrar en ella */
   const doneCount = zonesDone.length;
   const firstRun = useRef(true);
   useEffect(() => {
@@ -251,14 +289,16 @@ export function MapaMundo({
       firstRun.current = false;
       return;
     }
-    setCam("wide");
+    setVista("mapa");
     try {
       navigator.vibrate?.(40);
     } catch {
       /* sin vibración */
     }
     const t1 = setTimeout(() => setRevealed(nextZone?.id ?? null), 1800);
-    const t2 = setTimeout(() => setCam("zoom"), 3000);
+    const t2 = setTimeout(() => {
+      if (nextZone) irAlMundo(nextZone.id);
+    }, 3200);
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
@@ -266,16 +306,12 @@ export function MapaMundo({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doneCount]);
 
-  /** origen de cámara: la zona objetivo (aprox. del área interior del mapa) */
-  const focus = nextZone ?? AREAS[0]!;
-  const camStyle: React.CSSProperties = {
-    transformOrigin: `${focus.x}% ${14.6 + focus.y * 0.79}%`,
-    transform: cam === "zoom" ? "scale(2)" : "scale(1)",
-  };
+  const mundoArea = AREAS.find((a) => a.id === focusId) ?? nextZone ?? AREAS[0]!;
+
 
   useEffect(() => {
     const t = setTimeout(() => {
-      if (nextZone) say(`¡Vamos ${name}! Toca ${nextZone.name}.`, `zona-${nextZone.id}`);
+      if (nextZone) say(`¡Vamos ${name}! Bienvenido a ${nextZone.name}.`, `zona-${nextZone.id}`);
     }, 3400);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -288,14 +324,14 @@ export function MapaMundo({
     (["musica", "efectos", "narrador"] as const).forEach((k) => setOpcion(k, next));
     if (next) {
       playMusic("mapa");
-      if (nextZone) say(`Toca ${nextZone.name}.`);
+      if (nextZone) say(`¡Vamos a ${nextZone.name}!`);
     }
   };
 
   return (
     <div className="fixed inset-0 z-0 bg-[#8fd8ff]">
       <div ref={scroller} className="h-full w-full overflow-hidden">
-        <div className="cam relative h-full w-full" style={camStyle}>
+        <div className="map-in relative h-full w-full">
           <img
             src={mapaFondo}
             alt=""
@@ -345,7 +381,7 @@ export function MapaMundo({
                     if (!open) return;
                     sfx("tap");
                     if (a.boss) void narrar("¡Ha llegado el momento de salvar el Reino!", { delay: 400 });
-                    onArea(a);
+                    irAlMundo(a.id);
                   }}
                   aria-label={open ? a.name : `${a.name} bloqueada`}
                   disabled={!open}
@@ -537,15 +573,38 @@ export function MapaMundo({
         <RoundButton
           onClick={() => {
             sfx("tap");
-            setCam((c) => (c === "zoom" ? "wide" : "zoom"));
+            const target = nextZone ?? AREAS[0]!;
+            irAlMundo(target.id);
           }}
-          label={cam === "zoom" ? "Ver todo el mapa" : "Ir a mi zona"}
-          icon={cam === "zoom" ? "🗺️" : "🔍"}
+          label="Ir a mi zona"
+          icon="🔍"
           color="var(--arcade-orange)"
         />
 
       </div>
 
+      {/* escenario del mundo: pantalla completa, encima del mapa */}
+      {vista === "mundo" && (
+        <div className="absolute inset-0 z-30">
+          <Mundo
+            area={mundoArea}
+            done={zonesDone.includes(mundoArea.id)}
+            onFight={() => onArea(mundoArea)}
+            onMap={volverAlMapa}
+          />
+        </div>
+      )}
+
+      {/* barrido de nubes entre mapa y mundo */}
+      {sweep && (
+        <div className="pointer-events-none absolute inset-0 z-50 overflow-hidden" aria-hidden="true">
+          <div className="cloud-sweep absolute inset-0 flex items-center justify-around bg-white/85 blur-[2px]">
+            <span className="text-8xl">☁️</span>
+            <span className="text-9xl">☁️</span>
+            <span className="text-8xl">☁️</span>
+          </div>
+        </div>
+      )}
 
       {cine && (
         <Cinematica
@@ -555,6 +614,7 @@ export function MapaMundo({
           }}
         />
       )}
+
     </div>
   );
 }

@@ -1060,3 +1060,36 @@
   50% { transform: translate(-50%, 12px); }
 }
 @utility hint-arrow { animation: hint-arrow 0.8s ease-in-out infinite; }
+
+/* ---- Mapa 2.0: transición mapa general ⇄ escenario de mundo ---- */
+@keyframes cloud-sweep-in {
+  0% { transform: translateX(-120%) scale(1.2); opacity: 0; }
+  35% { transform: translateX(0) scale(1.2); opacity: 1; }
+  65% { transform: translateX(0) scale(1.2); opacity: 1; }
+  100% { transform: translateX(120%) scale(1.2); opacity: 0; }
+}
+@utility cloud-sweep { animation: cloud-sweep-in 0.95s ease-in-out forwards; }
+
+@keyframes scene-in {
+  from { opacity: 0; transform: scale(1.06); }
+  to { opacity: 1; transform: scale(1); }
+}
+@utility scene-in { animation: scene-in 0.7s ease-out both; }
+
+@keyframes map-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+@utility map-in { animation: map-in 0.6s ease-out both; }
+
+@keyframes zone-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 240, 150, 0); }
+  50% { box-shadow: 0 0 26px 10px rgba(255, 240, 150, 0.75); }
+}
+@utility zone-glow { animation: zone-glow 1.8s ease-in-out infinite; }
+
+@keyframes guard-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@utility guard-float { animation: guard-float 3s ease-in-out infinite; }
