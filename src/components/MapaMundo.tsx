@@ -397,6 +397,17 @@ export function MapaMundo({
                         aria-hidden="true"
                       />
                     )}
+                    {a.boss && (
+                      <span
+                        className="goal-beacon pointer-events-none absolute left-1/2 top-1/2 h-40 w-40 rounded-full blur-2xl"
+                        style={{
+                          background:
+                            "radial-gradient(circle, rgba(255,79,216,0.55), rgba(122,47,242,0.35) 55%, transparent 75%)",
+                        }}
+                        aria-hidden="true"
+                      />
+                    )}
+
                     <span
                       className={`pointer-events-none absolute bottom-1 left-1/2 h-3 -translate-x-1/2 rounded-[50%] blur-[3px] ${
                         a.boss ? "w-28" : "w-16"
