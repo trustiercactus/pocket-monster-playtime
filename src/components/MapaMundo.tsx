@@ -330,7 +330,7 @@ export function MapaMundo({
   return (
     <div className="fixed inset-0 z-0 bg-[#8fd8ff]">
       <div ref={scroller} className="h-full w-full overflow-hidden">
-        <div className="cam relative h-full w-full" style={camStyle}>
+        <div className="map-in relative h-full w-full">
           <img
             src={mapaFondo}
             alt=""
