@@ -365,6 +365,26 @@ export function MapaMundo({
                     />
                   )}
 
+                  {/* velo de nubes de las zonas aún bloqueadas: se disipa con magia al desbloquearse */}
+                  {(!open || revealed === a.id) && (
+                    <span
+                      className={`pointer-events-none absolute -inset-6 grid place-items-center ${
+                        revealed === a.id ? "cloud-veil-out" : "cloud-veil-idle"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <span className="absolute inset-0 rounded-[50%] bg-white/70 blur-md" />
+                      <span className="absolute -left-2 top-1 text-2xl opacity-90">☁️</span>
+                      <span className="absolute -right-2 bottom-2 text-2xl opacity-90">☁️</span>
+                    </span>
+                  )}
+
+                  {/* la zona recién revelada brilla un instante */}
+                  {revealed === a.id && (
+                    <span className="zone-reveal pointer-events-none absolute inset-0" aria-hidden="true" />
+                  )}
+
+
                   {/* guardián integrado en su terreno */}
                   <span className="relative grid place-items-center">
                     {a.boss && (
