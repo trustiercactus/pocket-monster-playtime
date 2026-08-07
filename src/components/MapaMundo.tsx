@@ -186,6 +186,9 @@ export function MapaMundo({
   const [cine, setCine] = useState(false);
   const [sound, setSound] = useState(true);
   const [justFilled, setJustFilled] = useState<string | null>(null);
+  /** cámara: "wide" = mapa completo, "zoom" = zona actual a pantalla casi completa */
+  const [cam, setCam] = useState<"wide" | "zoom">("wide");
+  const [revealed, setRevealed] = useState<string | null>(null);
   const prevDone = useRef<string[]>(zonesDone);
   const scroller = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
@@ -200,6 +203,7 @@ export function MapaMundo({
     const t = setTimeout(() => setJustFilled(null), 1200);
     return () => clearTimeout(t);
   }, [zonesDone]);
+
 
 
   const allGems = GEM_ZONES.every((z) => zonesDone.includes(z.id));
