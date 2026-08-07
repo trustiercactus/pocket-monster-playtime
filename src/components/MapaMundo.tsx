@@ -186,6 +186,9 @@ export function MapaMundo({
   const [cine, setCine] = useState(false);
   const [sound, setSound] = useState(true);
   const [justFilled, setJustFilled] = useState<string | null>(null);
+  /** cámara: "wide" = mapa completo, "zoom" = zona actual a pantalla casi completa */
+  const [cam, setCam] = useState<"wide" | "zoom">("wide");
+  const [revealed, setRevealed] = useState<string | null>(null);
   const prevDone = useRef<string[]>(zonesDone);
   const scroller = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
@@ -200,6 +203,7 @@ export function MapaMundo({
     const t = setTimeout(() => setJustFilled(null), 1200);
     return () => clearTimeout(t);
   }, [zonesDone]);
+
 
 
   const allGems = GEM_ZONES.every((z) => zonesDone.includes(z.id));
@@ -232,13 +236,51 @@ export function MapaMundo({
     if (allGems && !legendary) setCine(true);
   }, [allGems, legendary]);
 
+  /** intro cinematográfica: mapa completo → zoom a la zona actual */
+  useEffect(() => {
+    setCam("wide");
+    const t = setTimeout(() => setCam("zoom"), 2800);
+    return () => clearTimeout(t);
+  }, []);
+
+  /** al conseguir una esmeralda: alejar, revelar la siguiente zona y volver a acercar */
+  const doneCount = zonesDone.length;
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) {
+      firstRun.current = false;
+      return;
+    }
+    setCam("wide");
+    try {
+      navigator.vibrate?.(40);
+    } catch {
+      /* sin vibración */
+    }
+    const t1 = setTimeout(() => setRevealed(nextZone?.id ?? null), 1800);
+    const t2 = setTimeout(() => setCam("zoom"), 3000);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [doneCount]);
+
+  /** origen de cámara: la zona objetivo (aprox. del área interior del mapa) */
+  const focus = nextZone ?? AREAS[0]!;
+  const camStyle: React.CSSProperties = {
+    transformOrigin: `${focus.x}% ${14.6 + focus.y * 0.79}%`,
+    transform: cam === "zoom" ? "scale(2)" : "scale(1)",
+  };
+
   useEffect(() => {
     const t = setTimeout(() => {
       if (nextZone) say(`¡Vamos ${name}! Toca ${nextZone.name}.`, `zona-${nextZone.id}`);
-    }, 1100);
+    }, 3400);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nextZone?.id]);
+
 
   const toggleSound = () => {
     const next = !sound;
@@ -253,7 +295,7 @@ export function MapaMundo({
   return (
     <div className="fixed inset-0 z-0 bg-[#8fd8ff]">
       <div ref={scroller} className="h-full w-full overflow-hidden">
-        <div className="relative h-full w-full">
+        <div className="cam relative h-full w-full" style={camStyle}>
           <img
             src={mapaFondo}
             alt=""
@@ -323,6 +365,26 @@ export function MapaMundo({
                     />
                   )}
 
+                  {/* velo de nubes de las zonas aún bloqueadas: se disipa con magia al desbloquearse */}
+                  {(!open || revealed === a.id) && (
+                    <span
+                      className={`pointer-events-none absolute -inset-6 grid place-items-center ${
+                        revealed === a.id ? "cloud-veil-out" : "cloud-veil-idle"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <span className="absolute inset-0 rounded-[50%] bg-white/70 blur-md" />
+                      <span className="absolute -left-2 top-1 text-2xl opacity-90">☁️</span>
+                      <span className="absolute -right-2 bottom-2 text-2xl opacity-90">☁️</span>
+                    </span>
+                  )}
+
+                  {/* la zona recién revelada brilla un instante */}
+                  {revealed === a.id && (
+                    <span className="zone-reveal pointer-events-none absolute inset-0" aria-hidden="true" />
+                  )}
+
+
                   {/* guardián integrado en su terreno */}
                   <span className="relative grid place-items-center">
                     {a.boss && (
@@ -335,6 +397,17 @@ export function MapaMundo({
                         aria-hidden="true"
                       />
                     )}
+                    {a.boss && (
+                      <span
+                        className="goal-beacon pointer-events-none absolute left-1/2 top-1/2 h-40 w-40 rounded-full blur-2xl"
+                        style={{
+                          background:
+                            "radial-gradient(circle, rgba(255,79,216,0.55), rgba(122,47,242,0.35) 55%, transparent 75%)",
+                        }}
+                        aria-hidden="true"
+                      />
+                    )}
+
                     <span
                       className={`pointer-events-none absolute bottom-1 left-1/2 h-3 -translate-x-1/2 rounded-[50%] blur-[3px] ${
                         a.boss ? "w-28" : "w-16"
@@ -461,6 +534,16 @@ export function MapaMundo({
           icon="🎒"
           color="var(--arcade-yellow)"
         />
+        <RoundButton
+          onClick={() => {
+            sfx("tap");
+            setCam((c) => (c === "zoom" ? "wide" : "zoom"));
+          }}
+          label={cam === "zoom" ? "Ver todo el mapa" : "Ir a mi zona"}
+          icon={cam === "zoom" ? "🗺️" : "🔍"}
+          color="var(--arcade-orange)"
+        />
+
       </div>
 
 
