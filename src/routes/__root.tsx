@@ -81,18 +81,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         name: "viewport",
         content: "width=device-width, initial-scale=1, viewport-fit=cover",
       },
-      { title: "Criaturitas" },
+      { title: "Criaturitas Beta" },
       {
         name: "description",
         content:
-          "Criaturitas: aventura para peques. Explora zonas, libera guardianes y consigue las esmeraldas.",
+          "Criaturitas Beta: aventura para peques. Explora zonas, libera guardianes y consigue las esmeraldas.",
       },
-      { name: "application-name", content: "Criaturitas" },
-      { name: "apple-mobile-web-app-title", content: "Criaturitas" },
+      { name: "application-name", content: "Criaturitas Beta" },
+      { name: "apple-mobile-web-app-title", content: "Criaturitas Beta" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "theme-color", content: "#29b6f6" },
-      { property: "og:title", content: "Criaturitas" },
+      { property: "og:title", content: "Criaturitas Beta" },
       {
         property: "og:description",
         content: "Aventura de criaturas para niños: guardianes, esmeraldas y una amiga legendaria.",
