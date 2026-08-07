@@ -80,13 +80,13 @@ export function Mundo({
           onMap();
         }}
         aria-label="Ver el mapa"
-        className="btn-bounce btn-3d absolute left-3 top-[calc(env(safe-area-inset-top)+0.6rem)] z-20 grid h-14 w-14 place-items-center rounded-full border-[3px] border-white bg-[var(--arcade-orange)] text-3xl shadow-[0_5px_0_rgba(0,0,0,0.35)]"
+        className="btn-bounce btn-3d absolute left-3 top-3 z-20 grid h-14 w-14 place-items-center rounded-full border-[3px] border-white bg-[var(--arcade-orange)] text-3xl shadow-[0_5px_0_rgba(0,0,0,0.35)]"
       >
         🗺️
       </button>
 
       {/* nombre del mundo */}
-      <div className="pointer-events-none absolute left-1/2 top-[calc(env(safe-area-inset-top)+0.8rem)] z-10 -translate-x-1/2 rounded-full border-4 border-white/90 bg-ink/80 px-5 py-1 text-xl font-black text-white shadow-[0_4px_0_rgba(0,0,0,0.35)]">
+      <div className="pointer-events-none absolute left-1/2 top-4 z-10 -translate-x-1/2 rounded-full border-4 border-white/90 bg-ink/80 px-5 py-1 text-xl font-black text-white shadow-[0_4px_0_rgba(0,0,0,0.35)]">
         {area.emoji} {area.name}
       </div>
 
@@ -131,7 +131,7 @@ export function Mundo({
       </div>
 
       {/* acción única */}
-      <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+1.6rem)] flex justify-center">
+      <div className="absolute inset-x-0 bottom-10 flex justify-center">
         <button
           onClick={() => {
             sfx("tap");
