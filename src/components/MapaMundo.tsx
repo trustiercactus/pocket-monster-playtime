@@ -311,7 +311,7 @@ export function MapaMundo({
 
   useEffect(() => {
     const t = setTimeout(() => {
-      if (nextZone) say(`¡Vamos ${name}! Toca ${nextZone.name}.`, `zona-${nextZone.id}`);
+      if (nextZone) say(`¡Vamos ${name}! Bienvenido a ${nextZone.name}.`, `zona-${nextZone.id}`);
     }, 3400);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -324,7 +324,7 @@ export function MapaMundo({
     (["musica", "efectos", "narrador"] as const).forEach((k) => setOpcion(k, next));
     if (next) {
       playMusic("mapa");
-      if (nextZone) say(`Toca ${nextZone.name}.`);
+      if (nextZone) say(`¡Vamos a ${nextZone.name}!`);
     }
   };
 
