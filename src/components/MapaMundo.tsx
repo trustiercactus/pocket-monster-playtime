@@ -236,13 +236,51 @@ export function MapaMundo({
     if (allGems && !legendary) setCine(true);
   }, [allGems, legendary]);
 
+  /** intro cinematográfica: mapa completo → zoom a la zona actual */
+  useEffect(() => {
+    setCam("wide");
+    const t = setTimeout(() => setCam("zoom"), 2800);
+    return () => clearTimeout(t);
+  }, []);
+
+  /** al conseguir una esmeralda: alejar, revelar la siguiente zona y volver a acercar */
+  const doneCount = zonesDone.length;
+  const firstRun = useRef(true);
+  useEffect(() => {
+    if (firstRun.current) {
+      firstRun.current = false;
+      return;
+    }
+    setCam("wide");
+    try {
+      navigator.vibrate?.(40);
+    } catch {
+      /* sin vibración */
+    }
+    const t1 = setTimeout(() => setRevealed(nextZone?.id ?? null), 1800);
+    const t2 = setTimeout(() => setCam("zoom"), 3000);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [doneCount]);
+
+  /** origen de cámara: la zona objetivo (aprox. del área interior del mapa) */
+  const focus = nextZone ?? AREAS[0]!;
+  const camStyle: React.CSSProperties = {
+    transformOrigin: `${focus.x}% ${14.6 + focus.y * 0.79}%`,
+    transform: cam === "zoom" ? "scale(2)" : "scale(1)",
+  };
+
   useEffect(() => {
     const t = setTimeout(() => {
       if (nextZone) say(`¡Vamos ${name}! Toca ${nextZone.name}.`, `zona-${nextZone.id}`);
-    }, 1100);
+    }, 3400);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nextZone?.id]);
+
 
   const toggleSound = () => {
     const next = !sound;
