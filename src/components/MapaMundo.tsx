@@ -572,15 +572,38 @@ export function MapaMundo({
         <RoundButton
           onClick={() => {
             sfx("tap");
-            setCam((c) => (c === "zoom" ? "wide" : "zoom"));
+            const target = nextZone ?? AREAS[0]!;
+            irAlMundo(target.id);
           }}
-          label={cam === "zoom" ? "Ver todo el mapa" : "Ir a mi zona"}
-          icon={cam === "zoom" ? "🗺️" : "🔍"}
+          label="Ir a mi zona"
+          icon="🔍"
           color="var(--arcade-orange)"
         />
 
       </div>
 
+      {/* escenario del mundo: pantalla completa, encima del mapa */}
+      {vista === "mundo" && (
+        <div className="absolute inset-0 z-30">
+          <Mundo
+            area={mundoArea}
+            done={zonesDone.includes(mundoArea.id)}
+            onFight={() => onArea(mundoArea)}
+            onMap={volverAlMapa}
+          />
+        </div>
+      )}
+
+      {/* barrido de nubes entre mapa y mundo */}
+      {sweep && (
+        <div className="pointer-events-none absolute inset-0 z-50 overflow-hidden" aria-hidden="true">
+          <div className="cloud-sweep absolute inset-0 flex items-center justify-around bg-white/85 blur-[2px]">
+            <span className="text-8xl">☁️</span>
+            <span className="text-9xl">☁️</span>
+            <span className="text-8xl">☁️</span>
+          </div>
+        </div>
+      )}
 
       {cine && (
         <Cinematica
@@ -590,6 +613,7 @@ export function MapaMundo({
           }}
         />
       )}
+
     </div>
   );
 }
