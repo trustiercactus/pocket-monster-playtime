@@ -687,6 +687,39 @@
 @utility gem-trail { animation: gem-trail 1s ease-out both; }
 @utility socket-fill { animation: socket-fill 0.9s ease-out both; }
 
+/* ===== Cámara cinematográfica del mapa (v1.1) ===== */
+@utility cam {
+  transform-origin: 50% 50%;
+  transition: transform 2.4s cubic-bezier(0.42, 0, 0.18, 1);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+@keyframes cloud-veil-out {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.7); }
+}
+@keyframes cloud-veil-idle {
+  0%, 100% { opacity: 0.9; transform: translateX(-3px) scale(1); }
+  50% { opacity: 1; transform: translateX(3px) scale(1.06); }
+}
+@keyframes zone-reveal {
+  0% { filter: brightness(1.9) saturate(1.4); }
+  100% { filter: brightness(1) saturate(1); }
+}
+@keyframes goal-beacon {
+  0%, 100% { opacity: 0.45; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.95; transform: translate(-50%, -50%) scale(1.18); }
+}
+@utility cloud-veil-out { animation: cloud-veil-out 1.4s ease-out both; }
+@utility cloud-veil-idle { animation: cloud-veil-idle 6s ease-in-out infinite; }
+@utility zone-reveal { animation: zone-reveal 1.6s ease-out both; }
+@utility goal-beacon { animation: goal-beacon 2.6s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cam { transition: none; }
+}
+
+
 /* ---------- Combate ---------- */
 @keyframes hit-shake {
   0%, 100% { transform: translateX(0) rotate(0deg); }
