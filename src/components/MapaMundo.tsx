@@ -186,12 +186,16 @@ export function MapaMundo({
   const [cine, setCine] = useState(false);
   const [sound, setSound] = useState(true);
   const [justFilled, setJustFilled] = useState<string | null>(null);
-  /** cámara: "wide" = mapa completo, "zoom" = zona actual a pantalla casi completa */
-  const [cam, setCam] = useState<"wide" | "zoom">("wide");
+  /** vista: "mapa" = todo el reino, "mundo" = escenario propio de la zona */
+  const [vista, setVista] = useState<"mapa" | "mundo">("mapa");
+  const [sweep, setSweep] = useState(false);
+  const [focusId, setFocusId] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<string | null>(null);
   const prevDone = useRef<string[]>(zonesDone);
   const scroller = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+
 
   useEffect(() => {
     const added = zonesDone.find((id) => !prevDone.current.includes(id));
