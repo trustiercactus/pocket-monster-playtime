@@ -200,7 +200,7 @@ export function MapaMundo({
   const [revealed, setRevealed] = useState<string | null>(null);
   /** zona desde la que el camino se está iluminando piedra a piedra */
   const [trailFrom, setTrailFrom] = useState<string | null>(null);
-  const prevDoneIds = useRef<string[]>([...zonesDone]);
+  
   const prevDone = useRef<string[]>(zonesDone);
   const scroller = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
