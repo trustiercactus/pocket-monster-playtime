@@ -74,6 +74,8 @@ function Confetti() {
 export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}) {
   const [progress, setProgress] = useState<Progress | null>(null);
   const [screen, setScreen] = useState<Screen>(initialScreen);
+  /** zona recién ganada: el mapa anima el camino hasta la siguiente */
+  const [wonZone, setWonZone] = useState<string | null>(null);
   const [area, setArea] = useState<Area>(AREAS[0] as Area);
   const [fighter, setFighter] = useState<string | null>(null);
   const [captured, setCaptured] = useState<Creature | null>(null);
@@ -160,6 +162,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
       setScreen("final");
       return;
     }
+    setWonZone(won ? area.id : null);
     setScreen("mapa");
     if (nuevo) setCaptured(nuevo);
   }
@@ -171,8 +174,10 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
           name={progress.name}
           zonesDone={progress.zonesDone}
           legendary={progress.legendary}
+          wonZone={wonZone}
           hasEggs={progress.eggs.length > 0}
           onArea={(a) => {
+            setWonZone(null);
             setArea(a);
             // en el combate final entra por defecto la criatura legendaria
             if (a.boss && progress.unlocked.includes(LEGENDARY_ID)) {
@@ -181,8 +186,14 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
             }
             setScreen("elegir");
           }}
-          onCollection={() => setScreen("coleccion")}
-          onHome={() => setScreen("casa")}
+          onCollection={() => {
+            setWonZone(null);
+            setScreen("coleccion");
+          }}
+          onHome={() => {
+            setWonZone(null);
+            setScreen("casa");
+          }}
           onSettings={() => {
             window.location.href = "/";
           }}

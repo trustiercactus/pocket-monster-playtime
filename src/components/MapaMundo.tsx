@@ -104,7 +104,7 @@ function RoundButton({
 }
 
 /** piedras pequeñas del sendero, con el terreno propio de la zona */
-function PathStones({ a, b, lit }: { a: Area; b: Area; lit: boolean }) {
+function PathStones({ a, b, lit, trail }: { a: Area; b: Area; lit: boolean; trail?: boolean }) {
   const stones = 7;
   const t = TERRAIN[a.terrain];
   return (
@@ -117,14 +117,16 @@ function PathStones({ a, b, lit }: { a: Area; b: Area; lit: boolean }) {
         return (
           <span
             key={i}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 border ${lit ? "stone-pulse" : ""}`}
+            className={`absolute -translate-x-1/2 -translate-y-1/2 border ${
+              trail ? "stone-trail" : lit ? "stone-pulse" : ""
+            }`}
             style={{
               left: `${x}%`,
               top: `${y}%`,
               width: size,
               height: size * 0.78,
               borderRadius: t.round,
-              animationDelay: `${i * 0.14}s`,
+              animationDelay: trail ? `${i * 0.22}s` : `${i * 0.14}s`,
               background: t.fill,
               borderColor: t.border,
               opacity: lit ? 1 : 0.78,
@@ -139,6 +141,7 @@ function PathStones({ a, b, lit }: { a: Area; b: Area; lit: boolean }) {
     </>
   );
 }
+
 
 /** ambiente vivo del bioma alrededor de la zona */
 function Ambiente({ area }: { area: Area }) {
@@ -169,6 +172,7 @@ export function MapaMundo({
   name,
   zonesDone,
   legendary,
+  wonZone,
   onArea,
   onCollection,
   onSettings,
@@ -177,6 +181,8 @@ export function MapaMundo({
   name: string;
   zonesDone: string[];
   legendary: boolean;
+  /** zona recién completada: al volver del combate se anima el camino desde ella */
+  wonZone?: string | null;
   onArea: (a: Area) => void;
   onCollection: () => void;
   onHome?: () => void;
@@ -192,6 +198,9 @@ export function MapaMundo({
   const [sweep, setSweep] = useState(false);
   const [focusId, setFocusId] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<string | null>(null);
+  /** zona desde la que el camino se está iluminando piedra a piedra */
+  const [trailFrom, setTrailFrom] = useState<string | null>(null);
+  
   const prevDone = useRef<string[]>(zonesDone);
   const scroller = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLDivElement>(null);
@@ -268,54 +277,70 @@ export function MapaMundo({
     [],
   );
 
-  /** intro: se ve todo el reino unos segundos y luego entramos en la zona actual */
-  const introRef = useRef(false);
+  /**
+   * Al entrar en el mapa:
+   *  - si venimos de ganar, el camino se enciende piedra a piedra y el niño decide cuándo seguir.
+   *  - si no, se ve todo el reino unos segundos y entramos en la zona actual.
+   */
   useEffect(() => {
-    if (introRef.current) return;
-    introRef.current = true;
-    const t = setTimeout(() => {
-      const target = nextZone ?? AREAS[0]!;
-      irAlMundo(target.id);
-    }, 2600);
-    return () => clearTimeout(t);
+    const ts: ReturnType<typeof setTimeout>[] = [];
+    if (wonZone) {
+      setVista("mapa");
+      try {
+        navigator.vibrate?.(40);
+      } catch {
+        /* sin vibración */
+      }
+      ts.push(
+        setTimeout(() => {
+          setTrailFrom(wonZone);
+          sfx("abrir");
+        }, 700),
+      );
+      /* al llegar la luz al final, se disipan las nubes de la nueva zona */
+      ts.push(
+        setTimeout(() => {
+          setRevealed(nextZone?.id ?? null);
+          sfx("esmeralda");
+          try {
+            navigator.vibrate?.(30);
+          } catch {
+            /* sin vibración */
+          }
+        }, 2800),
+      );
+      ts.push(
+        setTimeout(() => {
+          setTrailFrom(null);
+          if (nextZone)
+            void narrar(`¡El camino está abierto! Toca ${nextZone.name}.`, { delay: 200 });
+        }, 3700),
+      );
+    } else {
+      ts.push(
+        setTimeout(() => {
+          const target = nextZone ?? AREAS[0]!;
+          irAlMundo(target.id);
+        }, 2600),
+      );
+    }
+    return () => ts.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** al conseguir una esmeralda: mapa general, revelar la siguiente zona y entrar en ella */
-  const doneCount = zonesDone.length;
-  const firstRun = useRef(true);
-  useEffect(() => {
-    if (firstRun.current) {
-      firstRun.current = false;
-      return;
-    }
-    setVista("mapa");
-    try {
-      navigator.vibrate?.(40);
-    } catch {
-      /* sin vibración */
-    }
-    const t1 = setTimeout(() => setRevealed(nextZone?.id ?? null), 1800);
-    const t2 = setTimeout(() => {
-      if (nextZone) irAlMundo(nextZone.id);
-    }, 3200);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doneCount]);
+
 
   const mundoArea = AREAS.find((a) => a.id === focusId) ?? nextZone ?? AREAS[0]!;
 
 
   useEffect(() => {
     const t = setTimeout(() => {
-      if (nextZone) say(`¡Vamos ${name}! Bienvenido a ${nextZone.name}.`, `zona-${nextZone.id}`);
+      if (nextZone && vista === "mundo")
+        say(`¡Vamos ${name}! Bienvenido a ${nextZone.name}.`, `zona-${nextZone.id}`);
     }, 3400);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nextZone?.id]);
+  }, [nextZone?.id, vista]);
 
 
   const toggleSound = () => {
@@ -344,7 +369,13 @@ export function MapaMundo({
 
           {/* sendero de piedras */}
           {AREAS.slice(0, -1).map((a, i) => (
-            <PathStones key={a.id} a={a} b={AREAS[i + 1]!} lit={zonesDone.includes(a.id)} />
+            <PathStones
+              key={a.id}
+              a={a}
+              b={AREAS[i + 1]!}
+              lit={zonesDone.includes(a.id)}
+              trail={trailFrom === a.id}
+            />
           ))}
 
           {/* zonas */}
