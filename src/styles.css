@@ -639,6 +639,24 @@
   0%, 100% { transform: scale(1); opacity: 0.9; }
   50% { transform: scale(1.25); opacity: 1; }
 }
+/* la luz recorre el sendero piedra a piedra hasta la siguiente zona */
+@keyframes stone-trail {
+  0% {
+    transform: scale(0.85);
+    filter: brightness(1);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.22);
+  }
+  35% {
+    transform: scale(1.45);
+    filter: brightness(1.6);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25), 0 0 16px 6px rgba(255, 236, 160, 0.95);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1.12);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25), 0 0 8px rgba(255, 236, 160, 0.85);
+  }
+}
 @keyframes arrow-point {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-12px); }
