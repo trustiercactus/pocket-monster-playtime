@@ -283,7 +283,6 @@ export function MapaMundo({
    *  - si no, se ve todo el reino unos segundos y entramos en la zona actual.
    */
   useEffect(() => {
-    console.log("[intro] efecto", wonZone);
     const ts: ReturnType<typeof setTimeout>[] = [];
     if (wonZone) {
       setVista("mapa");
@@ -321,7 +320,6 @@ export function MapaMundo({
       ts.push(
         setTimeout(() => {
           const target = nextZone ?? AREAS[0]!;
-          console.log("[intro] disparo", target.id);
           irAlMundo(target.id);
         }, 2600),
       );
