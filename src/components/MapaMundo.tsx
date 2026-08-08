@@ -341,11 +341,12 @@ export function MapaMundo({
 
   useEffect(() => {
     const t = setTimeout(() => {
-      if (nextZone) say(`¡Vamos ${name}! Bienvenido a ${nextZone.name}.`, `zona-${nextZone.id}`);
+      if (nextZone && vista === "mundo")
+        say(`¡Vamos ${name}! Bienvenido a ${nextZone.name}.`, `zona-${nextZone.id}`);
     }, 3400);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nextZone?.id]);
+  }, [nextZone?.id, vista]);
 
 
   const toggleSound = () => {
