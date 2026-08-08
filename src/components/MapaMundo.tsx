@@ -104,7 +104,7 @@ function RoundButton({
 }
 
 /** piedras pequeñas del sendero, con el terreno propio de la zona */
-function PathStones({ a, b, lit }: { a: Area; b: Area; lit: boolean }) {
+function PathStones({ a, b, lit, trail }: { a: Area; b: Area; lit: boolean; trail?: boolean }) {
   const stones = 7;
   const t = TERRAIN[a.terrain];
   return (
@@ -117,14 +117,16 @@ function PathStones({ a, b, lit }: { a: Area; b: Area; lit: boolean }) {
         return (
           <span
             key={i}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 border ${lit ? "stone-pulse" : ""}`}
+            className={`absolute -translate-x-1/2 -translate-y-1/2 border ${
+              trail ? "stone-trail" : lit ? "stone-pulse" : ""
+            }`}
             style={{
               left: `${x}%`,
               top: `${y}%`,
               width: size,
               height: size * 0.78,
               borderRadius: t.round,
-              animationDelay: `${i * 0.14}s`,
+              animationDelay: trail ? `${i * 0.22}s` : `${i * 0.14}s`,
               background: t.fill,
               borderColor: t.border,
               opacity: lit ? 1 : 0.78,
@@ -139,6 +141,7 @@ function PathStones({ a, b, lit }: { a: Area; b: Area; lit: boolean }) {
     </>
   );
 }
+
 
 /** ambiente vivo del bioma alrededor de la zona */
 function Ambiente({ area }: { area: Area }) {
