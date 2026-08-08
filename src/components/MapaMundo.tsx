@@ -284,7 +284,7 @@ export function MapaMundo({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** al conseguir una esmeralda: mapa general, revelar la siguiente zona y entrar en ella */
+  /** al conseguir una esmeralda: volver al mapa general y encender el camino poco a poco */
   const doneCount = zonesDone.length;
   const firstRun = useRef(true);
   useEffect(() => {
@@ -292,22 +292,46 @@ export function MapaMundo({
       firstRun.current = false;
       return;
     }
+    const from = AREAS.find((a) => zonesDone.includes(a.id) && !prevDoneIds.current.includes(a.id));
+    prevDoneIds.current = [...zonesDone];
+    setSweep(true);
     setVista("mapa");
     try {
       navigator.vibrate?.(40);
     } catch {
       /* sin vibración */
     }
-    const t1 = setTimeout(() => setRevealed(nextZone?.id ?? null), 1800);
-    const t2 = setTimeout(() => {
-      if (nextZone) irAlMundo(nextZone.id);
-    }, 3200);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
+    const ts: ReturnType<typeof setTimeout>[] = [];
+    ts.push(setTimeout(() => setSweep(false), 700));
+    /* el camino se enciende piedra a piedra desde la zona ganada */
+    ts.push(
+      setTimeout(() => {
+        setTrailFrom(from?.id ?? null);
+        sfx("abrir");
+      }, 900),
+    );
+    /* al llegar la luz al final, se disipan las nubes de la nueva zona */
+    ts.push(
+      setTimeout(() => {
+        setRevealed(nextZone?.id ?? null);
+        sfx("esmeralda");
+        try {
+          navigator.vibrate?.(30);
+        } catch {
+          /* sin vibración */
+        }
+      }, 3000),
+    );
+    ts.push(
+      setTimeout(() => {
+        setTrailFrom(null);
+        if (nextZone) void narrar(`¡El camino está abierto! Toca ${nextZone.name}.`, { delay: 200 });
+      }, 3900),
+    );
+    return () => ts.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doneCount]);
+
 
   const mundoArea = AREAS.find((a) => a.id === focusId) ?? nextZone ?? AREAS[0]!;
 
