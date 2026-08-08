@@ -172,6 +172,7 @@ export function MapaMundo({
   name,
   zonesDone,
   legendary,
+  wonZone,
   onArea,
   onCollection,
   onSettings,
@@ -180,6 +181,8 @@ export function MapaMundo({
   name: string;
   zonesDone: string[];
   legendary: boolean;
+  /** zona recién completada: al volver del combate se anima el camino desde ella */
+  wonZone?: string | null;
   onArea: (a: Area) => void;
   onCollection: () => void;
   onHome?: () => void;
