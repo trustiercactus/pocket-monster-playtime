@@ -274,47 +274,22 @@ export function MapaMundo({
     [],
   );
 
-  /** intro: se ve todo el reino unos segundos y luego entramos en la zona actual */
-  const introRef = useRef(false);
-  useEffect(() => {
-    if (introRef.current) return;
-    introRef.current = true;
-    const t = setTimeout(() => {
-      const target = nextZone ?? AREAS[0]!;
-      irAlMundo(target.id);
-    }, 2600);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /** al conseguir una esmeralda: volver al mapa general y encender el camino poco a poco */
-  const doneCount = zonesDone.length;
-  const firstRun = useRef(true);
-  useEffect(() => {
-    if (firstRun.current) {
-      firstRun.current = false;
-      return;
-    }
-    const from = AREAS.find((a) => zonesDone.includes(a.id) && !prevDoneIds.current.includes(a.id));
-    prevDoneIds.current = [...zonesDone];
-    setSweep(true);
+  /** vuelta al mapa tras ganar: el camino se enciende piedra a piedra hasta la nueva zona */
+  const celebrarCamino = (fromId: string) => {
     setVista("mapa");
     try {
       navigator.vibrate?.(40);
     } catch {
       /* sin vibración */
     }
-    const ts: ReturnType<typeof setTimeout>[] = [];
-    ts.push(setTimeout(() => setSweep(false), 700));
-    /* el camino se enciende piedra a piedra desde la zona ganada */
-    ts.push(
+    timers.current.push(
       setTimeout(() => {
-        setTrailFrom(from?.id ?? null);
+        setTrailFrom(fromId);
         sfx("abrir");
-      }, 900),
+      }, 700),
     );
     /* al llegar la luz al final, se disipan las nubes de la nueva zona */
-    ts.push(
+    timers.current.push(
       setTimeout(() => {
         setRevealed(nextZone?.id ?? null);
         sfx("esmeralda");
@@ -323,17 +298,34 @@ export function MapaMundo({
         } catch {
           /* sin vibración */
         }
-      }, 3000),
+      }, 2800),
     );
-    ts.push(
+    timers.current.push(
       setTimeout(() => {
         setTrailFrom(null);
         if (nextZone) void narrar(`¡El camino está abierto! Toca ${nextZone.name}.`, { delay: 200 });
-      }, 3900),
+      }, 3700),
     );
-    return () => ts.forEach(clearTimeout);
+  };
+
+  /** intro: se ve todo el reino y, si no venimos de ganar, entramos en la zona actual */
+  const introRef = useRef(false);
+  useEffect(() => {
+    if (introRef.current) return;
+    introRef.current = true;
+    prevDoneIds.current = [...zonesDone];
+    if (wonZone) {
+      celebrarCamino(wonZone);
+      return;
+    }
+    const t = setTimeout(() => {
+      const target = nextZone ?? AREAS[0]!;
+      irAlMundo(target.id);
+    }, 2600);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [doneCount]);
+  }, []);
+
 
 
   const mundoArea = AREAS.find((a) => a.id === focusId) ?? nextZone ?? AREAS[0]!;
