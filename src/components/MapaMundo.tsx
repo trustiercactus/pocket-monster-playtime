@@ -321,11 +321,12 @@ export function MapaMundo({
       celebrarCamino(wonZone);
       return;
     }
-    const t = setTimeout(() => {
-      const target = nextZone ?? AREAS[0]!;
-      irAlMundo(target.id);
-    }, 2600);
-    return () => clearTimeout(t);
+    timers.current.push(
+      setTimeout(() => {
+        const target = nextZone ?? AREAS[0]!;
+        irAlMundo(target.id);
+      }, 2600),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
