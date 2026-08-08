@@ -374,7 +374,13 @@ export function MapaMundo({
 
           {/* sendero de piedras */}
           {AREAS.slice(0, -1).map((a, i) => (
-            <PathStones key={a.id} a={a} b={AREAS[i + 1]!} lit={zonesDone.includes(a.id)} />
+            <PathStones
+              key={a.id}
+              a={a}
+              b={AREAS[i + 1]!}
+              lit={zonesDone.includes(a.id)}
+              trail={trailFrom === a.id}
+            />
           ))}
 
           {/* zonas */}
