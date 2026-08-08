@@ -74,6 +74,8 @@ function Confetti() {
 export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}) {
   const [progress, setProgress] = useState<Progress | null>(null);
   const [screen, setScreen] = useState<Screen>(initialScreen);
+  /** zona recién ganada: el mapa anima el camino hasta la siguiente */
+  const [wonZone, setWonZone] = useState<string | null>(null);
   const [area, setArea] = useState<Area>(AREAS[0] as Area);
   const [fighter, setFighter] = useState<string | null>(null);
   const [captured, setCaptured] = useState<Creature | null>(null);
