@@ -283,6 +283,7 @@ export function MapaMundo({
    *  - si no, se ve todo el reino unos segundos y entramos en la zona actual.
    */
   useEffect(() => {
+    console.log("[intro] efecto", wonZone);
     const ts: ReturnType<typeof setTimeout>[] = [];
     if (wonZone) {
       setVista("mapa");
