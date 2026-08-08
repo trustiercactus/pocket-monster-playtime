@@ -186,8 +186,14 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
             }
             setScreen("elegir");
           }}
-          onCollection={() => setScreen("coleccion")}
-          onHome={() => setScreen("casa")}
+          onCollection={() => {
+            setWonZone(null);
+            setScreen("coleccion");
+          }}
+          onHome={() => {
+            setWonZone(null);
+            setScreen("casa");
+          }}
           onSettings={() => {
             window.location.href = "/";
           }}
