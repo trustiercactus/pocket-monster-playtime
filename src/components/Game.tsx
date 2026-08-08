@@ -162,6 +162,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
       setScreen("final");
       return;
     }
+    setWonZone(won ? area.id : null);
     setScreen("mapa");
     if (nuevo) setCaptured(nuevo);
   }
@@ -173,8 +174,10 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
           name={progress.name}
           zonesDone={progress.zonesDone}
           legendary={progress.legendary}
+          wonZone={wonZone}
           hasEggs={progress.eggs.length > 0}
           onArea={(a) => {
+            setWonZone(null);
             setArea(a);
             // en el combate final entra por defecto la criatura legendaria
             if (a.boss && progress.unlocked.includes(LEGENDARY_ID)) {
