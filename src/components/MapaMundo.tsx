@@ -277,56 +277,54 @@ export function MapaMundo({
     [],
   );
 
-  /** vuelta al mapa tras ganar: el camino se enciende piedra a piedra hasta la nueva zona */
-  const celebrarCamino = (fromId: string) => {
-    setVista("mapa");
-    try {
-      navigator.vibrate?.(40);
-    } catch {
-      /* sin vibración */
-    }
-    timers.current.push(
-      setTimeout(() => {
-        setTrailFrom(fromId);
-        sfx("abrir");
-      }, 700),
-    );
-    /* al llegar la luz al final, se disipan las nubes de la nueva zona */
-    timers.current.push(
-      setTimeout(() => {
-        setRevealed(nextZone?.id ?? null);
-        sfx("esmeralda");
-        try {
-          navigator.vibrate?.(30);
-        } catch {
-          /* sin vibración */
-        }
-      }, 2800),
-    );
-    timers.current.push(
-      setTimeout(() => {
-        setTrailFrom(null);
-        if (nextZone) void narrar(`¡El camino está abierto! Toca ${nextZone.name}.`, { delay: 200 });
-      }, 3700),
-    );
-  };
-
-  /** intro: se ve todo el reino y, si no venimos de ganar, entramos en la zona actual */
-  const introRef = useRef(false);
+  /**
+   * Al entrar en el mapa:
+   *  - si venimos de ganar, el camino se enciende piedra a piedra y el niño decide cuándo seguir.
+   *  - si no, se ve todo el reino unos segundos y entramos en la zona actual.
+   */
   useEffect(() => {
-    if (introRef.current) return;
-    introRef.current = true;
-    prevDoneIds.current = [...zonesDone];
+    const ts: ReturnType<typeof setTimeout>[] = [];
     if (wonZone) {
-      celebrarCamino(wonZone);
-      return;
+      setVista("mapa");
+      try {
+        navigator.vibrate?.(40);
+      } catch {
+        /* sin vibración */
+      }
+      ts.push(
+        setTimeout(() => {
+          setTrailFrom(wonZone);
+          sfx("abrir");
+        }, 700),
+      );
+      /* al llegar la luz al final, se disipan las nubes de la nueva zona */
+      ts.push(
+        setTimeout(() => {
+          setRevealed(nextZone?.id ?? null);
+          sfx("esmeralda");
+          try {
+            navigator.vibrate?.(30);
+          } catch {
+            /* sin vibración */
+          }
+        }, 2800),
+      );
+      ts.push(
+        setTimeout(() => {
+          setTrailFrom(null);
+          if (nextZone)
+            void narrar(`¡El camino está abierto! Toca ${nextZone.name}.`, { delay: 200 });
+        }, 3700),
+      );
+    } else {
+      ts.push(
+        setTimeout(() => {
+          const target = nextZone ?? AREAS[0]!;
+          irAlMundo(target.id);
+        }, 2600),
+      );
     }
-    timers.current.push(
-      setTimeout(() => {
-        const target = nextZone ?? AREAS[0]!;
-        irAlMundo(target.id);
-      }, 2600),
-    );
+    return () => ts.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
