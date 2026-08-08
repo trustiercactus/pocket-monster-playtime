@@ -320,8 +320,8 @@ export function MapaMundo({
     } else {
       ts.push(
         setTimeout(() => {
-          console.log("[intro] disparo", target && target.id);
           const target = nextZone ?? AREAS[0]!;
+          console.log("[intro] disparo", target.id);
           irAlMundo(target.id);
         }, 2600),
       );
