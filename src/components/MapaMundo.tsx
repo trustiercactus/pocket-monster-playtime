@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AREAS, GEM_ZONES, TERRAIN, type Area } from "@/lib/areas";
 import { getCreature } from "@/lib/creatures";
@@ -378,6 +379,52 @@ export function MapaMundo({
             />
           ))}
 
+          {/* la luz de progreso viaja de la zona completada a la siguiente */}
+          {trailFrom &&
+            (() => {
+              const i = AREAS.findIndex((z) => z.id === trailFrom);
+              const from = AREAS[i];
+              const to = AREAS[i + 1];
+              if (!from || !to) return null;
+              return (
+                <>
+                  <span
+                    className="zone-start-glow pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full blur-md"
+                    style={{
+                      left: `${from.x}%`,
+                      top: `${from.y}%`,
+                      width: 90,
+                      height: 90,
+                      background:
+                        "radial-gradient(circle, rgba(255,246,190,0.95), rgba(255,214,90,0.35) 60%, transparent 75%)",
+                    }}
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="trail-spark pointer-events-none absolute z-10 grid place-items-center rounded-full"
+                    style={
+                      {
+                        "--sx": `${from.x}%`,
+                        "--sy": `${from.y}%`,
+                        "--ex": `${to.x}%`,
+                        "--ey": `${to.y}%`,
+                        width: 26,
+                        height: 26,
+                        background:
+                          "radial-gradient(circle, #fffdf0, #ffe07a 55%, rgba(255,200,60,0) 72%)",
+                        boxShadow: "0 0 18px 8px rgba(255,232,150,0.85)",
+                      } as CSSProperties
+                    }
+                    aria-hidden="true"
+                  >
+                    <span className="text-sm">✨</span>
+                  </span>
+                </>
+              );
+            })()}
+
+
+
           {/* zonas */}
           {AREAS.map((a, i) => {
             const done = zonesDone.includes(a.id);
@@ -529,10 +576,11 @@ export function MapaMundo({
                     <span
                       className={`grid place-items-center rounded-full border-2 border-white/90 bg-ink/70 font-black text-white ${
                         a.boss ? "h-9 w-9 text-xl" : "h-7 w-7 text-base"
-                      }`}
+                      } ${revealed === a.id ? "badge-pop" : ""}`}
                     >
                       {a.boss ? "👑" : open ? i + 1 : "🔒"}
                     </span>
+
                   </span>
 
                   <span
@@ -729,7 +777,7 @@ function Cinematica({ onDone }: { onDone: () => void }) {
                     "--r": fase === 2 ? "70px" : "110px",
                     "--spd": fase === 2 ? "0.6s" : "2.6s",
                     transition: "all 0.6s ease",
-                  } as React.CSSProperties
+                  } as CSSProperties
                 }
               >
                 <Gema color={z.gem} cut={z.gemCut} size={fase === 0 ? 26 : 34} spin />
@@ -786,7 +834,7 @@ function Cinematica({ onDone }: { onDone: () => void }) {
                       marginTop: y,
                       animationDelay: `${0.9 + i * 0.12}s`,
                       filter: `drop-shadow(0 0 8px ${z.gem})`,
-                    } as React.CSSProperties
+                    } as CSSProperties
                   }
                 >
                   <Gema color={z.gem} cut={z.gemCut} size={22} />
