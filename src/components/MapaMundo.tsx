@@ -378,6 +378,52 @@ export function MapaMundo({
             />
           ))}
 
+          {/* la luz de progreso viaja de la zona completada a la siguiente */}
+          {trailFrom &&
+            (() => {
+              const i = AREAS.findIndex((z) => z.id === trailFrom);
+              const from = AREAS[i];
+              const to = AREAS[i + 1];
+              if (!from || !to) return null;
+              return (
+                <>
+                  <span
+                    className="zone-start-glow pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full blur-md"
+                    style={{
+                      left: `${from.x}%`,
+                      top: `${from.y}%`,
+                      width: 90,
+                      height: 90,
+                      background:
+                        "radial-gradient(circle, rgba(255,246,190,0.95), rgba(255,214,90,0.35) 60%, transparent 75%)",
+                    }}
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="trail-spark pointer-events-none absolute z-10 grid place-items-center rounded-full"
+                    style={
+                      {
+                        "--sx": `${from.x}%`,
+                        "--sy": `${from.y}%`,
+                        "--ex": `${to.x}%`,
+                        "--ey": `${to.y}%`,
+                        width: 26,
+                        height: 26,
+                        background:
+                          "radial-gradient(circle, #fffdf0, #ffe07a 55%, rgba(255,200,60,0) 72%)",
+                        boxShadow: "0 0 18px 8px rgba(255,232,150,0.85)",
+                      } as React.CSSProperties
+                    }
+                    aria-hidden="true"
+                  >
+                    <span className="text-sm">✨</span>
+                  </span>
+                </>
+              );
+            })()}
+
+
+
           {/* zonas */}
           {AREAS.map((a, i) => {
             const done = zonesDone.includes(a.id);
