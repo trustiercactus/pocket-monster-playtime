@@ -576,10 +576,11 @@ export function MapaMundo({
                     <span
                       className={`grid place-items-center rounded-full border-2 border-white/90 bg-ink/70 font-black text-white ${
                         a.boss ? "h-9 w-9 text-xl" : "h-7 w-7 text-base"
-                      }`}
+                      } ${revealed === a.id ? "badge-pop" : ""}`}
                     >
                       {a.boss ? "👑" : open ? i + 1 : "🔒"}
                     </span>
+
                   </span>
 
                   <span
