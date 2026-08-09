@@ -79,6 +79,8 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
   const [area, setArea] = useState<Area>(AREAS[0] as Area);
   const [fighter, setFighter] = useState<string | null>(null);
   const [captured, setCaptured] = useState<Creature | null>(null);
+  /** zona ganada en espera: solo se anima el mapa al cerrar la pantalla de victoria */
+  const [pendingWon, setPendingWon] = useState<string | null>(null);
   /** aventura completada: la colección vuelve a la pantalla final */
   const [ended, setEnded] = useState(false);
 
@@ -162,9 +164,14 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
       setScreen("final");
       return;
     }
-    setWonZone(won ? area.id : null);
+    if (won && nuevo) {
+      setWonZone(null);
+      setPendingWon(area.id);
+      setCaptured(nuevo);
+    } else {
+      setWonZone(won ? area.id : null);
+    }
     setScreen("mapa");
-    if (nuevo) setCaptured(nuevo);
   }
 
   if (screen === "mapa") {
@@ -175,6 +182,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
           zonesDone={progress.zonesDone}
           legendary={progress.legendary}
           wonZone={wonZone}
+          pendingWin={pendingWon !== null}
           hasEggs={progress.eggs.length > 0}
           onArea={(a) => {
             setWonZone(null);
@@ -208,7 +216,18 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
             });
           }}
         />
-        {captured && <Captura creature={captured} onClose={() => setCaptured(null)} />}
+        {captured && (
+          <Captura
+            creature={captured}
+            onClose={() => {
+              setCaptured(null);
+              if (pendingWon) {
+                setWonZone(pendingWon);
+                setPendingWon(null);
+              }
+            }}
+          />
+        )}
       </main>
     );
   }
@@ -285,7 +304,18 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
         />
       )}
 
-      {captured && <Captura creature={captured} onClose={() => setCaptured(null)} />}
+      {captured && (
+          <Captura
+            creature={captured}
+            onClose={() => {
+              setCaptured(null);
+              if (pendingWon) {
+                setWonZone(pendingWon);
+                setPendingWon(null);
+              }
+            }}
+          />
+        )}
       </div>
     </main>
   );
