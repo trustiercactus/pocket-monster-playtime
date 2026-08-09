@@ -127,7 +127,7 @@ function PathStones({ a, b, lit, trail }: { a: Area; b: Area; lit: boolean; trai
               width: size,
               height: size * 0.78,
               borderRadius: t.round,
-              animationDelay: trail ? `${i * 0.22}s` : `${i * 0.14}s`,
+              animationDelay: trail ? `${i * 0.38}s` : `${i * 0.14}s`,
               background: t.fill,
               borderColor: t.border,
               opacity: lit ? 1 : 0.78,
@@ -174,6 +174,7 @@ export function MapaMundo({
   zonesDone,
   legendary,
   wonZone,
+  pendingWin,
   onArea,
   onCollection,
   onSettings,
@@ -184,6 +185,8 @@ export function MapaMundo({
   legendary: boolean;
   /** zona recién completada: al volver del combate se anima el camino desde ella */
   wonZone?: string | null;
+  /** la pantalla de victoria está abierta: el mapa debe quedarse quieto */
+  pendingWin?: boolean;
   onArea: (a: Area) => void;
   onCollection: () => void;
   onHome?: () => void;
@@ -283,51 +286,59 @@ export function MapaMundo({
    *  - si venimos de ganar, el camino se enciende piedra a piedra y el niño decide cuándo seguir.
    *  - si no, se ve todo el reino unos segundos y entramos en la zona actual.
    */
-  useEffect(() => {
+  const progresoHecho = useRef(false);
+  const arrancarProgreso = (zona: string) => {
+    if (progresoHecho.current) return () => {};
+    progresoHecho.current = true;
     const ts: ReturnType<typeof setTimeout>[] = [];
-    if (wonZone) {
-      setVista("mapa");
-      try {
-        navigator.vibrate?.(40);
-      } catch {
-        /* sin vibración */
-      }
-      ts.push(
-        setTimeout(() => {
-          setTrailFrom(wonZone);
-          sfx("abrir");
-        }, 700),
-      );
-      /* al llegar la luz al final, se disipan las nubes de la nueva zona */
-      ts.push(
-        setTimeout(() => {
-          setRevealed(nextZone?.id ?? null);
-          sfx("esmeralda");
-          try {
-            navigator.vibrate?.(30);
-          } catch {
-            /* sin vibración */
-          }
-        }, 2800),
-      );
-      ts.push(
-        setTimeout(() => {
-          setTrailFrom(null);
-          if (nextZone)
-            void narrar(`¡El camino está abierto! Toca ${nextZone.name}.`, { delay: 200 });
-        }, 3700),
-      );
-    } else {
-      ts.push(
-        setTimeout(() => {
-          const target = nextZone ?? AREAS[0]!;
-          irAlMundo(target.id);
-        }, 2600),
-      );
+    setVista("mapa");
+    try {
+      navigator.vibrate?.(40);
+    } catch {
+      /* sin vibración */
     }
+    /* 1) el niño ve el mapa quieto ~900ms, 2) la luz recorre el camino despacio */
+    ts.push(
+      setTimeout(() => {
+        setTrailFrom(zona);
+        sfx("abrir");
+      }, 900),
+    );
+    /* al llegar la luz al final, se disipan las nubes de la nueva zona */
+    ts.push(
+      setTimeout(() => {
+        setRevealed(nextZone?.id ?? null);
+        sfx("esmeralda");
+        try {
+          navigator.vibrate?.(30);
+        } catch {
+          /* sin vibración */
+        }
+      }, 4600),
+    );
+    ts.push(
+      setTimeout(() => {
+        setTrailFrom(null);
+        if (nextZone)
+          void narrar(`¡El camino está abierto! Toca ${nextZone.name}.`, { delay: 200 });
+      }, 5600),
+    );
+    return () => ts.forEach(clearTimeout);
+  };
+
+  useEffect(() => {
+    if (wonZone) return arrancarProgreso(wonZone);
+    if (pendingWin) return;
+    const ts: ReturnType<typeof setTimeout>[] = [];
+    ts.push(
+      setTimeout(() => {
+        const target = nextZone ?? AREAS[0]!;
+        irAlMundo(target.id);
+      }, 2600),
+    );
     return () => ts.forEach(clearTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [wonZone]);
 
 
 
