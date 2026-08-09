@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AREAS, GEM_ZONES, TERRAIN, type Area } from "@/lib/areas";
 import { getCreature } from "@/lib/creatures";
@@ -412,7 +413,7 @@ export function MapaMundo({
                         background:
                           "radial-gradient(circle, #fffdf0, #ffe07a 55%, rgba(255,200,60,0) 72%)",
                         boxShadow: "0 0 18px 8px rgba(255,232,150,0.85)",
-                      } as React.CSSProperties
+                      } as CSSProperties
                     }
                     aria-hidden="true"
                   >
@@ -775,7 +776,7 @@ function Cinematica({ onDone }: { onDone: () => void }) {
                     "--r": fase === 2 ? "70px" : "110px",
                     "--spd": fase === 2 ? "0.6s" : "2.6s",
                     transition: "all 0.6s ease",
-                  } as React.CSSProperties
+                  } as CSSProperties
                 }
               >
                 <Gema color={z.gem} cut={z.gemCut} size={fase === 0 ? 26 : 34} spin />
@@ -832,7 +833,7 @@ function Cinematica({ onDone }: { onDone: () => void }) {
                       marginTop: y,
                       animationDelay: `${0.9 + i * 0.12}s`,
                       filter: `drop-shadow(0 0 8px ${z.gem})`,
-                    } as React.CSSProperties
+                    } as CSSProperties
                   }
                 >
                   <Gema color={z.gem} cut={z.gemCut} size={22} />
