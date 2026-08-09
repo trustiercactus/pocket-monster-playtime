@@ -1112,3 +1112,27 @@
   50% { transform: translateY(-12px); }
 }
 @utility guard-float { animation: guard-float 3s ease-in-out infinite; }
+
+/* ===== Progreso del mapa: la luz viaja de una zona a la siguiente ===== */
+@keyframes trail-spark {
+  0% { left: var(--sx); top: var(--sy); opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  12% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  88% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+  100% { left: var(--ex); top: var(--ey); opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+}
+@utility trail-spark { animation: trail-spark 2.1s ease-in-out both; }
+
+@keyframes zone-start-glow {
+  0% { transform: scale(0.5); opacity: 0; }
+  40% { transform: scale(1.15); opacity: 0.95; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+@utility zone-start-glow { animation: zone-start-glow 1.2s ease-out both; }
+
+@keyframes badge-pop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.45); filter: brightness(1.6); }
+  55% { transform: scale(0.95); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+@utility badge-pop { animation: badge-pop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) 2 both; }
