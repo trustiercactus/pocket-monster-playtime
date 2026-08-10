@@ -47,6 +47,29 @@ export function Mundo({
   onMap: () => void;
 }) {
   const guardian = getCreature(area.guardian);
+  /** el guardián se sorprende, se enfada y entonces empieza el combate */
+  const [enfadado, setEnfadado] = useState(false);
+  const salto = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const provocar = () => {
+    if (enfadado) return;
+    setEnfadado(true);
+    sfx("tap");
+    try {
+      navigator.vibrate?.([20, 60, 40]);
+    } catch {
+      /* sin vibración */
+    }
+    setTimeout(() => sfx("jefe"), 220);
+    salto.current = setTimeout(onFight, 900);
+  };
+
+  useEffect(
+    () => () => {
+      if (salto.current) clearTimeout(salto.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     try {
