@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Area } from "@/lib/areas";
 import { getCreature } from "@/lib/creatures";
 import { Gema } from "@/components/Gema";
+import { GuardianSprite } from "@/components/GuardianSprite";
 import { sfx } from "@/lib/audio";
 
 /** partículas de ambiente del bioma, en grande y a pantalla completa */
@@ -61,7 +62,7 @@ export function Mundo({
       /* sin vibración */
     }
     setTimeout(() => sfx("jefe"), 220);
-    salto.current = setTimeout(onFight, 900);
+    salto.current = setTimeout(onFight, 1500);
   };
 
   useEffect(
@@ -113,72 +114,47 @@ export function Mundo({
         {area.emoji} {area.name}
       </div>
 
+      {/* oscurecimiento suave del ambiente durante la transformación */}
+      {enfadado && (
+        <span
+          className="rage-dark pointer-events-none absolute inset-0 z-[5]"
+          style={{
+            background:
+              "radial-gradient(circle at 50% 36%, transparent 20%, rgba(10,4,24,0.45) 70%, rgba(8,3,20,0.6))",
+          }}
+          aria-hidden="true"
+        />
+      )}
+
       {/* guardián del mundo */}
-      <div className="absolute inset-x-0 top-[38%] flex -translate-y-1/2 flex-col items-center">
+      <div className="absolute inset-x-0 top-[38%] z-10 flex -translate-y-1/2 flex-col items-center">
         <button
           onClick={provocar}
           aria-label={`Despertar a ${guardian.name}`}
           className="relative grid place-items-center"
         >
-          {area.boss && (
-            <span
-              className="boss-aura pointer-events-none absolute -inset-12 rounded-full blur-2xl"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(122,47,242,0.8), rgba(40,10,70,0.45) 55%, transparent 75%)",
-              }}
-              aria-hidden="true"
-            />
-          )}
           {enfadado && (
-            <>
-              <span
-                className="guard-energy pointer-events-none absolute -inset-10 rounded-full blur-xl"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(255,120,60,0.85), rgba(255,60,60,0.35) 55%, transparent 75%)",
-                }}
-                aria-hidden="true"
-              />
-              <span className="pop-in pointer-events-none absolute -right-4 -top-6 text-5xl drop-shadow">
-                💢
-              </span>
-            </>
+            <span className="pop-in pointer-events-none absolute -right-4 -top-6 z-20 text-5xl drop-shadow">
+              💢
+            </span>
           )}
-          <img
-            src={guardian.image}
-            alt={guardian.name}
-            loading="lazy"
-            className={`relative object-contain drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] ${
-              enfadado ? "guard-angry" : "guard-float"
-            } ${area.boss ? "h-56 w-56" : "h-40 w-40"}`}
-            style={{
-              filter: enfadado
-                ? "saturate(1.5) brightness(1.05) contrast(1.15)"
-                : done
-                  ? "saturate(1.2) brightness(1.06)"
-                  : "saturate(0.95)",
-              transition: "filter 0.3s ease",
-            }}
-          />
-          {(!done || enfadado) && (
-            <>
-              <span
-                className={`absolute left-[36%] top-[40%] rounded-[50%] bg-[#ff5c5c] shadow-[0_0_10px_#ff2b2b] ${
-                  enfadado ? "h-3 w-4 shadow-[0_0_16px_#ff2b2b]" : "h-2 w-3"
-                }`}
-              />
-              <span
-                className={`absolute left-[57%] top-[40%] rounded-[50%] bg-[#ff5c5c] shadow-[0_0_10px_#ff2b2b] ${
-                  enfadado ? "h-3 w-4 shadow-[0_0_16px_#ff2b2b]" : "h-2 w-3"
-                }`}
-              />
-            </>
-          )}
+          <span className={enfadado ? "guard-angry block" : "block"}>
+            <GuardianSprite
+              src={guardian.image}
+              alt={guardian.name}
+              motion="float"
+              enraged={enfadado}
+              boss={area.boss}
+              className={`object-contain drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] ${
+                area.boss ? "h-56 w-56" : "h-40 w-40"
+              }`}
+            />
+          </span>
           {done && !enfadado && (
             <span className="pop-in absolute -right-2 -top-2 text-4xl drop-shadow">😊</span>
           )}
         </button>
+
         <span
           className="mt-1 h-4 w-32 rounded-[50%] blur-[4px]"
           style={{ background: "rgba(0,0,0,0.3)" }}

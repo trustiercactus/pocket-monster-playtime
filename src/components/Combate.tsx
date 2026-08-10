@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getCreature, type Creature } from "@/lib/creatures";
 import { GEM_ZONES, type Area } from "@/lib/areas";
+import { GuardianSprite } from "@/components/GuardianSprite";
 import { LiveSprite } from "@/components/LiveSprite";
 import { Gema } from "@/components/Gema";
 import mapaFondo from "@/assets/mapa-vertical.jpg";
@@ -557,16 +558,6 @@ export function Combate({
         <div className="flex flex-1 flex-col items-center justify-center gap-0">
           {/* GUARDIÁN */}
           <div className="relative flex justify-center">
-            {area.boss && (
-              <span
-                className="boss-aura pointer-events-none absolute -inset-10 rounded-full blur-2xl"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(122,47,242,0.8), rgba(30,8,55,0.5) 55%, transparent 75%)",
-                }}
-                aria-hidden="true"
-              />
-            )}
             <span
               className={`pointer-events-none absolute -bottom-1 left-1/2 h-4 -translate-x-1/2 rounded-[50%] blur-[4px] ${
                 area.boss ? "w-40" : "w-32"
@@ -577,28 +568,25 @@ export function Combate({
             <div
               className={`${hitGuard ? "hit-shake knockback-up" : ""} ${lungeGuard ? "lunge-down" : ""}`}
             >
-              <LiveSprite
+              <GuardianSprite
                 src={guardian.image}
                 alt={guardian.name}
                 motion="float"
-                className={`${area.boss ? "w-64" : "w-52"} drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)] transition-all duration-500 ${
-                  ending >= 2 ? "friend-glow" : ""
-                } ${ending === 1 ? "surprise-jump" : ""} ${ending >= 3 ? "guard-dissolve" : ""}`}
+                enraged={ending === 0}
+                boss={area.boss}
+                className={`${area.boss ? "w-64" : "w-52"} drop-shadow-[0_10px_10px_rgba(0,0,0,0.45)]`}
+                imgClassName={`transition-all duration-500 ${ending >= 2 ? "friend-glow" : ""} ${
+                  ending === 1 ? "surprise-jump" : ""
+                } ${ending >= 3 ? "guard-dissolve" : ""}`}
               />
 
-              {/* ojos malvados mientras está hechizado */}
-              {ending < 2 && (
-                <>
-                  <span className="evil-eye absolute left-[38%] top-[34%]" />
-                  <span className="evil-eye absolute left-[54%] top-[34%]" />
-                </>
-              )}
               {hitGuard && ending === 0 && (
                 <span className="pop-in absolute -left-2 top-2 text-5xl">😖</span>
               )}
               {ending === 2 && <span className="absolute -right-2 top-2 text-5xl pop-in">😊</span>}
               {ending === 1 && <span className="absolute -right-2 top-0 text-5xl pop-in">😲</span>}
             </div>
+
 
             {/* partículas de luz (o humo oscuro para el jefe) al desaparecer */}
             {ending >= 3 && ending < 5 && (
