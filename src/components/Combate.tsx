@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getCreature, type Creature } from "@/lib/creatures";
 import { GEM_ZONES, type Area } from "@/lib/areas";
+import { GuardianSprite } from "@/components/GuardianSprite";
 import { LiveSprite } from "@/components/LiveSprite";
 import { Gema } from "@/components/Gema";
 import mapaFondo from "@/assets/mapa-vertical.jpg";

@@ -30,8 +30,8 @@ export function GuardianSprite({
   /** tamaño del sprite (w-52, h-40 w-40, …) */
   className?: string;
   motion?: Motion;
-  enraged?: boolean;
-  boss?: boolean;
+  enraged?: boolean | undefined;
+  boss?: boolean | undefined;
   auraColor?: string;
   /** animaciones extra sobre la imagen (sacudida, disolución, …) */
   imgClassName?: string;
