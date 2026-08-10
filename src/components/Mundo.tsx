@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Area } from "@/lib/areas";
 import { getCreature } from "@/lib/creatures";
 import { Gema } from "@/components/Gema";
+import { GuardianSprite } from "@/components/GuardianSprite";
 import { sfx } from "@/lib/audio";
 
 /** partículas de ambiente del bioma, en grande y a pantalla completa */
@@ -61,7 +62,7 @@ export function Mundo({
       /* sin vibración */
     }
     setTimeout(() => sfx("jefe"), 220);
-    salto.current = setTimeout(onFight, 900);
+    salto.current = setTimeout(onFight, 1500);
   };
 
   useEffect(
