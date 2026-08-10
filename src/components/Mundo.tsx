@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Area } from "@/lib/areas";
 import { getCreature } from "@/lib/creatures";
 import { Gema } from "@/components/Gema";
