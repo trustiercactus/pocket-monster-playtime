@@ -294,6 +294,7 @@ export function MapaMundo({
     progresoHecho.current = true;
     const ts: ReturnType<typeof setTimeout>[] = [];
     setVista("mapa");
+    setHandOn(false);
     try {
       navigator.vibrate?.(40);
     } catch {
