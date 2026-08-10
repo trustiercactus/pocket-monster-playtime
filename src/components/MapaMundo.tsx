@@ -612,9 +612,9 @@ export function MapaMundo({
                   </span>
 
 
-                  {isNext && (
-                    <span className="arrow-point absolute -top-11 left-1/2 -translate-x-1/2 text-4xl drop-shadow-[0_3px_2px_rgba(0,0,0,0.4)]">
-                      👇
+                  {isNext && handOn && (
+                    <span className="hand-in absolute -top-11 left-1/2 text-4xl drop-shadow-[0_3px_2px_rgba(0,0,0,0.4)]">
+                      <span className="arrow-point block">👇</span>
                     </span>
                   )}
 
