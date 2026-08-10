@@ -483,7 +483,6 @@ function Elegir({
 
       <div className="flex shrink-0 items-center gap-3">
         <LiveSprite src={trainerImg} alt="Tu entrenador" motion="hop" className="w-[16vw] max-w-24" />
-        <span className="wiggle text-4xl">👉</span>
       </div>
 
       <div className="grid min-h-0 w-full max-w-sm flex-1 grid-cols-3 content-start gap-2 overflow-hidden">
