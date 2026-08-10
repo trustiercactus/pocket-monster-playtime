@@ -326,6 +326,8 @@ export function MapaMundo({
           void narrar(`¡El camino está abierto! Toca ${nextZone.name}.`, { delay: 200 });
       }, 5600),
     );
+    /* la nube tarda 1,4s en desvanecerse; medio segundo después llega la mano */
+    ts.push(setTimeout(() => setHandOn(true), 6500));
     return () => ts.forEach(clearTimeout);
   };
 
