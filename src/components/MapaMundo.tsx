@@ -204,6 +204,8 @@ export function MapaMundo({
   const [revealed, setRevealed] = useState<string | null>(null);
   /** zona desde la que el camino se está iluminando piedra a piedra */
   const [trailFrom, setTrailFrom] = useState<string | null>(null);
+  /** la mano solo aparece cuando la nueva zona ya está totalmente visible */
+  const [handOn, setHandOn] = useState(true);
   
   const prevDone = useRef<string[]>(zonesDone);
   const scroller = useRef<HTMLDivElement>(null);
@@ -292,6 +294,7 @@ export function MapaMundo({
     progresoHecho.current = true;
     const ts: ReturnType<typeof setTimeout>[] = [];
     setVista("mapa");
+    setHandOn(false);
     try {
       navigator.vibrate?.(40);
     } catch {
@@ -323,6 +326,8 @@ export function MapaMundo({
           void narrar(`¡El camino está abierto! Toca ${nextZone.name}.`, { delay: 200 });
       }, 5600),
     );
+    /* la nube tarda 1,4s en desvanecerse; medio segundo después llega la mano */
+    ts.push(setTimeout(() => setHandOn(true), 6500));
     return () => ts.forEach(clearTimeout);
   };
 
@@ -607,9 +612,9 @@ export function MapaMundo({
                   </span>
 
 
-                  {isNext && (
-                    <span className="arrow-point absolute -top-11 left-1/2 -translate-x-1/2 text-4xl drop-shadow-[0_3px_2px_rgba(0,0,0,0.4)]">
-                      👇
+                  {isNext && handOn && (
+                    <span className="hand-in absolute -top-11 left-1/2 text-4xl drop-shadow-[0_3px_2px_rgba(0,0,0,0.4)]">
+                      <span className="arrow-point block">👇</span>
                     </span>
                   )}
 
