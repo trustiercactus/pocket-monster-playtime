@@ -521,19 +521,39 @@ export function MapaMundo({
                     />
                   )}
 
-                  {/* velo de nubes de las zonas aún bloqueadas: se disipa con magia al desbloquearse */}
+                  {/* cortina de nubes: oculta parcialmente al guardián y se abre al desbloquear */}
                   {(!open || revealed === a.id) && (
                     <span
-                      className={`pointer-events-none absolute -inset-6 grid place-items-center ${
-                        revealed === a.id ? "cloud-veil-out" : "cloud-veil-idle"
-                      }`}
+                      className="pointer-events-none absolute -inset-x-16 -inset-y-4 overflow-visible"
                       aria-hidden="true"
                     >
-                      <span className="absolute inset-0 rounded-[50%] bg-white/70 blur-md" />
-                      <span className="absolute -left-2 top-1 text-2xl opacity-90">☁️</span>
-                      <span className="absolute -right-2 bottom-2 text-2xl opacity-90">☁️</span>
+                      <span
+                        className={`absolute left-0 top-1/2 h-16 w-3/5 -translate-y-1/2 rounded-[50%] bg-white/85 blur-[6px] ${
+                          revealed === a.id ? "curtain-out-l" : "curtain-l"
+                        }`}
+                      />
+                      <span
+                        className={`absolute right-0 top-1/2 h-16 w-3/5 -translate-y-1/2 rounded-[50%] bg-white/85 blur-[6px] ${
+                          revealed === a.id ? "curtain-out-r" : "curtain-r"
+                        }`}
+                      />
+                      <span
+                        className={`absolute left-1 top-[38%] text-3xl opacity-95 ${
+                          revealed === a.id ? "curtain-out-l" : "curtain-l"
+                        }`}
+                      >
+                        ☁️
+                      </span>
+                      <span
+                        className={`absolute right-1 top-[46%] text-3xl opacity-95 ${
+                          revealed === a.id ? "curtain-out-r" : "curtain-r"
+                        }`}
+                      >
+                        ☁️
+                      </span>
                     </span>
                   )}
+
 
                   {/* la zona recién revelada brilla un instante */}
                   {revealed === a.id && (
