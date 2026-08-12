@@ -333,17 +333,11 @@ export function MapaMundo({
 
   useEffect(() => {
     if (wonZone) return arrancarProgreso(wonZone);
-    if (pendingWin) return;
-    const ts: ReturnType<typeof setTimeout>[] = [];
-    ts.push(
-      setTimeout(() => {
-        const target = nextZone ?? AREAS[0]!;
-        irAlMundo(target.id);
-      }, 2600),
-    );
-    return () => ts.forEach(clearTimeout);
+    // sin victoria previa: el mapa se queda quieto hasta que el niño pulse una zona
+    return;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wonZone]);
+
 
 
 
