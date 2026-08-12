@@ -417,16 +417,9 @@ export function MapaMundo({
         <div className="absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+2.6rem)] top-[calc(env(safe-area-inset-top)+6rem)]">
 
 
-          {/* sendero de piedras */}
-          {AREAS.slice(0, -1).map((a, i) => (
-            <PathStones
-              key={a.id}
-              a={a}
-              b={AREAS[i + 1]!}
-              lit={zonesDone.includes(a.id)}
-              trail={trailFrom === a.id}
-            />
-          ))}
+          {/* ruta curva continua 1 → 9 */}
+          <RutaCurva zonesDone={zonesDone} trailFrom={trailFrom} />
+
 
           {/* la luz de progreso viaja de la zona completada a la siguiente */}
           {trailFrom &&
