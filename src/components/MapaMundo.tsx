@@ -104,44 +104,83 @@ function RoundButton({
   );
 }
 
-/** piedras pequeñas del sendero, con el terreno propio de la zona */
-function PathStones({ a, b, lit, trail }: { a: Area; b: Area; lit: boolean; trail?: boolean }) {
-  const stones = 7;
-  const t = TERRAIN[a.terrain];
+/** ruta curva y continua que une todas las zonas en orden 1 → 9 */
+function segmentoCurvo(i: number) {
+  const p0 = AREAS[Math.max(0, i - 1)]!;
+  const p1 = AREAS[i]!;
+  const p2 = AREAS[i + 1]!;
+  const p3 = AREAS[Math.min(AREAS.length - 1, i + 2)]!;
+  const k = 0.22;
+  const c1x = p1.x + (p2.x - p0.x) * k;
+  const c1y = p1.y + (p2.y - p0.y) * k;
+  const c2x = p2.x - (p3.x - p1.x) * k;
+  const c2y = p2.y - (p3.y - p1.y) * k;
+  return `M ${p1.x} ${p1.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`;
+}
+
+function RutaCurva({ zonesDone, trailFrom }: { zonesDone: string[]; trailFrom: string | null }) {
   return (
-    <>
-      {Array.from({ length: stones }).map((_, i) => {
-        const k = (i + 1) / (stones + 1);
-        const x = a.x + (b.x - a.x) * k;
-        const y = a.y + (b.y - a.y) * k;
-        const size = 8 + Math.sin(k * Math.PI) * 3;
+    <svg
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      {AREAS.slice(0, -1).map((a, i) => {
+        const d = segmentoCurvo(i);
+        const lit = zonesDone.includes(a.id);
+        const trail = trailFrom === a.id;
         return (
-          <span
-            key={i}
-            className={`absolute -translate-x-1/2 -translate-y-1/2 border ${
-              trail ? "stone-trail" : lit ? "stone-pulse" : ""
-            }`}
-            style={{
-              left: `${x}%`,
-              top: `${y}%`,
-              width: size,
-              height: size * 0.78,
-              borderRadius: t.round,
-              animationDelay: trail ? `${i * 0.38}s` : `${i * 0.14}s`,
-              background: t.fill,
-              borderColor: t.border,
-              opacity: lit ? 1 : 0.78,
-              boxShadow: lit
-                ? "0 2px 0 rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,0.7), 0 0 8px rgba(255,236,160,0.85)"
-                : "0 2px 0 rgba(0,0,0,0.22), inset 0 1px 1px rgba(255,255,255,0.6)",
-            }}
-            aria-hidden="true"
-          />
+          <g key={a.id}>
+            {/* base suave de la ruta */}
+            <path
+              d={d}
+              fill="none"
+              stroke="rgba(255,255,255,0.55)"
+              strokeWidth={2.2}
+              strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+            <path
+              d={d}
+              fill="none"
+              stroke={lit ? "rgba(255,214,90,0.95)" : "rgba(120,110,140,0.45)"}
+              strokeWidth={1.2}
+              strokeLinecap="round"
+              strokeDasharray="0.1 3.4"
+              vectorEffect="non-scaling-stroke"
+              style={
+                lit
+                  ? { filter: "drop-shadow(0 0 4px rgba(255,232,150,0.9))" }
+                  : undefined
+              }
+            />
+            {trail && (
+              <path
+                className="ruta-draw"
+                d={d}
+                fill="none"
+                stroke="rgba(255,240,170,0.95)"
+                strokeWidth={2.4}
+                strokeLinecap="round"
+                pathLength={100}
+                vectorEffect="non-scaling-stroke"
+                style={
+                  {
+                    "--len": "100",
+                    strokeDasharray: 100,
+                    filter: "drop-shadow(0 0 6px rgba(255,232,150,0.95))",
+                  } as CSSProperties
+                }
+              />
+            )}
+          </g>
         );
       })}
-    </>
+    </svg>
   );
 }
+
 
 
 /** ambiente vivo del bioma alrededor de la zona */
