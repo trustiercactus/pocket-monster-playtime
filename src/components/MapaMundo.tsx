@@ -237,6 +237,71 @@ function Ambiente({ area }: { area: Area }) {
   );
 }
 
+/** masa de vapor con volumen (luz arriba, sombra abajo) */
+function Puff({
+  className,
+  style,
+}: {
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <span
+      className={`absolute rounded-[50%] ${className ?? ""}`}
+      style={{
+        background:
+          "radial-gradient(circle at 38% 24%, #ffffff 0%, #f7fbff 45%, #dfe9f7 78%, #c6d5ea 100%)",
+        boxShadow:
+          "inset 0 -6px 10px rgba(150,170,200,0.45), inset 0 5px 8px rgba(255,255,255,0.95), 0 4px 10px rgba(60,90,130,0.28)",
+        ...style,
+      }}
+      aria-hidden="true"
+    />
+  );
+}
+
+/**
+ * Nube mágica en primer plano que esconde el cuerpo del guardián,
+ * dejando ver solo la parte alta de la cabeza y los ojos.
+ */
+function NubeGuardian({ abriendo, boss }: { abriendo: boolean; boss?: boolean }) {
+  const izq = abriendo ? "curtain-out-l" : "curtain-l";
+  const der = abriendo ? "curtain-out-r" : "curtain-r";
+  return (
+    <span
+      className="pointer-events-none absolute inset-x-[-70%] z-30 overflow-visible"
+      style={{ top: boss ? "46%" : "50%", bottom: "-24%" }}
+      aria-hidden="true"
+    >
+      {/* mitad izquierda */}
+      <span className={`absolute inset-y-0 left-0 w-[62%] ${izq}`}>
+        <Puff className="bottom-0 left-[2%] h-[78%] w-[62%]" />
+        <Puff className="bottom-[6%] left-[26%] h-[96%] w-[58%]" />
+        <Puff className="bottom-[10%] left-[54%] h-[74%] w-[52%]" />
+        <span
+          className="absolute bottom-[-6%] left-[6%] h-[46%] w-[92%] rounded-[50%] blur-[6px]"
+          style={{ background: "rgba(255,255,255,0.85)" }}
+        />
+      </span>
+      {/* mitad derecha */}
+      <span className={`absolute inset-y-0 right-0 w-[62%] ${der}`}>
+        <Puff className="bottom-0 right-[2%] h-[76%] w-[60%]" />
+        <Puff className="bottom-[8%] right-[26%] h-[98%] w-[60%]" />
+        <Puff className="bottom-[10%] right-[54%] h-[72%] w-[50%]" />
+        <span
+          className="absolute bottom-[-6%] right-[6%] h-[46%] w-[92%] rounded-[50%] blur-[6px]"
+          style={{ background: "rgba(255,255,255,0.85)" }}
+        />
+      </span>
+      {/* brillo mágico sutil */}
+      <span
+        className="absolute inset-x-[8%] top-[10%] h-[40%] rounded-[50%] blur-[10px]"
+        style={{ background: "rgba(255,255,255,0.55)" }}
+      />
+    </span>
+  );
+}
+
 
 export function MapaMundo({
   name,
