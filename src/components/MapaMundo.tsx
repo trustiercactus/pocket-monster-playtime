@@ -551,34 +551,8 @@ export function MapaMundo({
                     />
                   )}
 
-                  {/* gran nube horizontal: esconde el cuerpo del guardián y deja ver la cabeza */}
-                  {(!open || revealed === a.id) && (
-                    <span
-                      className="pointer-events-none absolute -inset-x-24 top-[26%] h-24 overflow-visible"
-                      aria-hidden="true"
-                    >
-                      <span
-                        className={`absolute left-0 top-1/2 h-20 w-[62%] -translate-y-1/2 rounded-[50%] bg-white/92 blur-[7px] ${
-                          revealed === a.id ? "curtain-out-l" : "curtain-l"
-                        }`}
-                      />
-                      <span
-                        className={`absolute left-[8%] top-[18%] h-12 w-[40%] rounded-[50%] bg-white/95 blur-[5px] ${
-                          revealed === a.id ? "curtain-out-l" : "curtain-l"
-                        }`}
-                      />
-                      <span
-                        className={`absolute right-0 top-1/2 h-20 w-[62%] -translate-y-1/2 rounded-[50%] bg-white/92 blur-[7px] ${
-                          revealed === a.id ? "curtain-out-r" : "curtain-r"
-                        }`}
-                      />
-                      <span
-                        className={`absolute right-[10%] top-[22%] h-11 w-[36%] rounded-[50%] bg-white/95 blur-[5px] ${
-                          revealed === a.id ? "curtain-out-r" : "curtain-r"
-                        }`}
-                      />
-                    </span>
-                  )}
+
+
 
 
 
