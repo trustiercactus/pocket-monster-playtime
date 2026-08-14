@@ -618,7 +618,13 @@ export function MapaMundo({
                     {done && (
                       <span className="pop-in absolute -right-1 -top-1 text-xl drop-shadow">😊</span>
                     )}
+
+                    {/* nube volumétrica DELANTE del guardián: solo asoma la cabeza */}
+                    {(!open || revealed === a.id) && (
+                      <NubeGuardian abriendo={revealed === a.id} boss={a.boss} />
+                    )}
                   </span>
+
 
 
 
