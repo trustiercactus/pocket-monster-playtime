@@ -105,18 +105,26 @@ function RoundButton({
 }
 
 /** ruta curva y continua que une todas las zonas en orden 1 → 9 */
+/** curvatura variable por tramo: evita que la ruta parezca un esquema regular */
+const CURVA = [0.34, 0.5, 0.28, 0.46, 0.36, 0.52, 0.3, 0.42];
+
 function segmentoCurvo(i: number) {
   const p0 = AREAS[Math.max(0, i - 1)]!;
   const p1 = AREAS[i]!;
   const p2 = AREAS[i + 1]!;
   const p3 = AREAS[Math.min(AREAS.length - 1, i + 2)]!;
-  const k = 0.22;
+  const k = CURVA[i] ?? 0.36;
   const c1x = p1.x + (p2.x - p0.x) * k;
   const c1y = p1.y + (p2.y - p0.y) * k;
   const c2x = p2.x - (p3.x - p1.x) * k;
   const c2y = p2.y - (p3.y - p1.y) * k;
   return `M ${p1.x} ${p1.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${p2.x} ${p2.y}`;
 }
+
+/** ruta completa 1 → 9 como un único trazo continuo */
+const RUTA_COMPLETA = AREAS.slice(0, -1)
+  .map((_, i) => (i === 0 ? segmentoCurvo(i) : segmentoCurvo(i).replace(/^M [^C]+C/, "C")))
+  .join(" ");
 
 function RutaCurva({ zonesDone, trailFrom }: { zonesDone: string[]; trailFrom: string | null }) {
   return (
@@ -126,42 +134,63 @@ function RutaCurva({ zonesDone, trailFrom }: { zonesDone: string[]; trailFrom: s
       preserveAspectRatio="none"
       aria-hidden="true"
     >
+      {/* halo luminoso del camino */}
+      <path
+        d={RUTA_COMPLETA}
+        fill="none"
+        stroke="rgba(255,255,255,0.35)"
+        strokeWidth={16}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+        style={{ filter: "blur(6px)" }}
+      />
+      {/* camino blanco continuo */}
+      <path
+        d={RUTA_COMPLETA}
+        fill="none"
+        stroke="rgba(255,255,255,0.96)"
+        strokeWidth={9}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+      />
+      {/* brillo interior */}
+      <path
+        d={RUTA_COMPLETA}
+        fill="none"
+        stroke="rgba(255,255,255,1)"
+        strokeWidth={4}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        vectorEffect="non-scaling-stroke"
+        style={{ filter: "drop-shadow(0 0 4px rgba(255,255,255,0.9))" }}
+      />
+
       {AREAS.slice(0, -1).map((a, i) => {
         const d = segmentoCurvo(i);
         const lit = zonesDone.includes(a.id);
         const trail = trailFrom === a.id;
         return (
           <g key={a.id}>
-            {/* base suave de la ruta */}
-            <path
-              d={d}
-              fill="none"
-              stroke="rgba(255,255,255,0.55)"
-              strokeWidth={2.2}
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-            />
-            <path
-              d={d}
-              fill="none"
-              stroke={lit ? "rgba(255,214,90,0.95)" : "rgba(120,110,140,0.45)"}
-              strokeWidth={1.2}
-              strokeLinecap="round"
-              strokeDasharray="0.1 3.4"
-              vectorEffect="non-scaling-stroke"
-              style={
-                lit
-                  ? { filter: "drop-shadow(0 0 4px rgba(255,232,150,0.9))" }
-                  : undefined
-              }
-            />
+            {lit && (
+              <path
+                d={d}
+                fill="none"
+                stroke="rgba(255,224,130,0.9)"
+                strokeWidth={5}
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+                style={{ filter: "drop-shadow(0 0 5px rgba(255,232,150,0.9))" }}
+              />
+            )}
             {trail && (
               <path
                 className="ruta-draw"
                 d={d}
                 fill="none"
                 stroke="rgba(255,240,170,0.95)"
-                strokeWidth={2.4}
+                strokeWidth={6}
                 strokeLinecap="round"
                 pathLength={100}
                 vectorEffect="non-scaling-stroke"
@@ -180,6 +209,7 @@ function RutaCurva({ zonesDone, trailFrom }: { zonesDone: string[]; trailFrom: s
     </svg>
   );
 }
+
 
 
 
@@ -521,38 +551,35 @@ export function MapaMundo({
                     />
                   )}
 
-                  {/* cortina de nubes: oculta parcialmente al guardián y se abre al desbloquear */}
+                  {/* gran nube horizontal: esconde el cuerpo del guardián y deja ver la cabeza */}
                   {(!open || revealed === a.id) && (
                     <span
-                      className="pointer-events-none absolute -inset-x-16 -inset-y-4 overflow-visible"
+                      className="pointer-events-none absolute -inset-x-24 top-[26%] h-24 overflow-visible"
                       aria-hidden="true"
                     >
                       <span
-                        className={`absolute left-0 top-1/2 h-16 w-3/5 -translate-y-1/2 rounded-[50%] bg-white/85 blur-[6px] ${
+                        className={`absolute left-0 top-1/2 h-20 w-[62%] -translate-y-1/2 rounded-[50%] bg-white/92 blur-[7px] ${
                           revealed === a.id ? "curtain-out-l" : "curtain-l"
                         }`}
                       />
                       <span
-                        className={`absolute right-0 top-1/2 h-16 w-3/5 -translate-y-1/2 rounded-[50%] bg-white/85 blur-[6px] ${
+                        className={`absolute left-[8%] top-[18%] h-12 w-[40%] rounded-[50%] bg-white/95 blur-[5px] ${
+                          revealed === a.id ? "curtain-out-l" : "curtain-l"
+                        }`}
+                      />
+                      <span
+                        className={`absolute right-0 top-1/2 h-20 w-[62%] -translate-y-1/2 rounded-[50%] bg-white/92 blur-[7px] ${
                           revealed === a.id ? "curtain-out-r" : "curtain-r"
                         }`}
                       />
                       <span
-                        className={`absolute left-1 top-[38%] text-3xl opacity-95 ${
-                          revealed === a.id ? "curtain-out-l" : "curtain-l"
-                        }`}
-                      >
-                        ☁️
-                      </span>
-                      <span
-                        className={`absolute right-1 top-[46%] text-3xl opacity-95 ${
+                        className={`absolute right-[10%] top-[22%] h-11 w-[36%] rounded-[50%] bg-white/95 blur-[5px] ${
                           revealed === a.id ? "curtain-out-r" : "curtain-r"
                         }`}
-                      >
-                        ☁️
-                      </span>
+                      />
                     </span>
                   )}
+
 
 
                   {/* la zona recién revelada brilla un instante */}
