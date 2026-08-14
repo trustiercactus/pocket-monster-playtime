@@ -264,7 +264,7 @@ function Puff({
  * Nube mágica en primer plano que esconde el cuerpo del guardián,
  * dejando ver solo la parte alta de la cabeza y los ojos.
  */
-function NubeGuardian({ abriendo, boss }: { abriendo: boolean; boss?: boolean }) {
+function NubeGuardian({ abriendo, boss }: { abriendo: boolean; boss?: boolean | undefined }) {
   const izq = abriendo ? "curtain-out-l" : "curtain-l";
   const der = abriendo ? "curtain-out-r" : "curtain-r";
   return (
