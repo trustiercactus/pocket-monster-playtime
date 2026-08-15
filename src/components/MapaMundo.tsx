@@ -269,15 +269,15 @@ function NubeGuardian({ abriendo, boss }: { abriendo: boolean; boss?: boolean | 
   const der = abriendo ? "curtain-out-r" : "curtain-r";
   return (
     <span
-      className="pointer-events-none absolute inset-x-[-70%] z-30 overflow-visible"
-      style={{ top: boss ? "46%" : "50%", bottom: "-24%" }}
+      className="pointer-events-none absolute inset-x-[-52%] z-30 overflow-visible"
+      style={{ top: boss ? "52%" : "56%", bottom: "-22%" }}
       aria-hidden="true"
     >
       {/* mitad izquierda */}
       <span className={`absolute inset-y-0 left-0 w-[62%] ${izq}`}>
-        <Puff className="bottom-0 left-[2%] h-[78%] w-[62%]" />
-        <Puff className="bottom-[6%] left-[26%] h-[96%] w-[58%]" />
-        <Puff className="bottom-[10%] left-[54%] h-[74%] w-[52%]" />
+        <Puff className="bottom-0 left-[2%] h-[62%] w-[62%]" />
+        <Puff className="bottom-[4%] left-[26%] h-[82%] w-[58%]" />
+        <Puff className="bottom-[8%] left-[54%] h-[58%] w-[52%]" />
         <span
           className="absolute bottom-[-6%] left-[6%] h-[46%] w-[92%] rounded-[50%] blur-[6px]"
           style={{ background: "rgba(255,255,255,0.85)" }}
@@ -285,9 +285,9 @@ function NubeGuardian({ abriendo, boss }: { abriendo: boolean; boss?: boolean | 
       </span>
       {/* mitad derecha */}
       <span className={`absolute inset-y-0 right-0 w-[62%] ${der}`}>
-        <Puff className="bottom-0 right-[2%] h-[76%] w-[60%]" />
-        <Puff className="bottom-[8%] right-[26%] h-[98%] w-[60%]" />
-        <Puff className="bottom-[10%] right-[54%] h-[72%] w-[50%]" />
+        <Puff className="bottom-0 right-[2%] h-[60%] w-[60%]" />
+        <Puff className="bottom-[4%] right-[26%] h-[84%] w-[60%]" />
+        <Puff className="bottom-[8%] right-[54%] h-[56%] w-[50%]" />
         <span
           className="absolute bottom-[-6%] right-[6%] h-[46%] w-[92%] rounded-[50%] blur-[6px]"
           style={{ background: "rgba(255,255,255,0.85)" }}
