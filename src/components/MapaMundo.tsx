@@ -689,8 +689,8 @@ export function MapaMundo({
                     )}
 
                     {/* nube volumétrica DELANTE del guardián: solo asoma la cabeza */}
-                    {(!open || revealed === a.id) && (
-                      <NubeGuardian abriendo={revealed === a.id} boss={a.boss} />
+                    {!zonesDone.includes(a.id) && (
+                      <NubeGuardian abriendo={nubeAbierta === a.id} boss={a.boss} />
                     )}
                   </span>
 
