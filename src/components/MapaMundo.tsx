@@ -336,6 +336,8 @@ export function MapaMundo({
   const [sweep, setSweep] = useState(false);
   const [focusId, setFocusId] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<string | null>(null);
+  /** zona cuyas nubes se están abriendo porque el niño acaba de entrar en ella */
+  const [nubeAbierta, setNubeAbierta] = useState<string | null>(null);
   /** zona desde la que el camino se está iluminando piedra a piedra */
   const [trailFrom, setTrailFrom] = useState<string | null>(null);
   /** la mano solo aparece cuando la nueva zona ya está totalmente visible */
