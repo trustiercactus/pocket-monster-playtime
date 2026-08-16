@@ -395,6 +395,8 @@ export function MapaMundo({
   /** transición cinematográfica mapa general → escenario del mundo */
   const irAlMundo = (id: string) => {
     setFocusId(id);
+    /* las nubes de esa zona se abren justo al entrar */
+    setNubeAbierta(id);
     setSweep(true);
     sfx("abrir");
     try {
