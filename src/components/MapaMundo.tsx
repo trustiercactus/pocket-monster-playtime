@@ -336,6 +336,8 @@ export function MapaMundo({
   const [sweep, setSweep] = useState(false);
   const [focusId, setFocusId] = useState<string | null>(null);
   const [revealed, setRevealed] = useState<string | null>(null);
+  /** zona cuyas nubes se están abriendo porque el niño acaba de entrar en ella */
+  const [nubeAbierta, setNubeAbierta] = useState<string | null>(null);
   /** zona desde la que el camino se está iluminando piedra a piedra */
   const [trailFrom, setTrailFrom] = useState<string | null>(null);
   /** la mano solo aparece cuando la nueva zona ya está totalmente visible */
@@ -393,6 +395,8 @@ export function MapaMundo({
   /** transición cinematográfica mapa general → escenario del mundo */
   const irAlMundo = (id: string) => {
     setFocusId(id);
+    /* las nubes de esa zona se abren justo al entrar */
+    setNubeAbierta(id);
     setSweep(true);
     sfx("abrir");
     try {
@@ -406,7 +410,12 @@ export function MapaMundo({
 
   const volverAlMapa = () => {
     setSweep(true);
-    timers.current.push(setTimeout(() => setVista("mapa"), 470));
+    timers.current.push(
+      setTimeout(() => {
+        setVista("mapa");
+        setNubeAbierta(null);
+      }, 470),
+    );
     timers.current.push(setTimeout(() => setSweep(false), 980));
   };
 
@@ -685,8 +694,8 @@ export function MapaMundo({
                     )}
 
                     {/* nube volumétrica DELANTE del guardián: solo asoma la cabeza */}
-                    {(!open || revealed === a.id) && (
-                      <NubeGuardian abriendo={revealed === a.id} boss={a.boss} />
+                    {!zonesDone.includes(a.id) && (
+                      <NubeGuardian abriendo={nubeAbierta === a.id} boss={a.boss} />
                     )}
                   </span>
 
