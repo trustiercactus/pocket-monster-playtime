@@ -410,7 +410,12 @@ export function MapaMundo({
 
   const volverAlMapa = () => {
     setSweep(true);
-    timers.current.push(setTimeout(() => setVista("mapa"), 470));
+    timers.current.push(
+      setTimeout(() => {
+        setVista("mapa");
+        setNubeAbierta(null);
+      }, 470),
+    );
     timers.current.push(setTimeout(() => setSweep(false), 980));
   };
 
