@@ -270,7 +270,7 @@ function NubeGuardian({ abriendo, boss }: { abriendo: boolean; boss?: boolean | 
   return (
     <span
       className="pointer-events-none absolute inset-x-[-58%] z-30 overflow-visible"
-      style={{ top: boss ? "34%" : "38%", bottom: boss ? "-2%" : "-4%" }}
+      style={{ top: boss ? "42%" : "46%", bottom: boss ? "-2%" : "-4%" }}
       aria-hidden="true"
     >
       {/* mitad izquierda */}
