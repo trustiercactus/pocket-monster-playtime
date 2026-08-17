@@ -269,30 +269,25 @@ function NubeGuardian({ abriendo, boss }: { abriendo: boolean; boss?: boolean | 
   const der = abriendo ? "curtain-out-r" : "curtain-r";
   return (
     <span
-      className="pointer-events-none absolute inset-x-[-52%] z-30 overflow-visible"
-      style={{ top: boss ? "58%" : "62%", bottom: "-22%" }}
+      className="pointer-events-none absolute inset-x-[-58%] z-30 overflow-visible"
+      style={{ top: boss ? "34%" : "38%", bottom: boss ? "-2%" : "-4%" }}
       aria-hidden="true"
     >
       {/* mitad izquierda */}
       <span className={`absolute inset-y-0 left-0 w-[62%] ${izq}`}>
-        <Puff className="bottom-0 left-[2%] h-[62%] w-[62%]" />
-        <Puff className="bottom-[4%] left-[26%] h-[82%] w-[58%]" />
-        <Puff className="bottom-[8%] left-[54%] h-[58%] w-[52%]" />
-        <span
-          className="absolute bottom-[-6%] left-[6%] h-[46%] w-[92%] rounded-[50%] blur-[6px]"
-          style={{ background: "rgba(255,255,255,0.85)" }}
-        />
+        <Puff className="bottom-[6%] left-[0%] h-[64%] w-[58%]" />
+        <Puff className="bottom-[16%] left-[20%] h-[74%] w-[56%]" />
+        <Puff className="bottom-[10%] left-[48%] h-[66%] w-[56%]" />
+        <Puff className="bottom-0 left-[8%] h-[46%] w-[86%]" />
       </span>
       {/* mitad derecha */}
       <span className={`absolute inset-y-0 right-0 w-[62%] ${der}`}>
-        <Puff className="bottom-0 right-[2%] h-[60%] w-[60%]" />
-        <Puff className="bottom-[4%] right-[26%] h-[84%] w-[60%]" />
-        <Puff className="bottom-[8%] right-[54%] h-[56%] w-[50%]" />
-        <span
-          className="absolute bottom-[-6%] right-[6%] h-[46%] w-[92%] rounded-[50%] blur-[6px]"
-          style={{ background: "rgba(255,255,255,0.85)" }}
-        />
+        <Puff className="bottom-[6%] right-[0%] h-[62%] w-[58%]" />
+        <Puff className="bottom-[16%] right-[20%] h-[76%] w-[58%]" />
+        <Puff className="bottom-[10%] right-[48%] h-[64%] w-[54%]" />
+        <Puff className="bottom-0 right-[8%] h-[44%] w-[86%]" />
       </span>
+
       {/* brillo mágico sutil */}
       <span
         className="absolute inset-x-[8%] top-[10%] h-[40%] rounded-[50%] blur-[10px]"
