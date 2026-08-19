@@ -443,13 +443,13 @@ export function Combate({
       className={`fixed inset-0 z-40 overflow-hidden ${shake ? "screen-shake" : micro ? "micro-shake" : ""}`}
       style={{ touchAction: "manipulation" }}
     >
-      {/* El mismo mapa, con la cámara ampliada sobre esta zona */}
+      {/* escenario de batalla propio de este guardián */}
       <div
-        className="battle-zoom absolute inset-0"
+        className="scene-in absolute inset-0"
         style={{
-          backgroundImage: `url(${mapaFondo})`,
+          backgroundImage: `url(${getBattleBackground(area.guardian)})`,
           backgroundSize: "cover",
-          backgroundPosition: `${area.x}% ${area.y}%`,
+          backgroundPosition: "center bottom",
         }}
         aria-hidden="true"
       />
