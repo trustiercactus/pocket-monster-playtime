@@ -4,7 +4,7 @@ import { GEM_ZONES, type Area } from "@/lib/areas";
 import { GuardianSprite } from "@/components/GuardianSprite";
 import { LiveSprite } from "@/components/LiveSprite";
 import { Gema } from "@/components/Gema";
-import mapaFondo from "@/assets/mapa-vertical.jpg";
+import { getBattleBackground } from "@/lib/battle-scenes";
 import { narrar, playMusic, sfx, musicPause } from "@/lib/audio";
 
 const MAX_HP = 5;
@@ -443,13 +443,13 @@ export function Combate({
       className={`fixed inset-0 z-40 overflow-hidden ${shake ? "screen-shake" : micro ? "micro-shake" : ""}`}
       style={{ touchAction: "manipulation" }}
     >
-      {/* El mismo mapa, con la cámara ampliada sobre esta zona */}
+      {/* escenario de batalla propio de este guardián */}
       <div
-        className="battle-zoom absolute inset-0"
+        className="scene-in absolute inset-0"
         style={{
-          backgroundImage: `url(${mapaFondo})`,
+          backgroundImage: `url(${getBattleBackground(area.guardian)})`,
           backgroundSize: "cover",
-          backgroundPosition: `${area.x}% ${area.y}%`,
+          backgroundPosition: "center bottom",
         }}
         aria-hidden="true"
       />
