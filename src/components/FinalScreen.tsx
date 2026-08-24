@@ -3,7 +3,7 @@ import { getCreature, LEGENDARY_ID } from "@/lib/creatures";
 import { GEM_ZONES } from "@/lib/areas";
 import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
-import { narrar, playMusic, sfx } from "@/lib/audio";
+import { playMusic, sfx } from "@/lib/audio";
 
 function Fireworks() {
   const colors = ["#ffd54a", "#ff6b6b", "#4ade80", "#38bdf8", "#c084fc"];
@@ -60,7 +60,6 @@ export function FinalScreen({
     sfx("celebracion");
     sfx("confeti");
     const fw = window.setInterval(() => sfx("fuego"), 2600);
-    void narrar("¡Lo has conseguido! ¡Has salvado a todas las Criaturitas!", { once: "final", delay: 500 });
     const t1 = window.setTimeout(() => setPhase(1), 1600); // guardianes
     const t2 = window.setTimeout(() => setPhase(2), 4200); // primer mensaje
     const t3 = window.setTimeout(() => setPhase(3), 7600); // segundo mensaje + botones

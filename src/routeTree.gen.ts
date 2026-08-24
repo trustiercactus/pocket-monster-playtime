@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ColeccionRouteImport } from './routes/coleccion'
 import { Route as JugarRouteImport } from './routes/jugar'
-import { Route as ApiNarradorRouteImport } from './routes/api/narrador'
+import { Route as PrivacidadRouteImport } from './routes/privacidad'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,9 +29,9 @@ const JugarRoute = JugarRouteImport.update({
   path: '/jugar',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiNarradorRoute = ApiNarradorRouteImport.update({
-  id: '/api/narrador',
-  path: '/api/narrador',
+const PrivacidadRoute = PrivacidadRouteImport.update({
+  id: '/privacidad',
+  path: '/privacidad',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -39,34 +39,34 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/coleccion': typeof ColeccionRoute
   '/jugar': typeof JugarRoute
-  '/api/narrador': typeof ApiNarradorRoute
+  '/privacidad': typeof PrivacidadRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/coleccion': typeof ColeccionRoute
   '/jugar': typeof JugarRoute
-  '/api/narrador': typeof ApiNarradorRoute
+  '/privacidad': typeof PrivacidadRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/coleccion': typeof ColeccionRoute
   '/jugar': typeof JugarRoute
-  '/api/narrador': typeof ApiNarradorRoute
+  '/privacidad': typeof PrivacidadRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/coleccion' | '/jugar' | '/api/narrador'
+  fullPaths: '/' | '/coleccion' | '/jugar' | '/privacidad'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/coleccion' | '/jugar' | '/api/narrador'
-  id: '__root__' | '/' | '/coleccion' | '/jugar' | '/api/narrador'
+  to: '/' | '/coleccion' | '/jugar' | '/privacidad'
+  id: '__root__' | '/' | '/coleccion' | '/jugar' | '/privacidad'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ColeccionRoute: typeof ColeccionRoute
   JugarRoute: typeof JugarRoute
-  ApiNarradorRoute: typeof ApiNarradorRoute
+  PrivacidadRoute: typeof PrivacidadRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -92,11 +92,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JugarRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/narrador': {
-      id: '/api/narrador'
-      path: '/api/narrador'
-      fullPath: '/api/narrador'
-      preLoaderRoute: typeof ApiNarradorRouteImport
+    '/privacidad': {
+      id: '/privacidad'
+      path: '/privacidad'
+      fullPath: '/privacidad'
+      preLoaderRoute: typeof PrivacidadRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -106,18 +106,17 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ColeccionRoute: ColeccionRoute,
   JugarRoute: JugarRoute,
-  ApiNarradorRoute: ApiNarradorRoute,
+  PrivacidadRoute: PrivacidadRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
+import type { createStart } from '@tanstack/react-start'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

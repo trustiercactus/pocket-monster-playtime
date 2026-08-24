@@ -2,7 +2,6 @@
  * Motor de audio de Criaturitas.
  * - Música procedural por pantalla (xilófono, ukelele, flauta, campanas).
  * - Efectos de sonido suaves y simpáticos.
- * - Narrador con voz neuronal (TTS) y ducking automático de la música.
  */
 
 const OPTS_KEY = "criaturitas-opciones";
@@ -10,14 +9,12 @@ const OPTS_KEY = "criaturitas-opciones";
 export type Opciones = {
   musica: boolean;
   efectos: boolean;
-  narrador: boolean;
   vibracion: boolean;
 };
 
 export const OPTS_DEFAULT: Opciones = {
   musica: true,
   efectos: true,
-  narrador: true,
   vibracion: true,
 };
 
@@ -31,9 +28,9 @@ export function loadOpciones(): Opciones {
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<Opciones> & { sonidos?: boolean };
       opciones = {
-        ...OPTS_DEFAULT,
-        ...parsed,
+        musica: parsed.musica ?? true,
         efectos: parsed.efectos ?? parsed.sonidos ?? true,
+        vibracion: parsed.vibracion ?? true,
       };
     }
   } catch {
@@ -57,7 +54,6 @@ export function setOpcion(key: keyof Opciones, value: boolean) {
     if (value) resumeMusic();
     else stopMusic();
   }
-  if (key === "narrador" && !value) stopNarrator();
   listeners.forEach((l) => l(opciones));
 }
 
@@ -359,14 +355,6 @@ export function musicPause(ms = 500) {
   musicBus.gain.linearRampToValueAtTime(MUSIC_VOL, c.currentTime + ms / 1000 + 0.6);
 }
 
-function duck(on: boolean) {
-  const c = audio();
-  if (!c || !musicBus) return;
-  const target = on ? MUSIC_VOL * 0.22 : MUSIC_VOL;
-  musicBus.gain.cancelScheduledValues(c.currentTime);
-  musicBus.gain.setTargetAtTime(target, c.currentTime, on ? 0.08 : 0.35);
-}
-
 /* ------------------------------------------------------------------ */
 /* Efectos de sonido                                                   */
 /* ------------------------------------------------------------------ */
@@ -501,90 +489,6 @@ export function sfx(kind: Sfx) {
     } catch {
       /* sin vibración */
     }
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/* Narrador (voz neuronal)                                             */
-/* ------------------------------------------------------------------ */
-
-const voiceCache = new Map<string, string>();
-let current: HTMLAudioElement | null = null;
-let pending: number | null = null;
-const said = new Set<string>();
-
-export function stopNarrator() {
-  if (pending) {
-    window.clearTimeout(pending);
-    pending = null;
-  }
-  if (current) {
-    current.pause();
-    current = null;
-  }
-  duck(false);
-}
-
-/** el niño siempre manda: al tocar cualquier botón, el narrador calla */
-if (typeof window !== "undefined") {
-  window.addEventListener(
-    "pointerdown",
-    (e) => {
-      const t = e.target as HTMLElement | null;
-      if (t && t.closest("button,[role='button'],a")) stopNarrator();
-    },
-    { capture: true, passive: true },
-  );
-}
-
-/**
- * Narra una frase con voz neuronal cálida.
- * `once` evita repetir la misma frase en la misma sesión.
- * `delay` espera a que termine la animación antes de hablar (300-500 ms).
- */
-export async function narrar(text: string, opts: { once?: string; delay?: number } = {}) {
-  if (!opciones.narrador || typeof window === "undefined") return;
-  if (opts.once) {
-    if (said.has(opts.once)) return;
-    said.add(opts.once);
-  }
-  if (opts.delay && opts.delay > 0) {
-    const ms = opts.delay;
-    const { delay: _d, ...rest } = opts;
-    if (pending) window.clearTimeout(pending);
-    pending = window.setTimeout(() => {
-      pending = null;
-      void narrar(text, rest);
-    }, ms);
-    return;
-  }
-  try {
-    let url = voiceCache.get(text);
-    if (!url) {
-      const res = await fetch("/api/narrador", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-      if (!res.ok) throw new Error(String(res.status));
-      const blob = await res.blob();
-      url = URL.createObjectURL(blob);
-      voiceCache.set(text, url);
-    }
-    if (!opciones.narrador) return;
-    stopNarrator();
-    const el = new Audio(url);
-    el.volume = 1;
-    current = el;
-    duck(true);
-    el.onended = () => {
-      if (current === el) current = null;
-      duck(false);
-    };
-    el.onerror = () => duck(false);
-    await el.play().catch(() => duck(false));
-  } catch {
-    duck(false);
   }
 }
 

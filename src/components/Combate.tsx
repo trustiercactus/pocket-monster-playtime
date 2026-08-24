@@ -5,7 +5,7 @@ import { GuardianSprite } from "@/components/GuardianSprite";
 import { LiveSprite } from "@/components/LiveSprite";
 import { Gema } from "@/components/Gema";
 import { getBattleBackground } from "@/lib/battle-scenes";
-import { narrar, playMusic, sfx, musicPause } from "@/lib/audio";
+import { playMusic, sfx, musicPause } from "@/lib/audio";
 
 const MAX_HP = 5;
 const SUPER_CHARGE = 3;
@@ -65,12 +65,6 @@ function attackIcon(c: Creature, area: Area): string {
       return "⚡";
   }
 }
-
-/** el narrador habla siempre DESPUÉS de la animación, con una pequeña pausa */
-function speak(text: string, delay = 400) {
-  void narrar(text, { delay });
-}
-
 
 function boom(strong: boolean) {
   sfx(strong ? "super" : "ataque");
@@ -417,7 +411,6 @@ export function Combate({
     }
     later(() => {
       setEnding(2); // sonríe y brilla
-      speak(area.boss ? "¡Muy bien! ¡Has salvado el Reino!" : "¡Muy bien! ¡Ya es tu amiga!");
     }, 900);
     later(() => setEnding(3), 2100); // desaparece entre partículas de luz
     if (area.boss) {

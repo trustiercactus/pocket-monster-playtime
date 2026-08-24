@@ -7,6 +7,7 @@ export const getRouter = () => {
 
   const router = createRouter({
     routeTree,
+    basepath: "/pocket-monster-playtime",
     context: { queryClient },
     scrollRestoration: true,
     defaultPreloadStaleTime: 0,

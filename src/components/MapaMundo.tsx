@@ -7,7 +7,6 @@ import legendariaImg from "@/assets/legendaria.png";
 import { Gema, type GemCut } from "@/components/Gema";
 import { Mundo } from "@/components/Mundo";
 import {
-  narrar,
   playMusic,
   musicPause,
   sfx,
@@ -15,11 +14,6 @@ import {
   setOpcion,
   loadOpciones,
 } from "@/lib/audio";
-
-
-function say(text: string, once?: string) {
-  void narrar(text, once ? { once, delay: 400 } : { delay: 400 });
-}
 
 /** Hueco de corona: cavidad blanca 3D que espera SU esmeralda */
 function GemSocket({
@@ -299,7 +293,6 @@ function NubeGuardian({ abriendo, boss }: { abriendo: boolean; boss?: boolean | 
 
 
 export function MapaMundo({
-  name,
   zonesDone,
   legendary,
   wonZone,
@@ -309,7 +302,6 @@ export function MapaMundo({
   onSettings,
   onLegendary,
 }: {
-  name: string;
   zonesDone: string[];
   legendary: boolean;
   /** zona recién completada: al volver del combate se anima el camino desde ella */
@@ -350,7 +342,6 @@ export function MapaMundo({
     if (!added) return;
     setJustFilled(added);
     sfx("esmeralda");
-    void narrar("¡Has conseguido una nueva esmeralda!", { delay: 450 });
     const t = setTimeout(() => setJustFilled(null), 1200);
     return () => clearTimeout(t);
   }, [zonesDone]);
@@ -372,7 +363,7 @@ export function MapaMundo({
 
   useEffect(() => {
     const o = loadOpciones();
-    setSound(o.musica || o.efectos || o.narrador);
+    setSound(o.musica || o.efectos);
     playMusic("mapa");
   }, []);
 
@@ -458,11 +449,7 @@ export function MapaMundo({
       }, 4600),
     );
     ts.push(
-      setTimeout(() => {
-        setTrailFrom(null);
-        if (nextZone)
-          void narrar(`¡El camino está abierto! Toca ${nextZone.name}.`, { delay: 200 });
-      }, 5600),
+      setTimeout(() => setTrailFrom(null), 5600),
     );
     /* la nube tarda 1,4s en desvanecerse; medio segundo después llega la mano */
     ts.push(setTimeout(() => setHandOn(true), 6500));
@@ -482,23 +469,12 @@ export function MapaMundo({
   const mundoArea = AREAS.find((a) => a.id === focusId) ?? nextZone ?? AREAS[0]!;
 
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      if (nextZone && vista === "mundo")
-        say(`¡Vamos ${name}! Bienvenido a ${nextZone.name}.`, `zona-${nextZone.id}`);
-    }, 3400);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nextZone?.id, vista]);
-
-
   const toggleSound = () => {
     const next = !sound;
     setSound(next);
-    (["musica", "efectos", "narrador"] as const).forEach((k) => setOpcion(k, next));
+    (["musica", "efectos"] as const).forEach((k) => setOpcion(k, next));
     if (next) {
       playMusic("mapa");
-      if (nextZone) say(`¡Vamos a ${nextZone.name}!`);
     }
   };
 
@@ -599,7 +575,6 @@ export function MapaMundo({
                   onClick={() => {
                     if (!open) return;
                     sfx("tap");
-                    if (a.boss) void narrar("¡Ha llegado el momento de salvar el Reino!", { delay: 400 });
                     irAlMundo(a.id);
                   }}
                   aria-label={open ? a.name : `${a.name} bloqueada`}
@@ -877,7 +852,6 @@ function Cinematica({ onDone }: { onDone: () => void }) {
       }, 4600),
       setTimeout(() => {
         setFase(4);
-        say("¡Increíble! ¡Has despertado a Aurora!");
       }, 5900),
     ];
     return () => ts.forEach(clearTimeout);

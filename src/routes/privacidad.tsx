@@ -57,17 +57,12 @@ function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="text-xl font-bold">3. Narraciones de voz</h2>
+            <h2 className="text-xl font-bold">3. Conexiones técnicas</h2>
             <p className="mt-2">
-              Para generar algunas narraciones de voz, determinadas frases internas del juego se
-              envían mediante una conexión segura HTTPS a Lovable AI Gateway. Estas frases forman
-              parte del contenido de Criaturitas y no incluyen el nombre elegido por el jugador ni
-              otros datos personales.
-            </p>
-            <p className="mt-2">
-              Al realizar esta conexión puede existir el procesamiento técnico de red estrictamente
-              necesario para prestar el servicio, como la transmisión de la solicitud y de los
-              datos técnicos asociados a la conexión.
+              Criaturitas no envía el nombre del jugador, el progreso ni las preferencias a un
+              servidor. Al acceder a la página puede existir el procesamiento técnico de red
+              estrictamente necesario para servir sus archivos, como la dirección IP y los datos
+              técnicos asociados a la conexión.
             </p>
           </section>
 

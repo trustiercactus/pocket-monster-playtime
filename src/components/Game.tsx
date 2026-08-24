@@ -18,7 +18,7 @@ import { randomEgg, type Egg } from "@/lib/eggs";
 import { LiveSprite } from "@/components/LiveSprite";
 import trainerImg from "@/assets/trainer.png";
 import fondoImg from "@/assets/portada-fondo.jpg";
-import { narrar, playMusic, sfx, loadOpciones } from "@/lib/audio";
+import { playMusic, sfx, loadOpciones } from "@/lib/audio";
 
 export type Progress = {
   name: string;
@@ -178,7 +178,6 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
     return (
       <main className="relative h-[100dvh] w-full overflow-hidden bg-sky">
         <MapaMundo
-          name={progress.name}
           zonesDone={progress.zonesDone}
           legendary={progress.legendary}
           wonZone={wonZone}
@@ -203,7 +202,7 @@ export function Game({ initialScreen = "mapa" }: { initialScreen?: Screen } = {}
             setScreen("casa");
           }}
           onSettings={() => {
-            window.location.href = "/";
+            window.location.href = import.meta.env.BASE_URL;
           }}
           onLegendary={() => {
             save({
@@ -458,9 +457,6 @@ function Elegir({
   onBack: () => void;
 }) {
   const owned = COLLECTION.filter((c) => progress.unlocked.includes(c.id));
-  useEffect(() => {
-    void narrar("¡Elige a tu Criaturita!", { once: "elegir", delay: 450 });
-  }, []);
   // en el combate final, la legendaria va primero y ya viene elegida
   const mine = area.boss
     ? [...owned].sort((a, b) => Number(!!b.legendary) - Number(!!a.legendary))
@@ -519,12 +515,6 @@ function Captura({ creature, onClose }: { creature: Creature; onClose: () => voi
   useEffect(() => {
     sfx(creature.legendary ? "aurora" : "desbloqueo");
     sfx("confeti");
-    void narrar(
-      creature.legendary
-        ? "¡Increíble! ¡Has despertado a Aurora!"
-        : `¡${creature.name} ya es tu amiga!`,
-      { delay: 700 },
-    );
   }, [creature]);
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-ink/70 px-6">

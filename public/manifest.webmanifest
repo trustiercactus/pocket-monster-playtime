@@ -2,16 +2,16 @@
   "name": "Criaturitas Beta",
   "short_name": "Criaturitas Beta",
   "description": "Versión Beta de Criaturitas: explora zonas, libera guardianes y consigue las esmeraldas.",
-  "id": "/?app=criaturitas-beta",
-  "start_url": "/?app=criaturitas-beta&mode=standalone",
-  "scope": "/",
+  "id": "/pocket-monster-playtime/?app=criaturitas-beta",
+  "start_url": "/pocket-monster-playtime/?app=criaturitas-beta&mode=standalone",
+  "scope": "/pocket-monster-playtime/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#29b6f6",
   "theme_color": "#29b6f6",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "/pocket-monster-playtime/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/pocket-monster-playtime/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/pocket-monster-playtime/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }
